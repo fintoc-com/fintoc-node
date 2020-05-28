@@ -30,6 +30,20 @@ module.exports = class Fintoc {
     this.delete = this._request('delete');
 
     this.linkHeaders = null;
+
+    this._nextFetcher = this._createFetcher();
+  }
+
+  * _createFetcher() {
+    let { next } = this.linkHeaders;
+    while (next) {
+      yield next;
+      next = this.linkHeaders.next;
+    }
+  }
+
+  fetchNext() {
+    return this._nextFetcher.next().value;
   }
 
   // eslint-disable-next-line class-methods-use-this
@@ -63,14 +77,6 @@ module.exports = class Fintoc {
       }
     }
     return wrapper;
-  }
-
-  * fetchNext() {
-    let { next } = this.linkHeaders;
-    while (next) {
-      yield next;
-      next = this.linkHeaders.next;
-    }
   }
 
   _getLink(linkToken) {
