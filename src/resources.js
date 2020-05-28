@@ -130,8 +130,7 @@ class Link extends ResourceMixin {
     createdAt,
     accounts = null,
     linkToken = null,
-    _client = null,
-  }) {
+  }, _client = null) {
     super();
     this.id = id;
     this.username = username;

@@ -88,7 +88,7 @@ module.exports = class Fintoc {
   _buildLink(data) {
     const param = pick(data, 'link_token');
     this._client.defaults.params = { ...this._client.defaults.params, param };
-    return Link({ ...data, _client: this });
+    return Link(data, this);
   }
 
   async getLink(linkToken) {
