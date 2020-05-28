@@ -1,4 +1,5 @@
 const fieldsubs = [['id', 'id_'], ['type', 'type_']];
+const invertedFieldsubs = [['id_', 'id'], ['type_', 'type']];
 
 /**
  * Get a flat array out of an array of arrays.
@@ -78,6 +79,7 @@ const snakeToPascal = (string) => string.toLowerCase().split('_').map((word) => 
 
 module.exports = {
   fieldsubs,
+  invertedFieldsubs,
   flatten,
   pick,
   pluralize,

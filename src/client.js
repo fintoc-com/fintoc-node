@@ -1,6 +1,7 @@
 const axios = require('axios');
 const linkHeaderParser = require('parse-link-header');
 
+const { Link } = require('./resources');
 const {
   fieldsubs, pick, renameProperties, snakeToPascal,
 } = require('./utils');
@@ -87,7 +88,7 @@ module.exports = class Fintoc {
   _buildLink(data) {
     const param = pick(data, 'link_token');
     this._client.defaults.params = { ...this._client.defaults.params, param };
-    // COMPLETE BY RETURNING THE LINK OBJECT
+    return Link({ ...data, _client: this });
   }
 
   async getLink(linkToken) {
