@@ -19,7 +19,7 @@ const flatten = (sequence) => [].concat(...sequence);
  * @param {string} property Property to get from the object
  * @returns {Object}
  */
-const pick = (object, property) => (property in object ? object[property] : {});
+const pick = (object, property) => (property in object ? { [property]: object[property] } : {});
 
 /**
  * Get a pluralized noun with its appropriate quantifier.

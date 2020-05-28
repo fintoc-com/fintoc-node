@@ -1,5 +1,9 @@
 {
   "extends": "airbnb-base",
+  "env": {
+    "node": true,
+    "mocha": true
+  },
   "rules": {
     "func-names": "off",
     "no-underscore-dangle": "off",
