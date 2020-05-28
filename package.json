@@ -1,0 +1,24 @@
+{
+  "name": "fintoc-node",
+  "version": "0.0.1",
+  "description": "The official Node client for the Fintoc API.",
+  "author": "Daniel Leal <dlleal@uc.cl>",
+  "license": "UNLICENSED",
+  "main": "./index.js",
+  "scripts": {
+    "test": "./node_modules/.bin/mocha --reporter spec --timeout 4000",
+    "lint": "./node_modules/.bin/eslint ./src index.js",
+    "lint-fix": "./node_modules/.bin/eslint --fix ./src index.js"
+  },
+  "dependencies": {
+    "axios": "^0.19.2",
+    "parse-link-header": "^1.0.1"
+  },
+  "devDependencies": {
+    "eslint": "^7.0.0",
+    "eslint-config-airbnb": "^18.1.0",
+    "eslint-config-airbnb-base": "^14.1.0",
+    "eslint-plugin-import": "^2.20.2",
+    "mocha": "^7.2.0"
+  }
+}
