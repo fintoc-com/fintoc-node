@@ -1,6 +1,7 @@
 # Fintoc meets Node
 
 [![Version](https://img.shields.io/npm/v/fintoc.svg)](https://www.npmjs.org/package/fintoc)
+[![Try on RunKit](https://badge.runkitcdn.com/fintoc.svg)](https://runkit.com/npm/fintoc)
 
 You have just found the [Node](https://nodejs.org/en/)-flavored client of [Fintoc](https://fintoc.com). It mainly consists of a port (more of a carbon copy, really) of [fintoc-python](https://github.com/fintoc-com/fintoc-python).
 
