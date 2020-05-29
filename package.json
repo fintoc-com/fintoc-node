@@ -1,6 +1,6 @@
 {
-  "name": "fintoc-node",
-  "version": "0.0.1",
+  "name": "fintoc",
+  "version": "0.1.0",
   "description": "The official Node client for the Fintoc API.",
   "author": "Daniel Leal <dlleal@uc.cl>",
   "license": "BSD-3-Clause",
