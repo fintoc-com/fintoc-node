@@ -46,22 +46,24 @@ class ResourceMixin {
 }
 
 class Movement extends ResourceMixin {
+  /* eslint-disable camelcase */
   constructor({
     id_,
     amount,
     currency,
     description,
-    postDate,
-    transactionDate,
+    post_date,
+    transaction_date,
   }) {
     super();
     this.id_ = id_;
     this.amount = amount;
     this.currency = currency;
     this.description = description;
-    this.postDate = Date(postDate);
-    this.transactionDate = transactionDate && Date(postDate);
+    this.postDate = post_date && new Date(post_date);
+    this.transactionDate = transaction_date && new Date(transaction_date);
   }
+  /* eslint-enable camelcase */
 
   get localDate() {
     return this.postDate.toLocaleDateString();
@@ -89,8 +91,7 @@ class Balance extends ResourceMixin {
     return `${this.available.toLocaleString()} / ${this.current.toLocaleString()}`;
   }
 
-  // eslint-disable-next-line class-methods-use-this
-  _getId() {
+  static _getId() {
     if (!this._idGenerator) {
       this._idGenerator = 1;
     } else {
@@ -118,13 +119,14 @@ class Institution extends ResourceMixin {
 }
 
 class Account extends ResourceMixin {
+  /* eslint-disable camelcase */
   constructor({
     id_,
     name,
-    officialName,
+    official_name,
     number,
-    holderId,
-    holderName,
+    holder_id,
+    holder_name,
     type_,
     currency,
     balance = null,
@@ -133,13 +135,13 @@ class Account extends ResourceMixin {
     super();
     this.id_ = id_;
     this.name = name;
-    this.officialName = officialName;
+    this.officialName = official_name;
     this.number = number;
-    this.holderId = holderId;
-    this.holderName = holderName;
+    this.holderId = holder_id;
+    this.holderName = holder_name;
     this.type_ = type_;
     this.currency = currency;
-    this.balance = balance ? Balance(balance) : null;
+    this.balance = balance ? new Balance(balance) : null;
     this.movements = movements || [];
     this._client = _client;
 
@@ -153,6 +155,7 @@ class Account extends ResourceMixin {
       },
     });
   }
+  /* eslint-enable camelcase */
 
   get length() {
     return this.movements.length || 0;
@@ -173,7 +176,7 @@ class Account extends ResourceMixin {
   }
 
   async getMovements(params) {
-    return (await this._getMovements(params)).map((movement) => Movement(movement));
+    return (await this._getMovements(params)).map((movement) => new Movement(movement));
   }
 
   async updateMovements(params) {
@@ -216,23 +219,24 @@ class Account extends ResourceMixin {
 }
 
 class Link extends ResourceMixin {
+  /* eslint-disable camelcase */
   constructor({
     id_,
     username,
-    holderType,
+    holder_type,
     institution,
-    createdAt,
+    created_at,
     accounts = null,
-    linkToken = null,
+    link_token = null,
   }, _client = null) {
     super();
     this.id_ = id_;
     this.username = username;
-    this.holderType = holderType;
+    this.holderType = holder_type;
     this.institution = new Institution(institution);
-    this.createdAt = Date.parse(createdAt);
+    this.createdAt = new Date(created_at);
     this.accounts = (accounts || []).map((data) => new Account(data, _client));
-    this.linkToken = linkToken;
+    this._token = link_token;
     this._client = _client;
 
     return new Proxy(this, {
@@ -245,6 +249,7 @@ class Link extends ResourceMixin {
       },
     });
   }
+  /* eslint-enable camelcase */
 
   get length() {
     return this.accounts.length || 0;
@@ -257,6 +262,10 @@ class Link extends ResourceMixin {
 
     const [[field, value]] = Object.entries(kwargs);
     return this.accounts.filter((account) => account[field] === value);
+  }
+
+  find(kwargs) {
+    return this.findAll(kwargs)[0] || null;
   }
 
   shouAccounts(rows = 5) {

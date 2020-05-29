@@ -11,7 +11,7 @@
     "lint-fix": "./node_modules/.bin/eslint --fix ./src index.js"
   },
   "dependencies": {
-    "axios": "^0.19.2",
+    "axios": "^0.18.1",
     "parse-link-header": "^1.0.1"
   },
   "devDependencies": {

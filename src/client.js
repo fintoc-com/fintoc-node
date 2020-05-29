@@ -37,13 +37,14 @@ module.exports = class Fintoc {
   * _createFetcher() {
     let { next } = this.linkHeaders;
     while (next) {
-      yield next;
+      // Yield next relative path
+      yield next.url.replace(`${SCHEME}${BASE_URL}`, '');
       next = this.linkHeaders.next;
     }
   }
 
-  fetchNext() {
-    return this._nextFetcher.next().value;
+  async fetchNext() {
+    return this.get(this._nextFetcher.next().value);
   }
 
   // eslint-disable-next-line class-methods-use-this
@@ -93,8 +94,8 @@ module.exports = class Fintoc {
 
   _buildLink(data) {
     const param = pick(data, 'link_token');
-    this._client.defaults.params = { ...this._client.defaults.params, param };
-    return Link(data, this);
+    this._client.defaults.params = { ...this._client.defaults.params, ...param };
+    return new Link(data, this);
   }
 
   async getLink(linkToken) {
