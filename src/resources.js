@@ -268,7 +268,7 @@ class Link extends ResourceMixin {
     return this.findAll(kwargs)[0] || null;
   }
 
-  shouAccounts(rows = 5) {
+  showAccounts(rows = 5) {
     function getRow(index, account) {
       return {
         '#': index,
