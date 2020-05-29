@@ -3,7 +3,7 @@
   "version": "0.0.1",
   "description": "The official Node client for the Fintoc API.",
   "author": "Daniel Leal <dlleal@uc.cl>",
-  "license": "UNLICENSED",
+  "license": "BSD-3-Clause",
   "main": "./index.js",
   "scripts": {
     "test": "./node_modules/.bin/mocha --reporter spec --timeout 4000",
