@@ -1,6 +1,6 @@
 # Fintoc for Node
 
-The Node client to interact with the [Fintoc](https://fintoc.com/) API. Mainly a port of [fintoc-python](https://github.com/fintoc-com/fintoc-python).
+The Node client to interact with the [Fintoc](https://fintoc.com/) API. It mainly consists of a port (more of a carbon copy, really) of [fintoc-python](https://github.com/fintoc-com/fintoc-python).
 
 ---
 
@@ -176,9 +176,9 @@ yarn test
 
 ## Roadmap
 
-- Add more docstrings
-- Add more unit tests
+- Document the library more thoroughly
+- Add **way** more unit tests
 
 ## Acknowledgements
 
-This library was initially written by [**@daleal**](https://github.com/daleal) as a port (carbon copy) of [**@nebil**](https://github.com/nebil)’s [fintoc-python](https://github.com/fintoc-com/fintoc-python), so compliments for design choices should somehow get to him.
+This library was initially written by [**@daleal**](https://github.com/daleal) as a port (carbon copy) of [@nebil](https://github.com/nebil)’s [fintoc-python](https://github.com/fintoc-com/fintoc-python), so compliments for design choices should somehow get to the designer of the original library.
