@@ -1,12 +1,20 @@
-# Fintoc for Node
+# Fintoc meets Node
 
-The Node client to interact with the [Fintoc](https://fintoc.com/) API. It mainly consists of a port (more of a carbon copy, really) of [fintoc-python](https://github.com/fintoc-com/fintoc-python).
+You have just found the [Node](https://nodejs.org/en/)-flavored client of [Fintoc](https://fintoc.com). It mainly consists of a port (more of a carbon copy, really) of [fintoc-python](https://github.com/fintoc-com/fintoc-python).
+
+## Why?
+
+You can think of [Fintoc API](https://fintoc.com/docs) as a piscola.
+And the key ingredient to a properly made piscola are the ice cubes.  
+Sure, you can still have a [piscola without ice cubes](https://curl.haxx.se/).
+But hey… that’s not enjoyable -- why would you do that?  
+Do yourself a favor: go grab some ice cubes by installing this refreshing library.
 
 ---
 
 ## Table of contents
 
-- [Fintoc for Node](#fintoc-for-node)
+- [Fintoc meets Node](#fintoc-meets-node)
   - [Table of contents](#table-of-contents)
   - [How to install](#how-to-install)
   - [Quickstart](#quickstart)
