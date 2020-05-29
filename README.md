@@ -74,7 +74,7 @@ client.getLink('link_token')
 
 // Or... you can pretty print all the accounts in a Link
 client.getLink('link_token')
-  .then((link) => link.showAccounts());
+  .then((link) => link.showAccounts())
   .catch(console.log);
 ```
 
