@@ -167,12 +167,12 @@ class Account extends ResourceMixin {
 
   async _getMovements(params) {
     const first = await this._client.get(`accounts/${this.id_}/movements`, params);
-    return first.concat(params ? flatten(await this._client.fetchNext()) : []);
+    return first.concat(params ? flatten(await this._client.fetchNext() || []) : []);
   }
 
   async updateBalance() {
-    const data = (await this._client._getAccount()).balance;
-    this.balance = Balance(data);
+    const data = (await this._getAccount()).balance;
+    this.balance = new Balance(data);
   }
 
   async getMovements(params) {

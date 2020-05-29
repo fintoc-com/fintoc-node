@@ -38,13 +38,13 @@ module.exports = class Fintoc {
     let { next } = this.linkHeaders;
     while (next) {
       // Yield next relative path
-      yield next.url.replace(`${SCHEME}${BASE_URL}`, '');
+      yield this.get(next.url.replace(`${SCHEME}${BASE_URL}`, ''));
       next = this.linkHeaders.next;
     }
   }
 
   async fetchNext() {
-    return this.get(this._nextFetcher.next().value);
+    return this._nextFetcher.next().value;
   }
 
   // eslint-disable-next-line class-methods-use-this
@@ -61,7 +61,7 @@ module.exports = class Fintoc {
         const response = await this._client.request({
           method,
           url: resource,
-          ...kwargs,
+          data: kwargs,
         });
 
         const content = (
