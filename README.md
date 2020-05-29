@@ -33,10 +33,10 @@ Install it with your favorite dependency manager.
 
 ```
 # Using npm
-npm add fintoc-node
+npm add fintoc
 
 # Using yarn
-yarn add fintoc-node
+yarn add fintoc
 ```
 
 ## Quickstart
@@ -46,7 +46,7 @@ yarn add fintoc-node
 3. Write a few lines of JavaScript to see your bank movements.
 
 ```js
-const Fintoc = require('fintoc-node');
+const Fintoc = require('fintoc');
 
 const client = new Fintoc('api_key');
 
@@ -68,7 +68,7 @@ This client supports all Fintoc API endpoints. For complete information about th
 ### Get accounts
 
 ```js
-const Fintoc = require('fintoc-node');
+const Fintoc = require('fintoc');
 
 const client = new Fintoc('api_key');
 
@@ -89,7 +89,7 @@ client.getLink('link_token')
 If you want to find a specific account in a link, you can use **find**. You can search by any account field:
 
 ```js
-const Fintoc = require('fintoc-node');
+const Fintoc = require('fintoc');
 
 const client = new Fintoc('api_key');
 
@@ -112,7 +112,7 @@ client.getLink('link_token')
 You can also search for multiple accounts matching a specific criteria with **findAll**:
 
 ```js
-const Fintoc = require('fintoc-node');
+const Fintoc = require('fintoc');
 
 const client = new Fintoc('api_key');
 
@@ -125,7 +125,7 @@ client.getLink('link_token')
 To update the account balance you can use **updateBalance**:
 
 ```js
-const Fintoc = require('fintoc-node');
+const Fintoc = require('fintoc');
 
 const client = new Fintoc('api_key');
 
@@ -138,7 +138,7 @@ client.getLink('link_token')
 ### Get movements
 
 ```js
-const Fintoc = require('fintoc-node');
+const Fintoc = require('fintoc');
 
 const client = new Fintoc('api_key');
 
