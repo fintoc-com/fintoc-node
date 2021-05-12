@@ -37,9 +37,14 @@ class ResourceMixin {
         if (typeof field === 'object' && field !== null && 'serialize' in field) {
           serialized[attr] = field.serialize();
         } else {
-          serialized[attr] = field;
+          if (typeof field === 'object' && field !== null && (attr === 'postDate' || attr === 'transactionDate')) {
+            serialized[attr] = field.toISOString();
+          } else {
+            serialized[attr] = field;
+          }
         }
       }
+
     });
     return invertedFieldsubs.reduce(renameProperties, serialized);
   }
