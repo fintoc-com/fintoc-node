@@ -1,24 +1,88 @@
 {
   "name": "fintoc",
-  "version": "0.1.0",
+  "version": "1.0.0",
   "description": "The official Node client for the Fintoc API.",
-  "author": "Daniel Leal <dlleal@uc.cl>",
+  "main": "build/main/index.js",
+  "typings": "build/main/index.d.ts",
+  "module": "build/module/index.js",
+  "repository": "https://github.com/fintoc-com/fintoc-node",
   "license": "BSD-3-Clause",
-  "main": "./index.js",
+  "author": "Daniel Leal <daniel@fintoc.com>",
+  "maintainers": [
+    "Daniel Leal <daniel@fintoc.com>"
+  ],
+  "keywords": [],
   "scripts": {
-    "test": "./node_modules/.bin/mocha --reporter spec --timeout 4000",
-    "lint": "./node_modules/.bin/eslint ./src index.js",
-    "lint-fix": "./node_modules/.bin/eslint --fix ./src index.js"
+    "build": "run-p build:*",
+    "build:main": "tsc -p tsconfig.json",
+    "build:module": "tsc -p tsconfig.module.json",
+    "lint": "eslint src --ext .ts",
+    "test": "nyc --silent ava",
+    "watch:build": "tsc -p tsconfig.json -w",
+    "watch:test": "nyc --silent ava --watch",
+    "cov": "run-p cov:*",
+    "cov:text": "nyc report --reporter=text",
+    "cov:cobertura": "nyc report --reporter=cobertura",
+    "doc": "run-s doc:html && open-cli build/docs/index.html",
+    "doc:html": "typedoc src/ --exclude **/*.spec.ts --target ES6 --mode file --out build/docs",
+    "doc:json": "typedoc src/ --exclude **/*.spec.ts --target ES6 --mode file --json build/docs/typedoc.json",
+    "doc:publish": "gh-pages -m \"[ci skip] Updates\" -d build/docs",
+    "version:get": "node -p \"require('./package.json').version\"",
+    "version": "standard-version"
+  },
+  "engines": {
+    "node": ">=10"
   },
   "dependencies": {
-    "axios": "^0.18.1",
-    "parse-link-header": "^1.0.1"
+    "@types/node": "^16.6.1",
+    "axios": "^0.21.1"
   },
   "devDependencies": {
-    "eslint": "^7.0.0",
-    "eslint-config-airbnb": "^18.1.0",
-    "eslint-config-airbnb-base": "^14.1.0",
-    "eslint-plugin-import": "^2.20.2",
-    "mocha": "^7.2.0"
+    "@ava/typescript": "^1.1.1",
+    "@istanbuljs/nyc-config-typescript": "^1.0.1",
+    "@typescript-eslint/eslint-plugin": "^4.0.1",
+    "@typescript-eslint/parser": "^4.0.1",
+    "ava": "^3.12.1",
+    "codecov": "^3.5.0",
+    "cspell": "^4.1.0",
+    "cz-conventional-changelog": "^3.3.0",
+    "eslint": "^7.8.0",
+    "eslint-config-airbnb-base": "^14.2.1",
+    "eslint-plugin-eslint-comments": "^3.2.0",
+    "eslint-plugin-import": "^2.24.0",
+    "gh-pages": "^3.1.0",
+    "npm-run-all": "^4.1.5",
+    "nyc": "^15.1.0",
+    "open-cli": "^6.0.1",
+    "standard-version": "^9.0.0",
+    "ts-node": "^9.0.0",
+    "typedoc": "^0.19.0",
+    "typescript": "^4.0.2"
+  },
+  "files": [
+    "build/main",
+    "build/module",
+    "!**/*.spec.*",
+    "!**/*.json",
+    "LICENSE.md",
+    "README.md"
+  ],
+  "ava": {
+    "failFast": true,
+    "timeout": "60s",
+    "typescript": {
+      "rewritePaths": {
+        "src/": "build/main/"
+      }
+    },
+    "files": [
+      "!build/module/**"
+    ]
+  },
+  "nyc": {
+    "extends": "@istanbuljs/nyc-config-typescript",
+    "exclude": [
+      "**/*.spec.js"
+    ]
   }
 }
