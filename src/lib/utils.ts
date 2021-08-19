@@ -13,3 +13,21 @@ export function singularize(rawString: string) {
 export function isISODate(rawDate: string) {
   return !Number.isNaN(Date.parse(rawDate));
 }
+
+/* eslint-disable @typescript-eslint/no-explicit-any */
+export function canRaiseHTTPError(
+  _: unknown, __: string, descriptor: TypedPropertyDescriptor<any>,
+) {
+  const newDescriptor = { ...descriptor };
+
+  newDescriptor.value = function wrapper(...args: any[]) {
+    try {
+      return descriptor.value.apply(this, args);
+    } catch (error) {
+      throw new Error('F');
+    }
+  };
+
+  return newDescriptor;
+}
+/* eslint-enable @typescript-eslint/no-explicit-any */
