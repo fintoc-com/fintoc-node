@@ -18,35 +18,31 @@ export function parseLinkHeaders(linkHeader: string) {
   return linkHeader.split(',').reduce(parseLink, {});
 }
 
-export async function request(methodParams: {
+export async function request({ client, path, params = {} }: {
   client: AxiosInstance,
   path: string,
   params?: Record<string, string>
 }) {
-  const { client, path, params } = methodParams;
-  const response = await client.request({ method: 'get', url: path, params });
+  const response = await client.request({ method: 'get', url: path, params: params || {} });
   const headers = parseLinkHeaders(response.headers.link);
   const next = headers && headers.next;
-  const elements = response.data();
+  const elements = response.data;
   return { next, elements };
 }
 
-export async function* paginate(methodParams: {
+export async function* paginate({ client, path, params = {} }: {
   client: AxiosInstance,
   path: string,
-  params: Record<string, string>
+  params?: Record<string, string>
 }) {
-  const { client, path, params } = methodParams;
   let response = await request({ client, path, params });
-  let { elements } = response;
   /* eslint-disable no-restricted-syntax, no-await-in-loop */
-  for (const element of elements) {
+  for (const element of response.elements) {
     yield element;
   }
   while (response.next) {
     response = await request({ client, path: response.next });
-    elements = response.elements;
-    for (const element of elements) {
+    for (const element of response.elements) {
       yield element;
     }
   }

@@ -1,4 +1,6 @@
-import axios, { AxiosInstance } from 'axios';
+import axios, { AxiosInstance, Method } from 'axios';
+
+import { paginate } from './paginator';
 
 export default class Client {
   baseUrl: string;
@@ -7,15 +9,14 @@ export default class Client {
   params: Record<string, string>;
   __client?: AxiosInstance;
 
-  constructor(constructorParams: {
+  constructor({
+    baseUrl, apiKey, userAgent, params = {},
+  }: {
     baseUrl: string,
     apiKey: string,
     userAgent: string,
     params?: Record<string, string>,
   }) {
-    const {
-      baseUrl, apiKey, userAgent, params,
-    } = constructorParams;
     this.baseUrl = baseUrl;
     this.apiKey = apiKey;
     this.userAgent = userAgent;
@@ -23,7 +24,7 @@ export default class Client {
     this.__client = undefined;
   }
 
-  get client() {
+  get _client() {
     if (this.__client === undefined) {
       this.__client = axios.create({
         baseURL: this.baseUrl,
@@ -38,7 +39,29 @@ export default class Client {
     return { Authorization: this.apiKey, 'User-Agent': this.userAgent };
   }
 
-  extend(extenderParams: {
+  async request({
+    path, paginated = false, method = 'get', params = {}, json = {},
+  }: {
+    path: string,
+    paginated: boolean,
+    method: Method,
+    params: Record<string, string>,
+    json: Record<string, string>,
+  }) {
+    if (paginated) {
+      return paginate({
+        client: this._client,
+        path,
+        params,
+      });
+    }
+    const response = await this._client.request({
+      method, url: path, params, data: json,
+    });
+    return response.data;
+  }
+
+  extend(extension?: {
     baseUrl?: string,
     apiKey?: string,
     userAgent?: string,
@@ -46,7 +69,7 @@ export default class Client {
   }) {
     const {
       baseUrl, apiKey, userAgent, params,
-    } = extenderParams;
+    } = (extension || {});
     return new Client({
       baseUrl: baseUrl || this.baseUrl,
       apiKey: apiKey || this.apiKey,
