@@ -19,6 +19,7 @@
     "import/prefer-default-export": "off",
     "@typescript-eslint/no-explicit-any": "off",
     "import/extensions": "off",
+    "no-restricted-syntax": ["error", "ForInStatement", "LabeledStatement", "WithStatement"],
     "import/no-extraneous-dependencies": [
       "error",
       {
