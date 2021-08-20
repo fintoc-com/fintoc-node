@@ -1,8 +1,8 @@
 import { GenericFunction } from '../../types';
-import Client from '../client';
+import { Client } from '../client';
 import { canRaiseHTTPError } from '../utils';
 
-export default abstract class ManagerMixin {
+export abstract class ManagerMixin {
   _path: string;
   _client: Client;
   _handlers: Record<string, GenericFunction>

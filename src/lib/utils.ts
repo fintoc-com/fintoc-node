@@ -14,7 +14,6 @@ export function isISODate(rawDate: string) {
   return !Number.isNaN(Date.parse(rawDate));
 }
 
-/* eslint-disable @typescript-eslint/no-explicit-any */
 export function canRaiseHTTPError(
   _: unknown, __: string, descriptor: TypedPropertyDescriptor<any>,
 ) {
@@ -30,4 +29,3 @@ export function canRaiseHTTPError(
 
   return newDescriptor;
 }
-/* eslint-enable @typescript-eslint/no-explicit-any */

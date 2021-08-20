@@ -1,8 +1,8 @@
-import Client from './client';
+import { Client } from './client';
 import { API_BASE_URL, API_VERSION } from './constants';
-import version from './version';
+import { version } from './version';
 
-export default class Fintoc {
+export class Fintoc {
   _client: Client;
 
   constructor(apiKey: string) {

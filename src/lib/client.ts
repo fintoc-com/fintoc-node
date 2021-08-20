@@ -2,7 +2,7 @@ import axios, { AxiosInstance, Method } from 'axios';
 
 import { paginate } from './paginator';
 
-export default class Client {
+export class Client {
   baseUrl: string;
   apiKey: string;
   userAgent: string;

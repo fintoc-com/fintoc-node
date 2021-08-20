@@ -1,5 +1,3 @@
-/* eslint-disable import/prefer-default-export */
+export * from './lib/core';
 
-import Fintoc from './lib/core';
-
-export { Fintoc };
+export * from './lib/mixins/resourceMixin';
