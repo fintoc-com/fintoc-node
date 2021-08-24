@@ -1,6 +1,10 @@
+import { IManagerMixinConstructor } from '../../interfaces';
 import { GenericFunction } from '../../types';
 import { Client } from '../client';
-import { canRaiseHTTPError } from '../utils';
+import { resourceAll, resourceCreate, resourceGet } from '../resourceHandlers';
+import { canRaiseHTTPError, getResourceClass } from '../utils';
+
+import { ResourceMixin } from './resourceMixin';
 
 export abstract class ManagerMixin {
   _path: string;
@@ -16,48 +20,92 @@ export abstract class ManagerMixin {
     this._handlers = {};
   }
 
-  @canRaiseHTTPError
-  all(args: Record<string, string>) {
-    return this;
+  private originatingClass() {
+    return this.constructor as unknown as IManagerMixinConstructor;
   }
 
   @canRaiseHTTPError
-  get(args: Record<string, string>) {
-    return this;
+  async all(
+    args?: Record<string, string>,
+  ): Promise<ResourceMixin[] | AsyncGenerator<ResourceMixin>> {
+    const innerArgs = args || {};
+    const klass = getResourceClass(this.originatingClass().resource);
+    const objects = await resourceAll(
+      this._client,
+      this._path,
+      klass,
+      this._handlers,
+      this.originatingClass().methods,
+      innerArgs,
+    );
+    return this.postAllHandler(objects, innerArgs);
   }
 
   @canRaiseHTTPError
-  create(args: Record<string, string>) {
-    return this;
+  async get(identifier: string, args?: Record<string, string>): Promise<ResourceMixin> {
+    const innerArgs = args || {};
+    const klass = getResourceClass(this.originatingClass().resource);
+    const object = await resourceGet(
+      this._client,
+      this._path,
+      identifier,
+      klass,
+      this._handlers,
+      this.originatingClass().methods,
+      innerArgs,
+    );
+    return this.postGetHandler(object, identifier, innerArgs);
   }
 
   @canRaiseHTTPError
-  update(args: Record<string, string>) {
-    return this;
+  async create(args?: Record<string, string>): Promise<ResourceMixin> {
+    const innerArgs = args || {};
+    const klass = getResourceClass(this.originatingClass().resource);
+    const object = await resourceCreate(
+      this._client,
+      this._path,
+      klass,
+      this._handlers,
+      this.originatingClass().methods,
+      innerArgs,
+    );
+    return this.postCreateHandler(object, innerArgs);
   }
 
   @canRaiseHTTPError
-  delete(args: Record<string, string>) {
-    return this;
+  async update(identifier: string, args?: Record<string, string>): Promise<ResourceMixin> {
+    const innerArgs = args || {};
+    const object = await this.get(identifier);
+    return object.update(innerArgs);
+  }
+
+  @canRaiseHTTPError
+  async delete(identifier: string, args?: Record<string, string>): Promise<string> {
+    const innerArgs = args || {};
+    const object = await this.get(identifier);
+    return object.delete(innerArgs);
   }
 
   /* eslint-disable class-methods-use-this, @typescript-eslint/no-unused-vars */
-  postAllHandler(objects: Record<string, unknown>[], args: Record<string, string>) {
+  postAllHandler(
+    objects: ResourceMixin[] | AsyncGenerator<ResourceMixin>,
+    args: Record<string, string>,
+  ) {
     return objects;
   }
 
   postGetHandler(
-    object: Record<string, unknown>, identifier: string, args: Record<string, string>,
+    object: ResourceMixin, identifier: string, args: Record<string, string>,
   ) {
     return object;
   }
 
-  postCreateHandler(object: Record<string, unknown>, args: Record<string, string>) {
+  postCreateHandler(object: ResourceMixin, args: Record<string, string>) {
     return object;
   }
 
   postUpdateHandler(
-    object: Record<string, unknown>, identifier: string, args: Record<string, string>,
+    object: ResourceMixin, identifier: string, args: Record<string, string>,
   ) {
     return object;
   }

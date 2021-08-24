@@ -6,7 +6,7 @@ export class Client {
   baseUrl: string;
   apiKey: string;
   userAgent: string;
-  params: Record<string, string>;
+  params: Record<string, any>;
   __client?: AxiosInstance;
 
   constructor({
@@ -43,10 +43,10 @@ export class Client {
     path, paginated = false, method = 'get', params = {}, json = {},
   }: {
     path: string,
-    paginated: boolean,
-    method: Method,
-    params: Record<string, string>,
-    json: Record<string, string>,
+    paginated?: boolean,
+    method?: Method,
+    params?: Record<string, any>,
+    json?: Record<string, string>,
   }) {
     if (paginated) {
       return paginate({
