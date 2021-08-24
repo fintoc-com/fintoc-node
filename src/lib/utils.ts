@@ -30,7 +30,7 @@ export function getErrorsModule() {
 }
 
 export function getResourceClass(snakeResourceName: string, value: any = {}) {
-  const klass = (value || {}).constructor;
+  const klass = value?.constructor;
   if (klass === Object) {
     const resourcesModule = getResourcesModule();
     const resourceName = snakeToPascal(snakeResourceName);
