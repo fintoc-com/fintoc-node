@@ -1,10 +1,12 @@
 import { IResourceMixinConstructor } from '../../interfaces';
 import { GenericFunction } from '../../types';
 import { Client } from '../client';
-/* eslint-disable-next-line import/no-cycle */
+/* eslint-disable import/no-cycle */
+import { resourceDelete, resourceUpdate } from '../resourceHandlers';
 import {
-  getResourceClass, objetize, serialize, singularize,
+  canRaiseHTTPError, getResourceClass, objetize, serialize, singularize,
 } from '../utils';
+/* eslint-enable import/no-cycle */
 
 export abstract class ResourceMixin {
   _client: Client;
@@ -60,5 +62,36 @@ export abstract class ResourceMixin {
       serialized = { ...serialized, [attribute]: element };
     });
     return serialized;
+  }
+
+  @canRaiseHTTPError
+  async update(args?: Record<string, string>): Promise<ResourceMixin> {
+    const innerArgs = args || {};
+    const id = this[this.originatingClass().resourceIdentifier];
+    let object = await resourceUpdate(
+      this._client,
+      this._path,
+      id,
+      this.constructor,
+      this._handlers,
+      this._methods,
+      innerArgs,
+    );
+    object = await this._handlers.update(object, id, innerArgs);
+    Object.assign(this, object);
+    return this;
+  }
+
+  @canRaiseHTTPError
+  async delete(args?: Record<string, string>): Promise<string> {
+    const innerArgs = args || {};
+    const id = this[this.originatingClass().resourceIdentifier];
+    await resourceDelete(
+      this._client,
+      this._path,
+      id,
+      innerArgs,
+    );
+    return this._handlers.delete(id, innerArgs);
   }
 }

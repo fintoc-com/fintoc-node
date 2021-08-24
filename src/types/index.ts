@@ -1,1 +1,1 @@
-export { GenericFunction } from './genericFunction';
+export * from './genericFunction';
