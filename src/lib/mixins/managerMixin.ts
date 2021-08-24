@@ -17,7 +17,10 @@ export abstract class ManagerMixin {
   constructor(path: string, client: Client) {
     this._path = path;
     this._client = client.extend();
-    this._handlers = {};
+    this._handlers = {
+      update: this.postUpdateHandler,
+      delete: this.postDeleteHandler,
+    };
   }
 
   private originatingClass() {
