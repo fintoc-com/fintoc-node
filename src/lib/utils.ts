@@ -2,6 +2,7 @@ import { IModule } from '../interfaces';
 import { GenericFunction } from '../types';
 
 import { Client } from './client';
+import * as errors from './errors';
 import * as resources from './resources';
 
 export function toTitle(rawString: string) {
@@ -24,6 +25,10 @@ export function getResourcesModule() {
   return resources as IModule;
 }
 
+export function getErrorsModule() {
+  return errors as IModule;
+}
+
 export function getResourceClass(snakeResourceName: string, value: any = {}) {
   const klass = (value || {}).constructor;
   if (klass === Object) {
@@ -37,16 +42,24 @@ export function getResourceClass(snakeResourceName: string, value: any = {}) {
   return klass;
 }
 
+export function getErrorClass(snakeErrorName: string) {
+  const errorsModule = getErrorsModule();
+  const errorName = snakeToPascal(snakeErrorName);
+  return errorsModule[errorName] || errorsModule.FintocError;
+}
+
 export function canRaiseHTTPError(
   _: unknown, __: string, descriptor: TypedPropertyDescriptor<any>,
 ) {
   const newDescriptor = { ...descriptor };
 
-  newDescriptor.value = function wrapper(...args: any[]) {
+  newDescriptor.value = async function wrapper(...args: any[]) {
     try {
-      return descriptor.value.apply(this, args);
-    } catch (error) {
-      throw new Error('F');
+      return await descriptor.value.apply(this, args);
+    } catch (exc) {
+      const errorData = exc.response.data;
+      const ErrorKlass = getErrorClass(errorData.error.type);
+      throw new ErrorKlass(errorData.error);
     }
   };
 
