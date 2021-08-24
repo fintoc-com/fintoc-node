@@ -26,7 +26,7 @@ export function getResourcesModule() {
 }
 
 export function getResourceClass(snakeResourceName: string, value: any = {}) {
-  const klass = value.constructor;
+  const klass = (value || {}).constructor;
   if (klass === Object) {
     const resourcesModule = getResourcesModule();
     const resourceName = snakeToPascal(snakeResourceName);
@@ -55,7 +55,7 @@ export function canRaiseHTTPError(
 }
 
 export function serialize(object: any) {
-  if (typeof object.serialize === 'function') {
+  if (typeof object?.serialize === 'function') {
     return object.serialize();
   }
   if (object?.constructor === Date) {
@@ -67,7 +67,7 @@ export function serialize(object: any) {
 export function objetize(
   Klass: any,
   client: Client,
-  data: Record<string, any> | null,
+  data: any,
   handlers: Record<string, GenericFunction> = {},
   methods: string[] = [],
   path: string | null = null,
@@ -75,7 +75,10 @@ export function objetize(
   if (data === null) {
     return null;
   }
-  if ([String, Number, Object, Boolean, Date].includes(Klass)) {
+  if ([String, Number, Object, Boolean].includes(Klass)) {
+    return Klass(data);
+  }
+  if (Klass === Date) {
     return new Klass(data);
   }
   return new Klass(client, handlers, methods, path, data);

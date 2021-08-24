@@ -2,7 +2,9 @@ import { IResourceMixinConstructor } from '../../interfaces';
 import { GenericFunction } from '../../types';
 import { Client } from '../client';
 /* eslint-disable-next-line import/no-cycle */
-import { getResourceClass, objetize, singularize } from '../utils';
+import {
+  getResourceClass, objetize, serialize, singularize,
+} from '../utils';
 
 export abstract class ResourceMixin {
   _client: Client;
@@ -45,5 +47,18 @@ export abstract class ResourceMixin {
       }
       this._attributes.push(key);
     });
+  }
+
+  serialize() {
+    let serialized = {};
+    this._attributes.forEach((attribute) => {
+      const element = (
+        Array.isArray(this[attribute])
+          ? this[attribute].map(serialize)
+          : serialize(this[attribute])
+      );
+      serialized = { ...serialized, [attribute]: element };
+    });
+    return serialized;
   }
 }
