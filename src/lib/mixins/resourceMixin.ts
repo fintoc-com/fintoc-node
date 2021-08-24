@@ -1,7 +1,8 @@
 import { IResourceMixinConstructor } from '../../interfaces';
 import { GenericFunction } from '../../types';
 import { Client } from '../client';
-import { singularize } from '../utils';
+/* eslint-disable-next-line import/no-cycle */
+import { getResourceClass, objetize, singularize } from '../utils';
 
 export abstract class ResourceMixin {
   _client: Client;
@@ -32,19 +33,17 @@ export abstract class ResourceMixin {
     this._attributes = [];
 
     Object.entries(data).forEach(([key, value]) => {
-      try {
-        const rawResource = this.originatingClass().mappings[key] || key;
-        if (Array.isArray(value)) {
-          const resource = singularize(rawResource);
-          const element = value.length > 0 ? value[0] : {};
-          this[key] = value;
-        } else {
-          this[key] = value;
-        }
-        this._attributes.push(key);
-      } catch (error) {
-        console.log('F');
+      const rawResource = this.originatingClass().mappings[key] || key;
+      if (Array.isArray(value)) {
+        const resource = singularize(rawResource);
+        const element = value.length > 0 ? value[0] : {};
+        const klass = getResourceClass(resource, element);
+        this[key] = value.map((x) => objetize(klass, client, x));
+      } else {
+        const klass = getResourceClass(rawResource, value);
+        this[key] = objetize(klass, client, value);
       }
+      this._attributes.push(key);
     });
   }
 }

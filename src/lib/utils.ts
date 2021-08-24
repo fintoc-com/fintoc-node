@@ -2,6 +2,8 @@ import { IModule } from '../interfaces';
 import { GenericFunction } from '../types';
 
 import { Client } from './client';
+/* eslint-disable-next-line import/no-cycle */
+import * as resources from './resources';
 
 export function toTitle(rawString: string) {
   return rawString[0].toUpperCase() + rawString.substr(1).toLowerCase();
@@ -20,16 +22,15 @@ export function isISODate(rawDate: string) {
 }
 
 export function getResourcesModule() {
-  /* eslint-disable-next-line import/no-cycle */
-  return import('./resources') as IModule;
+  return resources as IModule;
 }
 
-export async function getResourceClass(snakeResourceName: string, value: any = {}) {
+export function getResourceClass(snakeResourceName: string, value: any = {}) {
   const klass = value.constructor;
   if (klass === Object) {
-    const resources = await getResourcesModule();
+    const resourcesModule = getResourcesModule();
     const resourceName = snakeToPascal(snakeResourceName);
-    return resources[resourceName] || resources.GenericFintocResource;
+    return resourcesModule[resourceName] || resourcesModule.GenericFintocResource;
   }
   if ((klass === String) && isISODate(value)) {
     return Date;
