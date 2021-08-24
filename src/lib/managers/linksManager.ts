@@ -7,13 +7,13 @@ export class LinksManager extends ManagerMixin {
 
   postGetHandler(object: ResourceMixin, identifier: string, args: Record<string, string>) {
     object._client = this._client.extend({ params: { link_token: identifier } });
-    object._link_token = identifier;
+    object._linkToken = identifier;
     return object;
   }
 
   postUpdateHandler(object: ResourceMixin, identifier: string, args: Record<string, string>) {
     object._client = this._client.extend({ params: { link_token: identifier } });
-    object._link_token = identifier;
+    object._linkToken = identifier;
     return object;
   }
 }
