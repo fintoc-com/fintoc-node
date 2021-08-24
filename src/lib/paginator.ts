@@ -36,7 +36,7 @@ export async function* paginate({ client, path, params = {} }: {
   params?: Record<string, string>
 }) {
   let response = await request({ client, path, params });
-  /* eslint-disable no-restricted-syntax, no-await-in-loop */
+  /* eslint-disable no-await-in-loop */
   for (const element of response.elements) {
     yield element;
   }
@@ -46,5 +46,5 @@ export async function* paginate({ client, path, params = {} }: {
       yield element;
     }
   }
-  /* eslint-enable no-restricted-syntax, no-await-in-loop */
+  /* eslint-enable no-await-in-loop */
 }

@@ -2,7 +2,6 @@ import { IModule } from '../interfaces';
 import { GenericFunction } from '../types';
 
 import { Client } from './client';
-/* eslint-disable-next-line import/no-cycle */
 import * as resources from './resources';
 
 export function toTitle(rawString: string) {

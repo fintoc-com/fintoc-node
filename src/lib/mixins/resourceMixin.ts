@@ -1,12 +1,10 @@
 import { IResourceMixinConstructor } from '../../interfaces';
 import { GenericFunction } from '../../types';
 import { Client } from '../client';
-/* eslint-disable import/no-cycle */
 import { resourceDelete, resourceUpdate } from '../resourceHandlers';
 import {
   canRaiseHTTPError, getResourceClass, objetize, serialize, singularize,
 } from '../utils';
-/* eslint-enable import/no-cycle */
 
 export abstract class ResourceMixin {
   _client: Client;
