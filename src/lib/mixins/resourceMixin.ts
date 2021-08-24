@@ -37,17 +37,19 @@ export abstract class ResourceMixin {
     this._attributes = [];
 
     Object.entries(data).forEach(([key, value]) => {
-      const rawResource = this.originatingClass().mappings[key] || key;
-      if (Array.isArray(value)) {
-        const resource = singularize(rawResource);
-        const element = value.length > 0 ? value[0] : {};
-        const klass = getResourceClass(resource, element);
-        this[key] = value.map((x) => objetize(klass, client, x));
-      } else {
-        const klass = getResourceClass(rawResource, value);
-        this[key] = objetize(klass, client, value);
-      }
-      this._attributes.push(key);
+      try {
+        const rawResource = this.originatingClass().mappings[key] || key;
+        if (Array.isArray(value)) {
+          const resource = singularize(rawResource);
+          const element = value.length > 0 ? value[0] : {};
+          const klass = getResourceClass(resource, element);
+          this[key] = value.map((x) => objetize(klass, client, x));
+        } else {
+          const klass = getResourceClass(rawResource, value);
+          this[key] = objetize(klass, client, value);
+        }
+        this._attributes.push(key);
+      } catch { } /* eslint-disable-line no-empty */
     });
   }
 
