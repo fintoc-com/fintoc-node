@@ -40,5 +40,13 @@
       "error",
       { "ignoreDeclarationSort": true, "ignoreCase": true }
     ]
-  }
+  },
+  "overrides": [
+    {
+      "files": ["src/lib/resources/**.ts"],
+      "rules": {
+        "import/no-cycle": "off"
+      }
+    }
+  ]
 }
