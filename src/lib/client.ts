@@ -7,7 +7,7 @@ import { IRequestOptions } from '../interfaces/client/requestOptions';
 import { paginate } from './paginator';
 
 export class Client {
-  private _client?: AxiosInstance;
+  #client?: AxiosInstance;
 
   baseUrl: string;
   apiKey: string;
@@ -22,18 +22,18 @@ export class Client {
     this.apiKey = apiKey;
     this.userAgent = userAgent;
     this.params = params || {};
-    this._client = undefined;
+    this.#client = undefined;
   }
 
   private get client() {
-    if (this._client === undefined) {
-      this._client = axios.create({
+    if (this.#client === undefined) {
+      this.#client = axios.create({
         baseURL: this.baseUrl,
         headers: this.headers,
         params: this.params,
       });
     }
-    return this._client;
+    return this.#client;
   }
 
   get headers() {

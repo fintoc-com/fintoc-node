@@ -8,10 +8,13 @@ import { ResourceMixin } from '../mixins/resourceMixin';
 export class Link extends ResourceMixin {
   static resourceIdentifier = '_linkToken';
 
-  private _accountsManager?: AccountsManager;
-  private _subscriptionsManager?: SubscriptionsManager;
-  private _taxReturnsManager?: TaxReturnsManager;
-  private _invoicesManager?: InvoicesManager;
+  #accountsManager?: AccountsManager;
+  #subscriptionsManager?: SubscriptionsManager;
+  #taxReturnsManager?: TaxReturnsManager;
+  #invoicesManager?: InvoicesManager;
+
+  // @ts-ignore: declared but value is never used
+  private _linkToken?: string;
 
   constructor(
     client: Client,
@@ -21,19 +24,19 @@ export class Link extends ResourceMixin {
     data: Record<string, any>,
   ) {
     super(client, handlers, methods, path, data);
-    this._accountsManager = undefined;
-    this._subscriptionsManager = undefined;
-    this._taxReturnsManager = undefined;
-    this._invoicesManager = undefined;
+    this.#accountsManager = undefined;
+    this.#subscriptionsManager = undefined;
+    this.#taxReturnsManager = undefined;
+    this.#invoicesManager = undefined;
   }
 
   get accounts() {
-    if (this._accountsManager === undefined) {
-      this._accountsManager = new AccountsManager(
+    if (this.#accountsManager === undefined) {
+      this.#accountsManager = new AccountsManager(
         '/accounts', this._client,
       );
     }
-    return this._accountsManager;
+    return this.#accountsManager;
   }
 
   set accounts(newValue) { /* eslint-disable-line class-methods-use-this */
@@ -41,12 +44,12 @@ export class Link extends ResourceMixin {
   }
 
   get subscriptions() {
-    if (this._subscriptionsManager === undefined) {
-      this._subscriptionsManager = new SubscriptionsManager(
+    if (this.#subscriptionsManager === undefined) {
+      this.#subscriptionsManager = new SubscriptionsManager(
         '/subscriptions', this._client,
       );
     }
-    return this._subscriptionsManager;
+    return this.#subscriptionsManager;
   }
 
   set subscriptions(newValue) { /* eslint-disable-line class-methods-use-this */
@@ -54,12 +57,12 @@ export class Link extends ResourceMixin {
   }
 
   get taxReturns() {
-    if (this._taxReturnsManager === undefined) {
-      this._taxReturnsManager = new TaxReturnsManager(
+    if (this.#taxReturnsManager === undefined) {
+      this.#taxReturnsManager = new TaxReturnsManager(
         '/tax_returns', this._client,
       );
     }
-    return this._taxReturnsManager;
+    return this.#taxReturnsManager;
   }
 
   set taxReturns(newValue) { /* eslint-disable-line class-methods-use-this */
@@ -67,12 +70,12 @@ export class Link extends ResourceMixin {
   }
 
   get invoices() {
-    if (this._invoicesManager === undefined) {
-      this._invoicesManager = new InvoicesManager(
+    if (this.#invoicesManager === undefined) {
+      this.#invoicesManager = new InvoicesManager(
         '/invoices', this._client,
       );
     }
-    return this._invoicesManager;
+    return this.#invoicesManager;
   }
 
   set invoices(newValue) { /* eslint-disable-line class-methods-use-this */

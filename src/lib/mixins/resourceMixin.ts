@@ -10,15 +10,15 @@ export abstract class ResourceMixin {
   static mappings = {};
   static resourceIdentifier = 'id';
 
-  private _handlers: Record<string, GenericFunction>;
-  private _methods: string[];
-  private _path: string;
-  private _attributes: string[];
+  #handlers: Record<string, GenericFunction>;
+  #methods: string[];
+  #path: string;
+  #attributes: string[];
 
   _client: Client;
   [anyAttribute: string]: any;
 
-  private originatingClass() {
+  protected originatingClass() {
     return this.constructor as unknown as IResourceMixinConstructor;
   }
 
@@ -30,10 +30,10 @@ export abstract class ResourceMixin {
     data: Record<string, any>,
   ) {
     this._client = client;
-    this._handlers = handlers;
-    this._methods = methods;
-    this._path = path;
-    this._attributes = [];
+    this.#handlers = handlers;
+    this.#methods = methods;
+    this.#path = path;
+    this.#attributes = [];
 
     Object.entries(data).forEach(([key, value]) => {
       try {
@@ -47,14 +47,14 @@ export abstract class ResourceMixin {
           const klass = getResourceClass(rawResource, value);
           this[key] = objetize(klass, client, value);
         }
-        this._attributes.push(key);
+        this.#attributes.push(key);
       } catch { } /* eslint-disable-line no-empty */
     });
   }
 
   serialize() {
     let serialized = {};
-    this._attributes.forEach((attribute) => {
+    this.#attributes.forEach((attribute) => {
       const element = (
         Array.isArray(this[attribute])
           ? this[attribute].map(serialize)
@@ -71,14 +71,14 @@ export abstract class ResourceMixin {
     const id = this[this.originatingClass().resourceIdentifier];
     let object = await resourceUpdate(
       this._client,
-      this._path,
+      this.#path,
       id,
       this.constructor,
-      this._handlers,
-      this._methods,
+      this.#handlers,
+      this.#methods,
       innerArgs,
     );
-    object = await this._handlers.update(object, id, innerArgs);
+    object = await this.#handlers.update(object, id, innerArgs);
     Object.assign(this, object);
     return this;
   }
@@ -89,10 +89,10 @@ export abstract class ResourceMixin {
     const id = this[this.originatingClass().resourceIdentifier];
     await resourceDelete(
       this._client,
-      this._path,
+      this.#path,
       id,
       innerArgs,
     );
-    return this._handlers.delete(id, innerArgs);
+    return this.#handlers.delete(id, innerArgs);
   }
 }

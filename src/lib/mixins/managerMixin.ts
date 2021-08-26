@@ -10,21 +10,21 @@ export abstract class ManagerMixin {
   static resource: string;
   static methods: string[];
 
-  private _path: string;
-  private _handlers: Record<string, GenericFunction>
+  #path: string;
+  #handlers: Record<string, GenericFunction>
 
-  _client: Client;
+  protected _client: Client;
 
   constructor(path: string, client: Client) {
-    this._path = path;
+    this.#path = path;
     this._client = client.extend();
-    this._handlers = {
-      update: this.postUpdateHandler,
-      delete: this.postDeleteHandler,
+    this.#handlers = {
+      update: this.postUpdateHandler.bind(this),
+      delete: this.postDeleteHandler.bind(this),
     };
   }
 
-  private originatingClass() {
+  protected originatingClass() {
     return this.constructor as unknown as IManagerMixinConstructor;
   }
 
@@ -36,9 +36,9 @@ export abstract class ManagerMixin {
     const klass = getResourceClass(this.originatingClass().resource);
     const objects = await resourceAll(
       this._client,
-      this._path,
+      this.#path,
       klass,
-      this._handlers,
+      this.#handlers,
       this.originatingClass().methods,
       innerArgs,
     );
@@ -51,10 +51,10 @@ export abstract class ManagerMixin {
     const klass = getResourceClass(this.originatingClass().resource);
     const object = await resourceGet(
       this._client,
-      this._path,
+      this.#path,
       identifier,
       klass,
-      this._handlers,
+      this.#handlers,
       this.originatingClass().methods,
       innerArgs,
     );
@@ -67,9 +67,9 @@ export abstract class ManagerMixin {
     const klass = getResourceClass(this.originatingClass().resource);
     const object = await resourceCreate(
       this._client,
-      this._path,
+      this.#path,
       klass,
-      this._handlers,
+      this.#handlers,
       this.originatingClass().methods,
       innerArgs,
     );
