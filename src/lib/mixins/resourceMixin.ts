@@ -1,4 +1,4 @@
-import { IResourceMixinConstructor } from '../../interfaces';
+import { IResourceMixinConstructor } from '../../interfaces/mixins';
 import { GenericFunction } from '../../types';
 import { Client } from '../client';
 import { resourceDelete, resourceUpdate } from '../resourceHandlers';

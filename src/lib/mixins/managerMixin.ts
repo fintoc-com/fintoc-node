@@ -1,4 +1,4 @@
-import { IManagerMixinConstructor } from '../../interfaces';
+import { IManagerMixinConstructor } from '../../interfaces/mixins';
 import { GenericFunction } from '../../types';
 import { Client } from '../client';
 import { resourceAll, resourceCreate, resourceGet } from '../resourceHandlers';

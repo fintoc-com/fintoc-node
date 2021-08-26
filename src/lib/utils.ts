@@ -1,4 +1,4 @@
-import { IModule } from '../interfaces';
+import { IModule } from '../interfaces/module';
 import { GenericFunction } from '../types';
 
 import { Client } from './client';

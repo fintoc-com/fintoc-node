@@ -1,4 +1,4 @@
-import { AxiosInstance } from 'axios';
+import { IPaginationOptions } from '../interfaces/paginator';
 
 import { LINK_HEADER_PATTERN } from './constants';
 
@@ -31,11 +31,8 @@ export function parseLinkHeaders(linkHeader: string) {
   return linkHeader.split(',').reduce(parseLink, {});
 }
 
-export async function request({ client, path, params = {} }: {
-  client: AxiosInstance,
-  path: string,
-  params?: Record<string, string>
-}) {
+export async function request(options: IPaginationOptions) {
+  const { client, path, params = {} } = options;
   const response = await client.request({ method: 'get', url: path, params: params || {} });
   const headers = parseLinkHeaders(response.headers.link);
   const next = headers && headers.next;
@@ -43,11 +40,8 @@ export async function request({ client, path, params = {} }: {
   return { next, elements };
 }
 
-export async function* paginate({ client, path, params = {} }: {
-  client: AxiosInstance,
-  path: string,
-  params?: Record<string, string>
-}) {
+export async function* paginate(options: IPaginationOptions) {
+  const { client, path, params = {} } = options;
   let response = await request({ client, path, params });
   /* eslint-disable no-await-in-loop */
   for (const element of response.elements) {

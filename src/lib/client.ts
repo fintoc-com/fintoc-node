@@ -1,4 +1,8 @@
-import axios, { AxiosInstance, Method } from 'axios';
+import axios, { AxiosInstance } from 'axios';
+
+import { IConstructorOptions } from '../interfaces/client';
+import { IExtendOptions } from '../interfaces/client/extensionOptions';
+import { IRequestOptions } from '../interfaces/client/requestOptions';
 
 import { paginate } from './paginator';
 
@@ -9,14 +13,10 @@ export class Client {
   params: Record<string, any>;
   __client?: AxiosInstance;
 
-  constructor({
-    baseUrl, apiKey, userAgent, params = {},
-  }: {
-    baseUrl: string,
-    apiKey: string,
-    userAgent: string,
-    params?: Record<string, string>,
-  }) {
+  constructor(options: IConstructorOptions) {
+    const {
+      baseUrl, apiKey, userAgent, params = {},
+    } = options;
     this.baseUrl = baseUrl;
     this.apiKey = apiKey;
     this.userAgent = userAgent;
@@ -39,15 +39,10 @@ export class Client {
     return { Authorization: this.apiKey, 'User-Agent': this.userAgent };
   }
 
-  async request({
-    path, paginated = false, method = 'get', params = {}, json = {},
-  }: {
-    path: string,
-    paginated?: boolean,
-    method?: Method,
-    params?: Record<string, any>,
-    json?: Record<string, string>,
-  }) {
+  async request(options: IRequestOptions) {
+    const {
+      path, paginated = false, method = 'get', params = {}, json = {},
+    } = options;
     if (paginated) {
       return paginate({
         client: this._client,
@@ -61,12 +56,7 @@ export class Client {
     return response.data;
   }
 
-  extend(extension?: {
-    baseUrl?: string,
-    apiKey?: string,
-    userAgent?: string,
-    params?: Record<string, string>,
-  }) {
+  extend(extension?: IExtendOptions) {
     const {
       baseUrl, apiKey, userAgent, params,
     } = (extension || {});
