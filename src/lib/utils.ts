@@ -5,30 +5,71 @@ import { Client } from './client';
 import * as errors from './errors';
 import * as resources from './resources';
 
+/**
+ * Transform a string into title case.
+ *
+ * @param rawString - String to be transformed into a title
+ * @returns Transformed title string
+ */
 export function toTitle(rawString: string) {
   return rawString[0].toUpperCase() + rawString.substr(1).toLowerCase();
 }
 
+/**
+ * Transforms a snake-cased string into a pascal-cased one.
+ *
+ * @param snakeString - Snake-cased string to be transformed
+ * @returns Pascal-cased string
+ */
 export function snakeToPascal(snakeString: string) {
   return snakeString.split('_').map(toTitle).join('');
 }
 
+/**
+ * Remove the last 's' from a string if exists.
+ *
+ * @param rawString - String to be singularized
+ * @returns The singularized string
+ */
 export function singularize(rawString: string) {
   return rawString.replace(/s$/, '');
 }
 
+/**
+ * Tries to parse an ISO formatted string to check if it is parseable as a Date object.
+ *
+ * @param rawDate - ISO formatted string to be checked
+ * @returns A boolean that represents if `rawDate` is parseable as a Date object
+ */
 export function isISODate(rawDate: string) {
   return !Number.isNaN(Date.parse(rawDate));
 }
 
+/**
+ * Gets and returns the resources module interfaced as an IModule.
+ *
+ * @returns The resources module interfaced as an IModule
+ */
 export function getResourcesModule() {
   return resources as IModule;
 }
 
+/**
+ * Gets and returns the errors module interfaced as an IModule.
+ *
+ * @returns The errors module interfaced as an IModule
+ */
 export function getErrorsModule() {
   return errors as IModule;
 }
 
+/**
+ * Get the class corresponding to the the resource name and value.
+ *
+ * @param snakeResourceName - Name of the resource in snake case
+ * @param value - Value of the resource from which to get the corresponding class
+ * @returns The class corresponding to the resource
+ */
 export function getResourceClass(snakeResourceName: string, value: any = {}) {
   const klass = value?.constructor;
   if (klass === Object) {
@@ -42,12 +83,32 @@ export function getResourceClass(snakeResourceName: string, value: any = {}) {
   return klass;
 }
 
+/**
+ * Get the error corresponding to the error name.
+ *
+ * @param snakeErrorName - Name of the error in snake case
+ * @returns The class corresponding to the error
+ */
 export function getErrorClass(snakeErrorName: string) {
   const errorsModule = getErrorsModule();
   const errorName = snakeToPascal(snakeErrorName);
   return errorsModule[errorName] || errorsModule.FintocError;
 }
 
+/**
+ * Decorator designed for an instance method. It tries tp execute the function,
+ * catches exceptions and re-rises the adequate Fintoc exception.
+ *
+ * @example
+ * ```ts
+ * class SampleClass {
+ *   @canRaiseHTTPError
+ *   myFunction() {
+ *     console.log('This method is decorated by the function.');
+ *   }
+ * }
+ * ```
+ */
 export function canRaiseHTTPError(
   _: unknown, __: string, descriptor: TypedPropertyDescriptor<any>,
 ) {
@@ -66,6 +127,12 @@ export function canRaiseHTTPError(
   return newDescriptor;
 }
 
+/**
+ * Serializes an object.
+ *
+ * @param object - Object to be serialized
+ * @returns The serialized object (object with only JSON-serializable fields)
+ */
 export function serialize(object: any) {
   if (typeof object?.serialize === 'function') {
     return object.serialize();
@@ -76,6 +143,17 @@ export function serialize(object: any) {
   return object;
 }
 
+/**
+ * Wraps some data with a class.
+ *
+ * @param Klass - Class that will wrap the data
+ * @param client - The Client object passed to the newly created object
+ * @param data - The data that the new object will contain
+ * @param handlers - The post-request handlers
+ * @param methods - An array of the methods that the object can execute
+ * @param path - The path within the API server for the resource
+ * @returns The data wrapped on the corresponding class
+ */
 export function objetize(
   Klass: any,
   client: Client,
@@ -96,6 +174,17 @@ export function objetize(
   return new Klass(client, handlers, methods, path, data);
 }
 
+/**
+ * Wraps and yields some data (from a generator) with a class.
+ *
+ * @param generator - The generator that yields elements to be wrapped
+ * @param klass - Class that will wrap the data
+ * @param client - The Client object passed to the newly created objects
+ * @param handlers - The post-request handlers
+ * @param methods - An array of the methods that the objects can execute
+ * @param path - The path within the API server for the resource
+ * @returns A generator producing a sequence of data wrapped with the class
+ */
 export async function* objetizeGenerator(
   generator: AsyncGenerator<Record<string, any>>,
   klass: any,

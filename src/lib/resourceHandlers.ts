@@ -1,8 +1,22 @@
+import { AxiosResponse } from 'axios';
+
 import { GenericFunction } from '../types';
 
 import { Client } from './client';
+import { ResourceMixin } from './mixins';
 import { objetize, objetizeGenerator } from './utils';
 
+/**
+ * Fetch all instances of a resource.
+ *
+ * @param client - The Client object passed to the retrieved objects
+ * @param path - The path within the API server for the resource
+ * @param klass - Class that will wrap the instances of the resource
+ * @param handlers - The post-request handlers
+ * @param methods - An array of the methods that the objects can execute
+ * @param params - The parameters passed to the request
+ * @returns - A generator (or an array, depending on the `lazy` param) of objects of class `klass`
+ */
 export async function resourceAll(
   client: Client,
   path: string,
@@ -10,7 +24,7 @@ export async function resourceAll(
   handlers: Record<string, GenericFunction> = {},
   methods: string[],
   params: Record<string, any>,
-) {
+): Promise<ResourceMixin[] | AsyncGenerator<ResourceMixin>> {
   const { lazy, ...innerParams } = { lazy: true, ...params };
   const data = await client.request({ path, paginated: true, params: innerParams });
   if (lazy) {
@@ -37,6 +51,18 @@ export async function resourceAll(
   return elements;
 }
 
+/**
+ * Fetch a specific instance of a resource.
+ *
+ * @param client - The Client object passed to the retrieved object
+ * @param path - The path within the API server for the resource
+ * @param id - The identifier value of the object to retrieve
+ * @param klass - Class that will wrap the instance of the resource
+ * @param handlers - The post-request handlers
+ * @param methods - An array of the methods that the object can execute
+ * @param params - The parameters passed to the request
+ * @returns - An object of class `klass`
+ */
 export async function resourceGet(
   client: Client,
   path: string,
@@ -45,7 +71,7 @@ export async function resourceGet(
   handlers: Record<string, GenericFunction> = {},
   methods: string[],
   params: Record<string, any>,
-) {
+): Promise<ResourceMixin> {
   const data = await client.request({ path: `${path}/${id}`, method: 'get', params });
   return objetize(
     klass,
@@ -57,6 +83,17 @@ export async function resourceGet(
   );
 }
 
+/**
+ * Create a new instance of a resource.
+ *
+ * @param client - The Client object passed to the created object
+ * @param path - The path within the API server for the resource
+ * @param klass - Class that will wrap the instance of the resource
+ * @param handlers - The post-request handlers
+ * @param methods - An array of the methods that the object can execute
+ * @param params - The parameters passed to the request
+ * @returns - An object of class `klass`
+ */
 export async function resourceCreate(
   client: Client,
   path: string,
@@ -64,7 +101,7 @@ export async function resourceCreate(
   handlers: Record<string, GenericFunction> = {},
   methods: string[],
   params: Record<string, any>,
-) {
+): Promise<ResourceMixin> {
   const data = await client.request({ path, method: 'post', json: params });
   return objetize(
     klass,
@@ -76,6 +113,18 @@ export async function resourceCreate(
   );
 }
 
+/**
+ * Update a specific instance of a resource.
+ *
+ * @param client - The Client object passed to the updated object
+ * @param path - The path within the API server for the resource
+ * @param id - The identifier value of the object to update
+ * @param klass - Class that will wrap the instance of the resource
+ * @param handlers - The post-request handlers
+ * @param methods - An array of the methods that the object can execute
+ * @param params - The parameters passed to the request for the resource to be updated
+ * @returns - An object of class `klass`
+ */
 export async function resourceUpdate(
   client: Client,
   path: string,
@@ -84,7 +133,7 @@ export async function resourceUpdate(
   handlers: Record<string, GenericFunction> = {},
   methods: string[],
   params: Record<string, any>,
-) {
+): Promise<ResourceMixin> {
   const data = await client.request({ path: `${path}/${id}`, method: 'patch', json: params });
   return objetize(
     klass,
@@ -96,11 +145,20 @@ export async function resourceUpdate(
   );
 }
 
+/**
+ * Delete an instance of a resource.
+ *
+ * @param client - The Client object passed to the updated object
+ * @param path - The path within the API server for the resource
+ * @param id - The identifier value of the object to update
+ * @param params - The parameters passed to the request
+ * @returns The request response
+ */
 export async function resourceDelete(
   client: Client,
   path: string,
   id: string,
   params: Record<string, any>,
-) {
+): Promise<AxiosResponse> {
   return client.request({ path: `${path}/${id}`, method: 'delete', params });
 }

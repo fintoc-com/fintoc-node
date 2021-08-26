@@ -2,6 +2,13 @@ import { AxiosInstance } from 'axios';
 
 import { LINK_HEADER_PATTERN } from './constants';
 
+/**
+ * Parse a link string and return an object with previous parsed links and the new one.
+ *
+ * @param object - Object containing already parsed links
+ * @param link - String with the link header to parse
+ * @returns Object that corresponds to the destructured `object` object and the parsed `link` string
+ */
 export function parseLink(object: Record<string, string>, link: string) {
   const data = LINK_HEADER_PATTERN.exec(link);
   if (data === null || data.groups === undefined) {
@@ -11,6 +18,12 @@ export function parseLink(object: Record<string, string>, link: string) {
   return { ...object, [groups.rel]: groups.url };
 }
 
+/**
+ * Parse the 'link' header into an object.
+ *
+ * @param linkHeader - String containing the 'link' header of an HTTP request
+ * @returns An object with the link headers parsed link headers
+ */
 export function parseLinkHeaders(linkHeader: string) {
   if (linkHeader === null || linkHeader === undefined) {
     return linkHeader;
