@@ -5,7 +5,8 @@ import { ManagerMixin } from './mixins';
 import { version } from './version';
 
 export class Fintoc {
-  _client: Client;
+  private _client: Client;
+
   links: ManagerMixin;
   webhookEndpoints: ManagerMixin;
 

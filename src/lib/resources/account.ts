@@ -4,6 +4,8 @@ import { MovementsManager } from '../managers';
 import { ResourceMixin } from '../mixins/resourceMixin';
 
 export class Account extends ResourceMixin {
+  private _movementsManager?: MovementsManager;
+
   constructor(
     client: Client,
     handlers: Record<string, GenericFunction>,
@@ -12,16 +14,16 @@ export class Account extends ResourceMixin {
     data: Record<string, any>,
   ) {
     super(client, handlers, methods, path, data);
-    this.__movementsManager = undefined;
+    this._movementsManager = undefined;
   }
 
   get movements() {
-    if (this.__movementsManager === undefined) {
-      this.__movementsManager = new MovementsManager(
+    if (this._movementsManager === undefined) {
+      this._movementsManager = new MovementsManager(
         `/accounts/${this.id}/movements`, this._client,
       );
     }
-    return this.__movementsManager;
+    return this._movementsManager;
   }
 
   set movements(newValue) { /* eslint-disable-line class-methods-use-this */

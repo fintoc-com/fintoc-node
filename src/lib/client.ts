@@ -7,11 +7,12 @@ import { IRequestOptions } from '../interfaces/client/requestOptions';
 import { paginate } from './paginator';
 
 export class Client {
+  private _client?: AxiosInstance;
+
   baseUrl: string;
   apiKey: string;
   userAgent: string;
   params: Record<string, any>;
-  __client?: AxiosInstance;
 
   constructor(options: IConstructorOptions) {
     const {
@@ -21,18 +22,18 @@ export class Client {
     this.apiKey = apiKey;
     this.userAgent = userAgent;
     this.params = params || {};
-    this.__client = undefined;
+    this._client = undefined;
   }
 
-  get _client() {
-    if (this.__client === undefined) {
-      this.__client = axios.create({
+  private get client() {
+    if (this._client === undefined) {
+      this._client = axios.create({
         baseURL: this.baseUrl,
         headers: this.headers,
         params: this.params,
       });
     }
-    return this.__client;
+    return this._client;
   }
 
   get headers() {
@@ -45,12 +46,12 @@ export class Client {
     } = options;
     if (paginated) {
       return paginate({
-        client: this._client,
+        client: this.client,
         path,
         params,
       });
     }
-    const response = await this._client.request({
+    const response = await this.client.request({
       method, url: path, params, data: json,
     });
     return response.data;

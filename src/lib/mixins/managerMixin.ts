@@ -7,12 +7,13 @@ import { canRaiseHTTPError, getResourceClass } from '../utils';
 import { ResourceMixin } from './resourceMixin';
 
 export abstract class ManagerMixin {
-  _path: string;
-  _client: Client;
-  _handlers: Record<string, GenericFunction>
-
   static resource: string;
   static methods: string[];
+
+  private _path: string;
+  private _handlers: Record<string, GenericFunction>
+
+  _client: Client;
 
   constructor(path: string, client: Client) {
     this._path = path;

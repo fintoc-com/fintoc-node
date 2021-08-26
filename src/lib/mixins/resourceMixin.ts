@@ -7,15 +7,16 @@ import {
 } from '../utils';
 
 export abstract class ResourceMixin {
-  _client: Client;
-  _handlers: Record<string, GenericFunction>;
-  _methods: string[];
-  _path: string;
-  _attributes: string[];
-  [anyAttribute: string]: any;
-
   static mappings = {};
   static resourceIdentifier = 'id';
+
+  private _handlers: Record<string, GenericFunction>;
+  private _methods: string[];
+  private _path: string;
+  private _attributes: string[];
+
+  _client: Client;
+  [anyAttribute: string]: any;
 
   private originatingClass() {
     return this.constructor as unknown as IResourceMixinConstructor;
