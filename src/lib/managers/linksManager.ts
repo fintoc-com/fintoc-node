@@ -1,4 +1,4 @@
-/* eslint-disable no-param-reassign, @typescript-eslint/no-unused-vars */
+/* eslint-disable @typescript-eslint/no-unused-vars */
 import { ManagerMixin, ResourceMixin } from '../mixins';
 
 export class LinksManager extends ManagerMixin {
@@ -8,16 +8,16 @@ export class LinksManager extends ManagerMixin {
   protected postGetHandler(
     object: ResourceMixin, identifier: string, args: Record<string, string>,
   ) {
-    object._client = this._client.extend({ params: { link_token: identifier } });
-    object._linkToken = identifier;
+    object._updateClient(this._client.extend({ params: { link_token: identifier } }));
+    object._setLinkToken(identifier);
     return object;
   }
 
   protected postUpdateHandler(
     object: ResourceMixin, identifier: string, args: Record<string, string>,
   ) {
-    object._client = this._client.extend({ params: { link_token: identifier } });
-    object._linkToken = identifier;
+    object._updateClient(this._client.extend({ params: { link_token: identifier } }));
+    object._setLinkToken(identifier);
     return object;
   }
 }

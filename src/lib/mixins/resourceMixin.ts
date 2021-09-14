@@ -14,8 +14,8 @@ export abstract class ResourceMixin {
   #methods: string[];
   #path: string;
   #attributes: string[];
+  #client: Client;
 
-  _client: Client;
   [anyAttribute: string]: any;
 
   get #originatingClass() {
@@ -29,7 +29,7 @@ export abstract class ResourceMixin {
     path: string,
     data: Record<string, any>,
   ) {
-    this._client = client;
+    this.#client = client;
     this.#handlers = handlers;
     this.#methods = methods;
     this.#path = path;
@@ -52,6 +52,14 @@ export abstract class ResourceMixin {
     });
   }
 
+  protected useClient(): Client {
+    return this.#client;
+  }
+
+  _updateClient(newClient: Client) {
+    this.#client = newClient;
+  }
+
   serialize() {
     let serialized = {};
     this.#attributes.forEach((attribute) => {
@@ -70,7 +78,7 @@ export abstract class ResourceMixin {
     const innerArgs = args || {};
     const id = this[this.#originatingClass.resourceIdentifier];
     let object = await resourceUpdate(
-      this._client,
+      this.#client,
       this.#path,
       id,
       this.constructor,
@@ -88,7 +96,7 @@ export abstract class ResourceMixin {
     const innerArgs = args || {};
     const id = this[this.#originatingClass.resourceIdentifier];
     await resourceDelete(
-      this._client,
+      this.#client,
       this.#path,
       id,
       innerArgs,

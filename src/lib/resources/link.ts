@@ -14,7 +14,7 @@ export class Link extends ResourceMixin {
   #invoicesManager?: InvoicesManager;
 
   // @ts-ignore: declared but value is never used
-  private _linkToken?: string;
+  #linkToken?: string;
 
   constructor(
     client: Client,
@@ -30,10 +30,18 @@ export class Link extends ResourceMixin {
     this.#invoicesManager = undefined;
   }
 
+  _setLinkToken(newLinkToken: string) {
+    this.#linkToken = newLinkToken;
+  }
+
+  get _linkToken() {
+    return this.#linkToken;
+  }
+
   get accounts() {
     if (this.#accountsManager === undefined) {
       this.#accountsManager = new AccountsManager(
-        '/accounts', this._client,
+        '/accounts', this.useClient(),
       );
     }
     return this.#accountsManager;
@@ -46,7 +54,7 @@ export class Link extends ResourceMixin {
   get subscriptions() {
     if (this.#subscriptionsManager === undefined) {
       this.#subscriptionsManager = new SubscriptionsManager(
-        '/subscriptions', this._client,
+        '/subscriptions', this.useClient(),
       );
     }
     return this.#subscriptionsManager;
@@ -59,7 +67,7 @@ export class Link extends ResourceMixin {
   get taxReturns() {
     if (this.#taxReturnsManager === undefined) {
       this.#taxReturnsManager = new TaxReturnsManager(
-        '/tax_returns', this._client,
+        '/tax_returns', this.useClient(),
       );
     }
     return this.#taxReturnsManager;
@@ -72,7 +80,7 @@ export class Link extends ResourceMixin {
   get invoices() {
     if (this.#invoicesManager === undefined) {
       this.#invoicesManager = new InvoicesManager(
-        '/invoices', this._client,
+        '/invoices', this.useClient(),
       );
     }
     return this.#invoicesManager;

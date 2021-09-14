@@ -28,8 +28,43 @@ export abstract class ManagerMixin {
     return this.constructor as unknown as IManagerMixinConstructor;
   }
 
+  all(args?: Record<string, string>) {
+    if (!this.#originatingClass.methods.includes('all')) {
+      throw new TypeError(`${this.#originatingClass.name}.all is not a valid function of of this manager`);
+    }
+    return this._all(args);
+  }
+
+  get(identifier: string, args?: Record<string, string>) {
+    if (!this.#originatingClass.methods.includes('get')) {
+      throw new TypeError(`${this.#originatingClass.name}.get is not a valid function of of this manager`);
+    }
+    return this._get(identifier, args);
+  }
+
+  create(args?: Record<string, string>) {
+    if (!this.#originatingClass.methods.includes('create')) {
+      throw new TypeError(`${this.#originatingClass.name}.create is not a valid function of of this manager`);
+    }
+    return this._create(args);
+  }
+
+  update(identifier: string, args?: Record<string, string>) {
+    if (!this.#originatingClass.methods.includes('update')) {
+      throw new TypeError(`${this.#originatingClass.name}.update is not a valid function of of this manager`);
+    }
+    return this._update(identifier, args);
+  }
+
+  delete(identifier: string, args?: Record<string, string>) {
+    if (!this.#originatingClass.methods.includes('delete')) {
+      throw new TypeError(`${this.#originatingClass.name}.delete is not a valid function of of this manager`);
+    }
+    return this._delete(identifier, args);
+  }
+
   @canRaiseHTTPError
-  async all(
+  private async _all(
     args?: Record<string, string>,
   ): Promise<ResourceMixin[] | AsyncGenerator<ResourceMixin>> {
     const innerArgs = args || {};
@@ -46,7 +81,7 @@ export abstract class ManagerMixin {
   }
 
   @canRaiseHTTPError
-  async get(identifier: string, args?: Record<string, string>): Promise<ResourceMixin> {
+  private async _get(identifier: string, args?: Record<string, string>): Promise<ResourceMixin> {
     const innerArgs = args || {};
     const klass = getResourceClass(this.#originatingClass.resource);
     const object = await resourceGet(
@@ -62,7 +97,7 @@ export abstract class ManagerMixin {
   }
 
   @canRaiseHTTPError
-  async create(args?: Record<string, string>): Promise<ResourceMixin> {
+  private async _create(args?: Record<string, string>): Promise<ResourceMixin> {
     const innerArgs = args || {};
     const klass = getResourceClass(this.#originatingClass.resource);
     const object = await resourceCreate(
@@ -77,14 +112,16 @@ export abstract class ManagerMixin {
   }
 
   @canRaiseHTTPError
-  async update(identifier: string, args?: Record<string, string>): Promise<ResourceMixin> {
+  private async _update(
+    identifier: string, args?: Record<string, string>,
+  ): Promise<ResourceMixin> {
     const innerArgs = args || {};
     const object = await this.get(identifier);
     return object.update(innerArgs);
   }
 
   @canRaiseHTTPError
-  async delete(identifier: string, args?: Record<string, string>): Promise<string> {
+  private async _delete(identifier: string, args?: Record<string, string>): Promise<string> {
     const innerArgs = args || {};
     const object = await this.get(identifier);
     return object.delete(innerArgs);
