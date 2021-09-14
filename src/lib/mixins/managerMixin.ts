@@ -32,7 +32,10 @@ export abstract class ManagerMixin<ResourceType extends IResourceMixin> {
    * @param args - Object with the arguments to filter the query, using the API parameters
    * @returns All the instances of the resource
    */
-  all(args?: ResourceArguments) {
+  all(args?: ResourceArguments & { lazy: true }): Promise<AsyncGenerator<ResourceType>>;
+  all(args?: ResourceArguments & { lazy: false }): Promise<ResourceType[]>;
+  all(args?: ResourceArguments): Promise<AsyncGenerator<ResourceType>>;
+  all(args?: ResourceArguments): Promise<ResourceType[] | AsyncGenerator<ResourceType>> {
     if (!this.#originatingClass.methods.includes('all')) {
       throw new TypeError(`${this.#originatingClass.name}.all is not a valid function of of this manager`);
     }
