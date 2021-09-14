@@ -3,7 +3,7 @@ import { Client } from '../client';
 import { MovementsManager } from '../managers';
 import { ResourceMixin } from '../mixins/resourceMixin';
 
-export class Account extends ResourceMixin {
+export class Account extends ResourceMixin<Account> {
   #movementsManager?: MovementsManager;
 
   constructor(

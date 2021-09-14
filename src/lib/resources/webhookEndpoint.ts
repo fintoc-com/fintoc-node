@@ -1,3 +1,3 @@
 import { ResourceMixin } from '../mixins/resourceMixin';
 
-export class WebhookEndpoint extends ResourceMixin {}
+export class WebhookEndpoint extends ResourceMixin<WebhookEndpoint> {}

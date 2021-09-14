@@ -6,7 +6,7 @@ import {
   canRaiseHTTPError, getResourceClass, objetize, serialize, singularize,
 } from '../utils';
 
-export abstract class ResourceMixin {
+export abstract class ResourceMixin<ResourceType> {
   static mappings = {};
   static resourceIdentifier = 'id';
 
@@ -100,10 +100,10 @@ export abstract class ResourceMixin {
   }
 
   @canRaiseHTTPError
-  private async _update(args?: ResourceArguments): Promise<ResourceMixin> {
+  private async _update(args?: ResourceArguments): Promise<ResourceType> {
     const innerArgs = args || {};
     const id = this[this.#originatingClass.resourceIdentifier];
-    let object = await resourceUpdate(
+    let object = await resourceUpdate<ResourceType>(
       this.#client,
       this.#path,
       id,
@@ -114,7 +114,7 @@ export abstract class ResourceMixin {
     );
     object = await this.#handlers.update(object, id, innerArgs);
     Object.assign(this, object);
-    return this;
+    return object;
   }
 
   @canRaiseHTTPError

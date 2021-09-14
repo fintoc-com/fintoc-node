@@ -1,3 +1,3 @@
 import { ResourceMixin } from '../mixins/resourceMixin';
 
-export class InstitutionTaxReturn extends ResourceMixin {}
+export class InstitutionTaxReturn extends ResourceMixin<InstitutionTaxReturn> {}

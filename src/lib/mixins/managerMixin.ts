@@ -4,8 +4,6 @@ import { Client } from '../client';
 import { resourceAll, resourceCreate, resourceGet } from '../resourceHandlers';
 import { canRaiseHTTPError, getResourceClass } from '../utils';
 
-import { ResourceMixin } from './resourceMixin';
-
 export abstract class ManagerMixin<ResourceType extends IResourceMixin> {
   static resource: string;
   static methods: string[];
@@ -145,7 +143,7 @@ export abstract class ManagerMixin<ResourceType extends IResourceMixin> {
   }
 
   @canRaiseHTTPError
-  private async _update(identifier: string, args?: ResourceArguments): Promise<ResourceMixin> {
+  private async _update(identifier: string, args?: ResourceArguments): Promise<ResourceType> {
     const innerArgs = args || {};
     const object = await this.get(identifier);
     return object.update(innerArgs);

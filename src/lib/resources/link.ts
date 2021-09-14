@@ -5,7 +5,7 @@ import {
 } from '../managers';
 import { ResourceMixin } from '../mixins/resourceMixin';
 
-export class Link extends ResourceMixin {
+export class Link extends ResourceMixin<Link> {
   static resourceIdentifier = '_linkToken';
 
   #accountsManager?: AccountsManager;

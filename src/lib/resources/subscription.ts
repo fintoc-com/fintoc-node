@@ -1,3 +1,3 @@
 import { ResourceMixin } from '../mixins/resourceMixin';
 
-export class Subscription extends ResourceMixin {}
+export class Subscription extends ResourceMixin<Subscription> {}
