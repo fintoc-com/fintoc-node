@@ -1,13 +1,14 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
 import { ResourceArguments } from '../../types';
-import { ManagerMixin, ResourceMixin } from '../mixins';
+import { ManagerMixin } from '../mixins';
+import { Link } from '../resources';
 
-export class LinksManager extends ManagerMixin {
+export class LinksManager extends ManagerMixin<Link> {
   static resource = 'link';
   static methods = ['all', 'get', 'update', 'delete'];
 
   protected postGetHandler(
-    object: ResourceMixin, identifier: string, args: ResourceArguments,
+    object: Link, identifier: string, args: ResourceArguments,
   ) {
     object._updateClient(this._client.extend({ params: { link_token: identifier } }));
     object._setLinkToken(identifier);
@@ -15,7 +16,7 @@ export class LinksManager extends ManagerMixin {
   }
 
   protected postUpdateHandler(
-    object: ResourceMixin, identifier: string, args: ResourceArguments,
+    object: Link, identifier: string, args: ResourceArguments,
   ) {
     object._updateClient(this._client.extend({ params: { link_token: identifier } }));
     object._setLinkToken(identifier);

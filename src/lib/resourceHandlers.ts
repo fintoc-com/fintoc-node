@@ -3,7 +3,6 @@ import { AxiosResponse } from 'axios';
 import { GenericFunction } from '../types';
 
 import { Client } from './client';
-import { ResourceMixin } from './mixins';
 import { objetize, objetizeGenerator } from './utils';
 
 /**
@@ -17,14 +16,14 @@ import { objetize, objetizeGenerator } from './utils';
  * @param params - The parameters passed to the request
  * @returns - A generator (or an array, depending on the `lazy` param) of objects of class `klass`
  */
-export async function resourceAll(
+export async function resourceAll<ResourceType>(
   client: Client,
   path: string,
   klass: any,
   handlers: Record<string, GenericFunction> = {},
   methods: string[],
   params: Record<string, any>,
-): Promise<ResourceMixin[] | AsyncGenerator<ResourceMixin>> {
+): Promise<ResourceType[] | AsyncGenerator<ResourceType>> {
   const { lazy, ...innerParams } = { lazy: true, ...params };
   const data = await client.request({ path, paginated: true, params: innerParams });
   if (lazy) {
@@ -63,7 +62,7 @@ export async function resourceAll(
  * @param params - The parameters passed to the request
  * @returns - An object of class `klass`
  */
-export async function resourceGet(
+export async function resourceGet<ResourceType>(
   client: Client,
   path: string,
   id: string,
@@ -71,7 +70,7 @@ export async function resourceGet(
   handlers: Record<string, GenericFunction> = {},
   methods: string[],
   params: Record<string, any>,
-): Promise<ResourceMixin> {
+): Promise<ResourceType> {
   const data = await client.request({ path: `${path}/${id}`, method: 'get', params });
   return objetize(
     klass,
@@ -94,14 +93,14 @@ export async function resourceGet(
  * @param params - The parameters passed to the request
  * @returns - An object of class `klass`
  */
-export async function resourceCreate(
+export async function resourceCreate<ResourceType>(
   client: Client,
   path: string,
   klass: any,
   handlers: Record<string, GenericFunction> = {},
   methods: string[],
   params: Record<string, any>,
-): Promise<ResourceMixin> {
+): Promise<ResourceType> {
   const data = await client.request({ path, method: 'post', json: params });
   return objetize(
     klass,
@@ -125,7 +124,7 @@ export async function resourceCreate(
  * @param params - The parameters passed to the request for the resource to be updated
  * @returns - An object of class `klass`
  */
-export async function resourceUpdate(
+export async function resourceUpdate<ResourceType>(
   client: Client,
   path: string,
   id: string,
@@ -133,7 +132,7 @@ export async function resourceUpdate(
   handlers: Record<string, GenericFunction> = {},
   methods: string[],
   params: Record<string, any>,
-): Promise<ResourceMixin> {
+): Promise<ResourceType> {
   const data = await client.request({ path: `${path}/${id}`, method: 'patch', json: params });
   return objetize(
     klass,

@@ -1,14 +1,13 @@
 import { Client } from './client';
 import { API_BASE_URL, API_VERSION } from './constants';
 import { LinksManager, WebhookEndpointsManager } from './managers';
-import { ManagerMixin } from './mixins';
 import { version } from './version';
 
 export class Fintoc {
   #client: Client;
 
-  links: ManagerMixin;
-  webhookEndpoints: ManagerMixin;
+  links: LinksManager;
+  webhookEndpoints: WebhookEndpointsManager;
 
   constructor(apiKey: string) {
     this.#client = new Client({

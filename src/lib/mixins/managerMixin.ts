@@ -1,4 +1,4 @@
-import { IManagerMixinConstructor } from '../../interfaces/mixins';
+import { IManagerMixinConstructor, IResourceMixin } from '../../interfaces/mixins';
 import { GenericFunction, ResourceArguments } from '../../types';
 import { Client } from '../client';
 import { resourceAll, resourceCreate, resourceGet } from '../resourceHandlers';
@@ -6,7 +6,7 @@ import { canRaiseHTTPError, getResourceClass } from '../utils';
 
 import { ResourceMixin } from './resourceMixin';
 
-export abstract class ManagerMixin {
+export abstract class ManagerMixin<ResourceType extends IResourceMixin> {
   static resource: string;
   static methods: string[];
 
@@ -99,10 +99,10 @@ export abstract class ManagerMixin {
   @canRaiseHTTPError
   private async _all(
     args?: ResourceArguments,
-  ): Promise<ResourceMixin[] | AsyncGenerator<ResourceMixin>> {
+  ): Promise<ResourceType[] | AsyncGenerator<ResourceType>> {
     const innerArgs = args || {};
     const klass = getResourceClass(this.#originatingClass.resource);
-    const objects = await resourceAll(
+    const objects = await resourceAll<ResourceType>(
       this._client,
       this.#path,
       klass,
@@ -114,10 +114,10 @@ export abstract class ManagerMixin {
   }
 
   @canRaiseHTTPError
-  private async _get(identifier: string, args?: ResourceArguments): Promise<ResourceMixin> {
+  private async _get(identifier: string, args?: ResourceArguments): Promise<ResourceType> {
     const innerArgs = args || {};
     const klass = getResourceClass(this.#originatingClass.resource);
-    const object = await resourceGet(
+    const object = await resourceGet<ResourceType>(
       this._client,
       this.#path,
       identifier,
@@ -130,10 +130,10 @@ export abstract class ManagerMixin {
   }
 
   @canRaiseHTTPError
-  private async _create(args?: ResourceArguments): Promise<ResourceMixin> {
+  private async _create(args?: ResourceArguments): Promise<ResourceType> {
     const innerArgs = args || {};
     const klass = getResourceClass(this.#originatingClass.resource);
-    const object = await resourceCreate(
+    const object = await resourceCreate<ResourceType>(
       this._client,
       this.#path,
       klass,
@@ -160,21 +160,21 @@ export abstract class ManagerMixin {
 
   /* eslint-disable class-methods-use-this, @typescript-eslint/no-unused-vars */
   protected postAllHandler(
-    objects: ResourceMixin[] | AsyncGenerator<ResourceMixin>,
+    objects: ResourceType[] | AsyncGenerator<ResourceType>,
     args: ResourceArguments,
   ) {
     return objects;
   }
 
-  protected postGetHandler(object: ResourceMixin, identifier: string, args: ResourceArguments) {
+  protected postGetHandler(object: ResourceType, identifier: string, args: ResourceArguments) {
     return object;
   }
 
-  protected postCreateHandler(object: ResourceMixin, args: ResourceArguments) {
+  protected postCreateHandler(object: ResourceType, args: ResourceArguments) {
     return object;
   }
 
-  protected postUpdateHandler(object: ResourceMixin, identifier: string, args: ResourceArguments) {
+  protected postUpdateHandler(object: ResourceType, identifier: string, args: ResourceArguments) {
     return object;
   }
 
