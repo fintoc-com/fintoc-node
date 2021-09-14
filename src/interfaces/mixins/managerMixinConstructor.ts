@@ -1,5 +1,5 @@
 export interface IManagerMixinConstructor {
-  name: string,
+  name: string;
   resource: string;
   methods: string[];
 }

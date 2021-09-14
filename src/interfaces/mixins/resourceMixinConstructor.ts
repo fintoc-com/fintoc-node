@@ -1,5 +1,5 @@
 export interface IResourceMixinConstructor {
-  name: string,
+  name: string;
   mappings: Record<string, string>;
   resourceIdentifier: string;
 }
