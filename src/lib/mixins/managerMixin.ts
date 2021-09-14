@@ -24,7 +24,7 @@ export abstract class ManagerMixin {
     };
   }
 
-  protected originatingClass() {
+  get #originatingClass() {
     return this.constructor as unknown as IManagerMixinConstructor;
   }
 
@@ -33,13 +33,13 @@ export abstract class ManagerMixin {
     args?: Record<string, string>,
   ): Promise<ResourceMixin[] | AsyncGenerator<ResourceMixin>> {
     const innerArgs = args || {};
-    const klass = getResourceClass(this.originatingClass().resource);
+    const klass = getResourceClass(this.#originatingClass.resource);
     const objects = await resourceAll(
       this._client,
       this.#path,
       klass,
       this.#handlers,
-      this.originatingClass().methods,
+      this.#originatingClass.methods,
       innerArgs,
     );
     return this.postAllHandler(objects, innerArgs);
@@ -48,14 +48,14 @@ export abstract class ManagerMixin {
   @canRaiseHTTPError
   async get(identifier: string, args?: Record<string, string>): Promise<ResourceMixin> {
     const innerArgs = args || {};
-    const klass = getResourceClass(this.originatingClass().resource);
+    const klass = getResourceClass(this.#originatingClass.resource);
     const object = await resourceGet(
       this._client,
       this.#path,
       identifier,
       klass,
       this.#handlers,
-      this.originatingClass().methods,
+      this.#originatingClass.methods,
       innerArgs,
     );
     return this.postGetHandler(object, identifier, innerArgs);
@@ -64,13 +64,13 @@ export abstract class ManagerMixin {
   @canRaiseHTTPError
   async create(args?: Record<string, string>): Promise<ResourceMixin> {
     const innerArgs = args || {};
-    const klass = getResourceClass(this.originatingClass().resource);
+    const klass = getResourceClass(this.#originatingClass.resource);
     const object = await resourceCreate(
       this._client,
       this.#path,
       klass,
       this.#handlers,
-      this.originatingClass().methods,
+      this.#originatingClass.methods,
       innerArgs,
     );
     return this.postCreateHandler(object, innerArgs);

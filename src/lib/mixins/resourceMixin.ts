@@ -18,7 +18,7 @@ export abstract class ResourceMixin {
   _client: Client;
   [anyAttribute: string]: any;
 
-  protected originatingClass() {
+  get #originatingClass() {
     return this.constructor as unknown as IResourceMixinConstructor;
   }
 
@@ -37,7 +37,7 @@ export abstract class ResourceMixin {
 
     Object.entries(data).forEach(([key, value]) => {
       try {
-        const rawResource = this.originatingClass().mappings[key] || key;
+        const rawResource = this.#originatingClass.mappings[key] || key;
         if (Array.isArray(value)) {
           const resource = singularize(rawResource);
           const element = value.length > 0 ? value[0] : {};
@@ -68,7 +68,7 @@ export abstract class ResourceMixin {
   @canRaiseHTTPError
   async update(args?: Record<string, string>): Promise<ResourceMixin> {
     const innerArgs = args || {};
-    const id = this[this.originatingClass().resourceIdentifier];
+    const id = this[this.#originatingClass.resourceIdentifier];
     let object = await resourceUpdate(
       this._client,
       this.#path,
@@ -86,7 +86,7 @@ export abstract class ResourceMixin {
   @canRaiseHTTPError
   async delete(args?: Record<string, string>): Promise<string> {
     const innerArgs = args || {};
-    const id = this[this.originatingClass().resourceIdentifier];
+    const id = this[this.#originatingClass.resourceIdentifier];
     await resourceDelete(
       this._client,
       this.#path,
