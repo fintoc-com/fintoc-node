@@ -32,10 +32,10 @@ jobs:
         run: yarn build
 
       - name: Publish the package
-        run: yarn publish
+        run: npm publish
 
   github-release:
-    needs: pypi-release
+    needs: npm-release
 
     runs-on: ubuntu-latest
     steps:
