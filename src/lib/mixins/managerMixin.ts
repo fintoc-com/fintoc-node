@@ -1,5 +1,5 @@
 import { IManagerMixinConstructor } from '../../interfaces/mixins';
-import { GenericFunction } from '../../types';
+import { GenericFunction, ResourceArguments } from '../../types';
 import { Client } from '../client';
 import { resourceAll, resourceCreate, resourceGet } from '../resourceHandlers';
 import { canRaiseHTTPError, getResourceClass } from '../utils';
@@ -28,35 +28,68 @@ export abstract class ManagerMixin {
     return this.constructor as unknown as IManagerMixinConstructor;
   }
 
-  all(args?: Record<string, string>) {
+  /**
+   * Return all the instances of the resource being handled by the manager.
+   *
+   * @param args - Object with the arguments to filter the query, using the API parameters
+   * @returns All the instances of the resource
+   */
+  all(args?: ResourceArguments) {
     if (!this.#originatingClass.methods.includes('all')) {
       throw new TypeError(`${this.#originatingClass.name}.all is not a valid function of of this manager`);
     }
     return this._all(args);
   }
 
-  get(identifier: string, args?: Record<string, string>) {
+  /**
+   * Return an instance of the resource being handled by the manager.
+   *
+   * @param identifier - The identifier of the resource to get
+   * @param args - Object with the arguments to filter the query, using the API parameters
+   * @returns An instance of the resource
+   */
+  get(identifier: string, args?: ResourceArguments) {
     if (!this.#originatingClass.methods.includes('get')) {
       throw new TypeError(`${this.#originatingClass.name}.get is not a valid function of of this manager`);
     }
     return this._get(identifier, args);
   }
 
-  create(args?: Record<string, string>) {
+  /**
+   * Create an instance of the resource being handled by the manager.
+   *
+   * @param args - Data to be passed for the object creation, as specified by the API
+   * @returns The created instance of the object
+   */
+  create(args?: ResourceArguments) {
     if (!this.#originatingClass.methods.includes('create')) {
       throw new TypeError(`${this.#originatingClass.name}.create is not a valid function of of this manager`);
     }
     return this._create(args);
   }
 
-  update(identifier: string, args?: Record<string, string>) {
+  /**
+   * Update an instance of the resource being handled by the manager.
+   *
+   * @param identifier - The identifier of the resource to update
+   * @param args - Data to be passed for the object to be updated with, as specified by the API
+   * @returns The updated instance of the object
+   */
+  update(identifier: string, args?: ResourceArguments) {
     if (!this.#originatingClass.methods.includes('update')) {
       throw new TypeError(`${this.#originatingClass.name}.update is not a valid function of of this manager`);
     }
     return this._update(identifier, args);
   }
 
-  delete(identifier: string, args?: Record<string, string>) {
+  /**
+   * Delete an instance of the resource being handled by the manager.
+   *
+   * @param identifier - The identifier of the resource to delete
+   * @param args - Object with the arguments to filter the query, using the API parameters
+   * @returns The identifier of the deleted object
+   */
+  delete(identifier: string, args?: ResourceArguments) {
     if (!this.#originatingClass.methods.includes('delete')) {
       throw new TypeError(`${this.#originatingClass.name}.delete is not a valid function of of this manager`);
     }
@@ -65,7 +98,7 @@ export abstract class ManagerMixin {
 
   @canRaiseHTTPError
   private async _all(
-    args?: Record<string, string>,
+    args?: ResourceArguments,
   ): Promise<ResourceMixin[] | AsyncGenerator<ResourceMixin>> {
     const innerArgs = args || {};
     const klass = getResourceClass(this.#originatingClass.resource);
@@ -81,7 +114,7 @@ export abstract class ManagerMixin {
   }
 
   @canRaiseHTTPError
-  private async _get(identifier: string, args?: Record<string, string>): Promise<ResourceMixin> {
+  private async _get(identifier: string, args?: ResourceArguments): Promise<ResourceMixin> {
     const innerArgs = args || {};
     const klass = getResourceClass(this.#originatingClass.resource);
     const object = await resourceGet(
@@ -97,7 +130,7 @@ export abstract class ManagerMixin {
   }
 
   @canRaiseHTTPError
-  private async _create(args?: Record<string, string>): Promise<ResourceMixin> {
+  private async _create(args?: ResourceArguments): Promise<ResourceMixin> {
     const innerArgs = args || {};
     const klass = getResourceClass(this.#originatingClass.resource);
     const object = await resourceCreate(
@@ -112,16 +145,14 @@ export abstract class ManagerMixin {
   }
 
   @canRaiseHTTPError
-  private async _update(
-    identifier: string, args?: Record<string, string>,
-  ): Promise<ResourceMixin> {
+  private async _update(identifier: string, args?: ResourceArguments): Promise<ResourceMixin> {
     const innerArgs = args || {};
     const object = await this.get(identifier);
     return object.update(innerArgs);
   }
 
   @canRaiseHTTPError
-  private async _delete(identifier: string, args?: Record<string, string>): Promise<string> {
+  private async _delete(identifier: string, args?: ResourceArguments): Promise<string> {
     const innerArgs = args || {};
     const object = await this.get(identifier);
     return object.delete(innerArgs);
@@ -130,28 +161,24 @@ export abstract class ManagerMixin {
   /* eslint-disable class-methods-use-this, @typescript-eslint/no-unused-vars */
   protected postAllHandler(
     objects: ResourceMixin[] | AsyncGenerator<ResourceMixin>,
-    args: Record<string, string>,
+    args: ResourceArguments,
   ) {
     return objects;
   }
 
-  protected postGetHandler(
-    object: ResourceMixin, identifier: string, args: Record<string, string>,
-  ) {
+  protected postGetHandler(object: ResourceMixin, identifier: string, args: ResourceArguments) {
     return object;
   }
 
-  protected postCreateHandler(object: ResourceMixin, args: Record<string, string>) {
+  protected postCreateHandler(object: ResourceMixin, args: ResourceArguments) {
     return object;
   }
 
-  protected postUpdateHandler(
-    object: ResourceMixin, identifier: string, args: Record<string, string>,
-  ) {
+  protected postUpdateHandler(object: ResourceMixin, identifier: string, args: ResourceArguments) {
     return object;
   }
 
-  protected postDeleteHandler(identifier: string, args: Record<string, string>) {
+  protected postDeleteHandler(identifier: string, args: ResourceArguments) {
     return identifier;
   }
   /* eslint-enable class-methods-use-this, @typescript-eslint/no-unused-vars */

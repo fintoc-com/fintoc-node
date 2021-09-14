@@ -1,5 +1,5 @@
 import { IResourceMixinConstructor } from '../../interfaces/mixins';
-import { GenericFunction } from '../../types';
+import { GenericFunction, ResourceArguments } from '../../types';
 import { Client } from '../client';
 import { resourceDelete, resourceUpdate } from '../resourceHandlers';
 import {
@@ -73,8 +73,34 @@ export abstract class ResourceMixin {
     return serialized;
   }
 
+  /**
+   * Update this instance of the resource.
+   *
+   * @param args - Data to be passed for the object to be updated with, as specified by the API
+   * @returns The updated instance of the object
+   */
+  update(args?: ResourceArguments) {
+    if (!this.#methods.includes('update')) {
+      throw new TypeError(`${this.#originatingClass.name}.update is not a valid function of of this resource`);
+    }
+    return this._update(args);
+  }
+
+  /**
+   * Delete this instance of the resource.
+   *
+   * @param args - Object with the arguments to filter the query, using the API parameters
+   * @returns The identifier of the deleted object
+   */
+  delete(args?: ResourceArguments) {
+    if (!this.#methods.includes('delete')) {
+      throw new TypeError(`${this.#originatingClass.name}.delete is not a valid function of of this resource`);
+    }
+    return this._delete(args);
+  }
+
   @canRaiseHTTPError
-  async update(args?: Record<string, string>): Promise<ResourceMixin> {
+  private async _update(args?: ResourceArguments): Promise<ResourceMixin> {
     const innerArgs = args || {};
     const id = this[this.#originatingClass.resourceIdentifier];
     let object = await resourceUpdate(
@@ -92,7 +118,7 @@ export abstract class ResourceMixin {
   }
 
   @canRaiseHTTPError
-  async delete(args?: Record<string, string>): Promise<string> {
+  private async _delete(args?: ResourceArguments): Promise<string> {
     const innerArgs = args || {};
     const id = this[this.#originatingClass.resourceIdentifier];
     await resourceDelete(
