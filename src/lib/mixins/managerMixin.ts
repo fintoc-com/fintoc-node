@@ -91,30 +91,30 @@ export abstract class ManagerMixin {
   }
 
   /* eslint-disable class-methods-use-this, @typescript-eslint/no-unused-vars */
-  postAllHandler(
+  protected postAllHandler(
     objects: ResourceMixin[] | AsyncGenerator<ResourceMixin>,
     args: Record<string, string>,
   ) {
     return objects;
   }
 
-  postGetHandler(
+  protected postGetHandler(
     object: ResourceMixin, identifier: string, args: Record<string, string>,
   ) {
     return object;
   }
 
-  postCreateHandler(object: ResourceMixin, args: Record<string, string>) {
+  protected postCreateHandler(object: ResourceMixin, args: Record<string, string>) {
     return object;
   }
 
-  postUpdateHandler(
+  protected postUpdateHandler(
     object: ResourceMixin, identifier: string, args: Record<string, string>,
   ) {
     return object;
   }
 
-  postDeleteHandler(identifier: string, args: Record<string, string>) {
+  protected postDeleteHandler(identifier: string, args: Record<string, string>) {
     return identifier;
   }
   /* eslint-enable class-methods-use-this, @typescript-eslint/no-unused-vars */
