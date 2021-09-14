@@ -52,11 +52,11 @@ export abstract class ResourceMixin<ResourceType> {
     });
   }
 
-  protected useClient(): Client {
+  protected _useClient(): Client {
     return this.#client;
   }
 
-  _updateClient(newClient: Client) {
+  protected _updateClient(newClient: Client) {
     this.#client = newClient;
   }
 

@@ -30,18 +30,18 @@ export class Link extends ResourceMixin<Link> {
     this.#invoicesManager = undefined;
   }
 
-  _setLinkToken(newLinkToken: string) {
+  protected _setLinkToken(newLinkToken: string) {
     this.#linkToken = newLinkToken;
   }
 
-  get _linkToken() {
+  protected get _linkToken() {
     return this.#linkToken;
   }
 
   get accounts() {
     if (this.#accountsManager === undefined) {
       this.#accountsManager = new AccountsManager(
-        '/accounts', this.useClient(),
+        '/accounts', this._useClient(),
       );
     }
     return this.#accountsManager;
@@ -54,7 +54,7 @@ export class Link extends ResourceMixin<Link> {
   get subscriptions() {
     if (this.#subscriptionsManager === undefined) {
       this.#subscriptionsManager = new SubscriptionsManager(
-        '/subscriptions', this.useClient(),
+        '/subscriptions', this._useClient(),
       );
     }
     return this.#subscriptionsManager;
@@ -67,7 +67,7 @@ export class Link extends ResourceMixin<Link> {
   get taxReturns() {
     if (this.#taxReturnsManager === undefined) {
       this.#taxReturnsManager = new TaxReturnsManager(
-        '/tax_returns', this.useClient(),
+        '/tax_returns', this._useClient(),
       );
     }
     return this.#taxReturnsManager;
@@ -80,7 +80,7 @@ export class Link extends ResourceMixin<Link> {
   get invoices() {
     if (this.#invoicesManager === undefined) {
       this.#invoicesManager = new InvoicesManager(
-        '/invoices', this.useClient(),
+        '/invoices', this._useClient(),
       );
     }
     return this.#invoicesManager;

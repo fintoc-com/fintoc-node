@@ -10,16 +10,24 @@ export class LinksManager extends ManagerMixin<Link> {
   protected postGetHandler(
     object: Link, identifier: string, args: ResourceArguments,
   ) {
+    // @ts-ignore: property is protected
     object._updateClient(this._client.extend({ params: { link_token: identifier } }));
+
+    // @ts-ignore: property is protected
     object._setLinkToken(identifier);
+
     return object;
   }
 
   protected postUpdateHandler(
     object: Link, identifier: string, args: ResourceArguments,
   ) {
+    // @ts-ignore: property is protected
     object._updateClient(this._client.extend({ params: { link_token: identifier } }));
+
+    // @ts-ignore: property is protected
     object._setLinkToken(identifier);
+
     return object;
   }
 }
