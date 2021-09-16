@@ -1,0 +1,26 @@
+import test from 'ava';
+
+import { Client } from '../../lib/client';
+import { objetizeGenerator } from '../../lib/utils';
+
+import { ExampleClass } from './shared/exampleClass';
+import { getGenerator } from './shared/getGenerator';
+
+test.beforeEach((t) => {
+  const ctx: any = t.context;
+  ctx.client = 'This is a client' as unknown as Client; // Not relevant
+});
+
+test('"objetizeGenerator" generator objetization', async (t) => {
+  const ctx: any = t.context;
+  const generator = getGenerator();
+  t.assert(generator.toString().includes('[object AsyncGenerator]'));
+
+  const objetizedGenerator = objetizeGenerator(generator, ExampleClass, ctx.client);
+
+  t.assert(objetizedGenerator.toString().includes('[object AsyncGenerator]'));
+
+  for await (const object of await objetizedGenerator) {
+    t.assert(object instanceof ExampleClass);
+  }
+});
