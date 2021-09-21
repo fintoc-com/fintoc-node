@@ -63,27 +63,10 @@
   "files": [
     "build/main",
     "build/module",
+    "!src/spec/**",
     "!**/*.spec.*",
     "!**/*.json",
     "LICENSE.md",
     "README.md"
-  ],
-  "ava": {
-    "failFast": true,
-    "timeout": "60s",
-    "typescript": {
-      "rewritePaths": {
-        "src/": "build/main/"
-      }
-    },
-    "files": [
-      "!build/module/**"
-    ]
-  },
-  "nyc": {
-    "extends": "@istanbuljs/nyc-config-typescript",
-    "exclude": [
-      "**/*.spec.js"
-    ]
-  }
+  ]
 }
