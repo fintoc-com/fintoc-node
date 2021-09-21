@@ -24,7 +24,13 @@ export function parseLink(object: Record<string, string>, link: string) {
  * @param linkHeader - String containing the 'link' header of an HTTP request
  * @returns An object with the link headers parsed link headers
  */
-export function parseLinkHeaders(linkHeader: string) {
+export function parseLinkHeaders(linkHeader: null): null;
+export function parseLinkHeaders(linkHeader: undefined): undefined;
+export function parseLinkHeaders(linkHeader: string): Record<string, string>;
+export function parseLinkHeaders(linkHeader: any): Record<string, string> | null | undefined;
+export function parseLinkHeaders(
+  linkHeader: string | null | undefined,
+): Record<string, string> | null | undefined {
   if (linkHeader === null || linkHeader === undefined) {
     return linkHeader;
   }
