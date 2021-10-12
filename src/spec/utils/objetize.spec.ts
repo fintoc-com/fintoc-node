@@ -1,6 +1,7 @@
 import test from 'ava';
 
 import { objetize } from '../../lib/utils';
+import { isDictLike } from '../shared/utils';
 
 import { ExampleClass } from './shared/exampleClass';
 
@@ -25,7 +26,7 @@ test('"objetize" string objetization', (t) => {
 test('"objetize" record objetization', (t) => {
   const ctx: any = t.context;
   const object = objetize(Object, ctx.client, ctx.data);
-  t.assert(typeof object === 'object');
+  t.assert(isDictLike(object));
   t.is(object, ctx.data);
 });
 

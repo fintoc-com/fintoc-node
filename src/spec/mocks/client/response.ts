@@ -20,7 +20,7 @@ export class MockResponse {
       delete this.params.page;
     }
 
-    this.page = page;
+    this.page = Number.parseInt(page, 10) || undefined;
     this.method = method;
     this.url = url;
     this.json = json;
@@ -31,7 +31,7 @@ export class MockResponse {
       return {};
     }
     if (this.method === 'get' && this.url.charAt(this.url.length - 1) === 's') {
-      return Array(10).map(() => ({
+      return Array.from(Array(10)).map(() => ({
         id: 'idx',
         method: this.method,
         url: this.url,
@@ -47,5 +47,19 @@ export class MockResponse {
       params: this.params,
       json: this.json,
     };
+  }
+
+  get headers() {
+    if (this.page !== undefined && this.page < 10) {
+      const params = [...this.formattedParams, `page=${this.page + 1}`].join('&');
+      return {
+        link: `<${this.baseURL}/${this.url}?${params}>; rel="next"`,
+      };
+    }
+    return {};
+  }
+
+  get formattedParams() {
+    return Object.entries(this.params).map(([key, value]) => `${key}=${value}`);
   }
 }

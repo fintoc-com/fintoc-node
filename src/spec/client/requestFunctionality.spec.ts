@@ -2,7 +2,7 @@ import test from 'ava';
 
 import { Client } from '../../lib/client';
 import { mockAxios, restoreAxios } from '../mocks/initializers';
-import { isAsyncGenerator } from '../shared/utils';
+import { isAsyncGenerator, isDictLike } from '../shared/utils';
 
 test.before((t) => {
   const ctx: any = t.context;
@@ -37,7 +37,7 @@ test('"Client" get request', async (t) => {
   const data = await ctx.client.request({ path: '/movements/3', method: 'get' });
 
   t.assert(!isAsyncGenerator(data));
-  t.assert(data instanceof Object);
+  t.assert(isDictLike(data));
   t.assert(Object.keys(data).length > 0);
 });
 
@@ -47,6 +47,6 @@ test('"Client" delete request', async (t) => {
   const data = await ctx.client.request({ path: '/movements/3', method: 'delete' });
 
   t.assert(!isAsyncGenerator(data));
-  t.assert(data instanceof Object);
+  t.assert(isDictLike(data));
   t.assert(Object.keys(data).length === 0);
 });

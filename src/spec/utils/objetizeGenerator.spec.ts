@@ -21,7 +21,7 @@ test('"objetizeGenerator" generator objetization', async (t) => {
 
   t.assert(isAsyncGenerator(objetizedGenerator));
 
-  for await (const object of await objetizedGenerator) {
+  for await (const object of objetizedGenerator) {
     t.assert(object instanceof ExampleClass);
   }
 });
