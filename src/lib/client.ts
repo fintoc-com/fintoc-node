@@ -40,7 +40,15 @@ export class Client {
     return { Authorization: this.apiKey, 'User-Agent': this.userAgent };
   }
 
-  async request(options: IRequestOptions) {
+  // Promise<Record<string, string> | AsyncGenerator<any, void, unknown>>
+  async request(options: IRequestOptions & { paginated: false }): Promise<Record<string, string>>;
+  async request(
+    options: IRequestOptions & { paginated: true }
+  ): Promise<AsyncGenerator<Record<string, string>, void, unknown>>;
+  async request(options: IRequestOptions): Promise<Record<string, string>>;
+  async request(
+    options: IRequestOptions,
+  ): Promise<Record<string, string> | AsyncGenerator<Record<string, string>, void, unknown>> {
     const {
       path, paginated = false, method = 'get', params = {}, json = {},
     } = options;

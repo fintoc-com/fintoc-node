@@ -39,7 +39,7 @@ export function parseLinkHeaders(
 
 export async function request(options: IPaginationOptions) {
   const { client, path, params = {} } = options;
-  const response = await client.request({ method: 'get', url: path, params: params || {} });
+  const response = await client.request<Array<Record<string, any>>>({ method: 'get', url: path, params: params || {} });
   const headers = parseLinkHeaders(response.headers.link);
   const next = headers && headers.next;
   const elements = response.data;

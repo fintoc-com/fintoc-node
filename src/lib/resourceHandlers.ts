@@ -1,5 +1,3 @@
-import { AxiosResponse } from 'axios';
-
 import { GenericFunction } from '../types';
 
 import { Client } from './client';
@@ -158,6 +156,6 @@ export async function resourceDelete(
   path: string,
   id: string,
   params: Record<string, any>,
-): Promise<AxiosResponse> {
+): Promise<Record<string, string>> {
   return client.request({ path: `${path}/${id}`, method: 'delete', params });
 }
