@@ -3,8 +3,10 @@ import test from 'ava';
 import { Client } from '../../../lib/client';
 import { ResourceMixin } from '../../../lib/mixins';
 import { GenericFintocResource } from '../../../lib/resources/genericFintocResource';
+import { Link } from '../../../lib/resources/link';
 import { mockAxios, restore } from '../../mocks/initializers';
 
+import { ComplexMockResource } from './mocks/complexMockResource';
 import { EmptyMockResource } from './mocks/emptyMockResource';
 
 test.before((t) => {
@@ -56,15 +58,72 @@ test('"ResourceMixin" creation empty mock resource', async (t) => {
     ],
     resource: { id: 'id3', identifier: 'identifier3' },
   };
+  // @ts-ignore: property is protected
   const resource = await EmptyMockResource._build(
     ctx.client, ctx.handlers, methods, ctx.path, data,
   );
 
   t.assert(resource instanceof ResourceMixin);
-  // t.assert(resource.resource instanceof GenericFintocResource);
-  // t.is(resource.resource.id, data.resource.id);
-  // t.assert(Array.isArray(resource.resources));
-  // resource.resources.forEach((subResource: any) => {
-  //   t.assert(subResource instanceof GenericFintocResource);
-  // });
+  t.assert(resource.resource instanceof GenericFintocResource);
+  t.is(resource.resource.id, data.resource.id);
+  t.assert(Array.isArray(resource.resources));
+  resource.resources.forEach((subResource: any) => {
+    t.assert(subResource instanceof GenericFintocResource);
+  });
+});
+
+test('"ResourceMixin" creation complex mock resource', async (t) => {
+  const ctx: any = t.context;
+
+  const methods: string[] = [];
+  const data = {
+    id: 'id0',
+    identifier: 'identifier0',
+    resources: [
+      { id: 'id1', identifier: 'identifier1' },
+      { id: 'id2', identifier: 'identifier2' },
+    ],
+    resource: { id: 'id3', identifier: 'identifier3' },
+  };
+  // @ts-ignore: property is protected
+  const resource = await ComplexMockResource._build(
+    ctx.client, ctx.handlers, methods, ctx.path, data,
+  );
+
+  t.assert(resource instanceof ResourceMixin);
+  t.assert(resource.resource instanceof Link);
+  t.is(resource.resource.id, data.resource.id);
+  t.assert(Array.isArray(resource.resources));
+  resource.resources.forEach((subResource: any) => {
+    t.assert(subResource instanceof GenericFintocResource);
+  });
+});
+
+test('"ResourceMixin" creation update delete methods access', async (t) => {
+  const ctx: any = t.context;
+
+  const methods: string[] = ['delete'];
+  const data = {
+    id: 'id0',
+    identifier: 'identifier0',
+    resources: [
+      { id: 'id1', identifier: 'identifier1' },
+      { id: 'id2', identifier: 'identifier2' },
+    ],
+    resource: { id: 'id3', identifier: 'identifier3' },
+  };
+  // @ts-ignore: property is protected
+  const resource = await EmptyMockResource._build(
+    ctx.client, ctx.handlers, methods, ctx.path, data,
+  );
+
+  t.assert(resource instanceof ResourceMixin);
+
+  await t.throwsAsync(async () => {
+    await resource.update();
+  }, { instanceOf: TypeError });
+
+  await t.notThrowsAsync(async () => {
+    await resource.delete();
+  });
 });
