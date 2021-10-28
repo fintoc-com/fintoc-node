@@ -15,24 +15,24 @@ test.beforeEach((t) => {
   };
 });
 
-test('"objetize" string objetization', (t) => {
+test('"objetize" string objetization', async (t) => {
   const ctx: any = t.context;
   const data = 'This is data';
-  const object = objetize(String, ctx.client, data);
+  const object = await objetize(String, ctx.client, data);
   t.assert(typeof object === 'string');
   t.is(object, data);
 });
 
-test('"objetize" record objetization', (t) => {
+test('"objetize" record objetization', async (t) => {
   const ctx: any = t.context;
-  const object = objetize(Object, ctx.client, ctx.data);
+  const object = await objetize(Object, ctx.client, ctx.data);
   t.assert(isDictLike(object));
   t.is(object, ctx.data);
 });
 
-test('"objetize" complete objetization', (t) => {
+test('"objetize" complete objetization', async (t) => {
   const ctx: any = t.context;
-  const object = objetize(ExampleClass, ctx.client, ctx.data);
+  const object = await objetize(ExampleClass, ctx.client, ctx.data);
   t.assert(object instanceof ExampleClass);
   t.is(object.data.id, ctx.data.id);
 });
