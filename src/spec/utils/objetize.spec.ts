@@ -31,11 +31,23 @@ test('"objetize" record objetization', async (t) => {
   t.is(object, ctx.data);
 });
 
+test('"objetize" date objetization', async (t) => {
+  const ctx: any = t.context;
+  const object = await objetize(Date, ctx.client, '2021-08-13T13:40:40.811Z');
+  t.assert(object instanceof Date);
+});
+
 test('"objetize" complete objetization', async (t) => {
   const ctx: any = t.context;
   const object = await objetize(ExampleClass, ctx.client, ctx.data);
   t.assert(object instanceof ExampleClass);
   t.is(object.data.id, ctx.data.id);
+});
+
+test('"objetize" null objetization', async (t) => {
+  const ctx: any = t.context;
+  const object = await objetize(Object, ctx.client, null);
+  t.is(object, null);
 });
 
 test('"objetize" un-buildable class objetization', async (t) => {
