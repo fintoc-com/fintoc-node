@@ -1,3 +1,5 @@
+/* eslint-disable no-console */
+
 import test from 'ava';
 
 import { Client } from '../../../lib/client';
@@ -30,7 +32,7 @@ test.beforeEach((t) => {
   });
   ctx.path = '/resources';
   ctx.handlers = {
-    update: (object: any, identifier: string) => {
+    update: (object: any) => {
       console.log('Calling update...');
       return object;
     },

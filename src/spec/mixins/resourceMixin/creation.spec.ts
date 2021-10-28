@@ -34,14 +34,8 @@ test.beforeEach((t) => {
   });
   ctx.path = '/resources';
   ctx.handlers = {
-    update: (object: any, identifier: string) => {
-      console.log('Calling update...');
-      return object;
-    },
-    delete: (identifier: string) => {
-      console.log('Calling delete...');
-      return identifier;
-    },
+    update: (object: any) => object,
+    delete: (identifier: string) => identifier,
   };
 });
 
