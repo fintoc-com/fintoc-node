@@ -4,6 +4,7 @@ import { objetize } from '../../lib/utils';
 import { isDictLike } from '../shared/utils';
 
 import { ExampleClass } from './shared/exampleClass';
+import { IncompleteClass } from './shared/incompleteClass';
 
 test.beforeEach((t) => {
   const ctx: any = t.context;
@@ -35,4 +36,11 @@ test('"objetize" complete objetization', async (t) => {
   const object = await objetize(ExampleClass, ctx.client, ctx.data);
   t.assert(object instanceof ExampleClass);
   t.is(object.data.id, ctx.data.id);
+});
+
+test('"objetize" un-buildable class objetization', async (t) => {
+  const ctx: any = t.context;
+  await t.throwsAsync(async () => {
+    await objetize(IncompleteClass, ctx.client, ctx.data);
+  }, { instanceOf: TypeError });
 });

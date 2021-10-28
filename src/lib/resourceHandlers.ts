@@ -36,7 +36,7 @@ export async function resourceAll<ResourceType>(
   }
   const elements = [];
   for await (const element of data) {
-    elements.push(objetize(
+    elements.push(await objetize(
       klass,
       client,
       element,

@@ -27,29 +27,48 @@ export abstract class ResourceMixin<ResourceType> {
     handlers: Record<string, GenericFunction>,
     methods: string[],
     path: string,
-    data: Record<string, any>,
+    content: Record<string, any>,
+    attributes: string[],
   ) {
     this.#client = client;
     this.#handlers = handlers;
     this.#methods = methods;
     this.#path = path;
-    this.#attributes = [];
+    this.#attributes = attributes;
 
-    Object.entries(data).forEach(async ([key, value]) => {
+    Object.entries(content).forEach(([key, value]) => {
+      this[key] = value;
+    });
+  }
+
+  protected static async _build(
+    client: Client,
+    handlers: Record<string, GenericFunction>,
+    methods: string[],
+    path: string,
+    data: Record<string, any>,
+  ) {
+    const attributes: string[] = [];
+    const content: Record<string, any> = {};
+    for (const [key, value] of Object.entries(data)) {
+      /* eslint-disable no-await-in-loop */
       try {
-        const rawResource = this.#originatingClass.mappings[key] || key;
+        const rawResource = (this.mappings as Record<string, any>)[key] || key;
         if (Array.isArray(value)) {
           const resource = singularize(rawResource);
           const element = value.length > 0 ? value[0] : {};
           const klass = await getResourceClass(resource, element);
-          this[key] = value.map((x) => objetize(klass, client, x));
+          content[key] = await Promise.all(value.map((x) => objetize(klass, client, x)));
         } else {
           const klass = await getResourceClass(rawResource, value);
-          this[key] = objetize(klass, client, value);
+          content[key] = await objetize(klass, client, value);
         }
-        this.#attributes.push(key);
+        attributes.push(key);
       } catch { } /* eslint-disable-line no-empty */
-    });
+      /* eslint-enable no-await-in-loop */
+    }
+    // @ts-ignore: cannot create an instance of an abstract class
+    return new this(client, handlers, methods, path, content, attributes);
   }
 
   protected _useClient(): Client {

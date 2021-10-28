@@ -161,7 +161,7 @@ export function serialize(object: any) {
  * @param path - The path within the API server for the resource
  * @returns The data wrapped on the corresponding class
  */
-export function objetize(
+export async function objetize(
   Klass: any,
   client: Client,
   data: any,
@@ -178,7 +178,7 @@ export function objetize(
   if (Klass === Date) {
     return new Klass(data);
   }
-  return new Klass(client, handlers, methods, path, data);
+  return Klass._build(client, handlers, methods, path, data);
 }
 
 /**

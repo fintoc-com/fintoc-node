@@ -56,9 +56,9 @@ test('"ResourceMixin" creation empty mock resource', async (t) => {
     ],
     resource: { id: 'id3', identifier: 'identifier3' },
   };
-  const resource = new EmptyMockResource(ctx.client, ctx.handlers, methods, ctx.path, data);
-
-  t.log(resource.serialize());
+  const resource = await EmptyMockResource._build(
+    ctx.client, ctx.handlers, methods, ctx.path, data,
+  );
 
   t.assert(resource instanceof ResourceMixin);
   // t.assert(resource.resource instanceof GenericFintocResource);

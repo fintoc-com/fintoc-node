@@ -1,4 +1,4 @@
-export class ExampleClass {
+export class IncompleteClass {
   client: any;
   handlers: any;
   methods: any;
@@ -17,16 +17,6 @@ export class ExampleClass {
     this.methods = methods;
     this.path = path;
     this.data = data;
-  }
-
-  static async _build(
-    client: any,
-    handlers: any,
-    methods: any,
-    path: any,
-    data: Record<string, string> = {},
-  ) {
-    return new this(client, handlers, methods, path, data);
   }
 
   serialize() {
