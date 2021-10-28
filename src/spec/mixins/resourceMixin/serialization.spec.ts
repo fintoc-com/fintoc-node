@@ -3,6 +3,8 @@ import test from 'ava';
 import { Client } from '../../../lib/client';
 import { mockAxios, restore } from '../../mocks/initializers';
 
+import { EmptyMockResource } from './mocks/emptyMockResource';
+
 test.before((t) => {
   const ctx: any = t.context;
   ctx.axiosMock = mockAxios();
@@ -27,6 +29,52 @@ test.beforeEach((t) => {
     params: ctx.params,
   });
   ctx.path = '/resources';
+  ctx.handlers = {
+    update: (object: any, identifier: string) => {
+      console.log('Calling update...');
+      return object;
+    },
+    delete: (identifier: string) => {
+      console.log('Calling delete...');
+      return identifier;
+    },
+  };
 });
 
-test.todo('"ResourceMixin" serialization tests');
+test('"ResourceMixin" serialization method', async (t) => {
+  const ctx: any = t.context;
+
+  const methods = ['delete'];
+  const data = {
+    id: 'id0',
+    identifier: 'identifier0',
+    resource: { id: 'id3', identifier: 'identifier3' },
+  };
+  // @ts-ignore: property is protected
+  const resource = await EmptyMockResource._build(
+    ctx.client, ctx.handlers, methods, ctx.path, data,
+  );
+
+  t.deepEqual(resource.serialize(), data);
+});
+
+test('"ResourceMixin" serialization method (array)', async (t) => {
+  const ctx: any = t.context;
+
+  const methods = ['delete'];
+  const data = {
+    id: 'id0',
+    identifier: 'identifier0',
+    resources: [
+      { id: 'id1', identifier: 'identifier1' },
+      { id: 'id2', identifier: 'identifier2' },
+    ],
+    resource: { id: 'id3', identifier: 'identifier3' },
+  };
+  // @ts-ignore: property is protected
+  const resource = await EmptyMockResource._build(
+    ctx.client, ctx.handlers, methods, ctx.path, data,
+  );
+
+  t.deepEqual(resource.serialize(), data);
+});
