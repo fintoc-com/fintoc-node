@@ -1,7 +1,7 @@
 import test from 'ava';
 
 import { Client } from '../../lib/client';
-import { mockAxios, restoreAxios } from '../mocks/initializers';
+import { mockAxios, restore } from '../mocks/initializers';
 import { isAsyncGenerator, isDictLike } from '../shared/utils';
 
 test.before((t) => {
@@ -11,7 +11,7 @@ test.before((t) => {
 
 test.after((t) => {
   const ctx: any = t.context;
-  restoreAxios(ctx.axiosMock);
+  restore(ctx.axiosMock);
 });
 
 test.beforeEach((t) => {

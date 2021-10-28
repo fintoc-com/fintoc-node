@@ -10,6 +10,10 @@ export function mockAxios() {
   return mockedAxios;
 }
 
-export function restoreAxios(stub: SinonStub) {
+export function mockConsoleLog() {
+  return sinon.stub(console, 'log');
+}
+
+export function restore(stub: SinonStub) {
   stub.restore();
 }

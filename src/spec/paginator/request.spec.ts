@@ -2,7 +2,7 @@ import test from 'ava';
 import axios from 'axios';
 
 import { request } from '../../lib/paginator';
-import { mockAxios, restoreAxios } from '../mocks/initializers';
+import { mockAxios, restore } from '../mocks/initializers';
 
 test.before((t) => {
   const ctx: any = t.context;
@@ -11,7 +11,7 @@ test.before((t) => {
 
 test.after((t) => {
   const ctx: any = t.context;
-  restoreAxios(ctx.axiosMock);
+  restore(ctx.axiosMock);
 });
 
 test('"Request" request response', async (t) => {

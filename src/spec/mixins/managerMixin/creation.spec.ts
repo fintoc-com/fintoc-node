@@ -1,9 +1,10 @@
 import test from 'ava';
 
 import { Client } from '../../../lib/client';
-import { mockAxios, restoreAxios } from '../../mocks/initializers';
+import { mockAxios, restore } from '../../mocks/initializers';
 
 import { IncompleteMockManager } from './mocks/incompleteMockManager';
+import { InvalidMethodsMockManager } from './mocks/invalidMethodsMockManager';
 
 test.before((t) => {
   const ctx: any = t.context;
@@ -12,7 +13,7 @@ test.before((t) => {
 
 test.after((t) => {
   const ctx: any = t.context;
-  restoreAxios(ctx.axiosMock);
+  restore(ctx.axiosMock);
 });
 
 test.beforeEach((t) => {
@@ -31,16 +32,64 @@ test.beforeEach((t) => {
   ctx.path = '/resources';
 });
 
-test('"ManagerMixin" creation calling invalid methods', async (t) => {
+test('"ManagerMixin" creation calling invalid "all" method', async (t) => {
   const ctx: any = t.context;
 
-  const manager = new IncompleteMockManager(ctx.path, ctx.client);
+  const manager = new InvalidMethodsMockManager(ctx.path, ctx.client);
 
   const error = await t.throwsAsync(async () => {
     await manager.all();
   }, { instanceOf: TypeError });
 
   t.assert(error.message.includes('.all'));
+});
+
+test('"ManagerMixin" creation calling invalid "get" method', async (t) => {
+  const ctx: any = t.context;
+
+  const manager = new InvalidMethodsMockManager(ctx.path, ctx.client);
+
+  const error = await t.throwsAsync(async () => {
+    await manager.get('my_id');
+  }, { instanceOf: TypeError });
+
+  t.assert(error.message.includes('.get'));
+});
+
+test('"ManagerMixin" creation calling invalid "create" method', async (t) => {
+  const ctx: any = t.context;
+
+  const manager = new InvalidMethodsMockManager(ctx.path, ctx.client);
+
+  const error = await t.throwsAsync(async () => {
+    await manager.create();
+  }, { instanceOf: TypeError });
+
+  t.assert(error.message.includes('.create'));
+});
+
+test('"ManagerMixin" creation calling invalid "update" method', async (t) => {
+  const ctx: any = t.context;
+
+  const manager = new InvalidMethodsMockManager(ctx.path, ctx.client);
+
+  const error = await t.throwsAsync(async () => {
+    await manager.update('my_id');
+  }, { instanceOf: TypeError });
+
+  t.assert(error.message.includes('.update'));
+});
+
+test('"ManagerMixin" creation calling invalid "delete" method', async (t) => {
+  const ctx: any = t.context;
+
+  const manager = new InvalidMethodsMockManager(ctx.path, ctx.client);
+
+  const error = await t.throwsAsync(async () => {
+    await manager.delete('my_id');
+  }, { instanceOf: TypeError });
+
+  t.assert(error.message.includes('.delete'));
 });
 
 test('"ManagerMixin" creation calling valid methods', async (t) => {
