@@ -35,16 +35,16 @@ export abstract class ResourceMixin<ResourceType> {
     this.#path = path;
     this.#attributes = [];
 
-    Object.entries(data).forEach(([key, value]) => {
+    Object.entries(data).forEach(async ([key, value]) => {
       try {
         const rawResource = this.#originatingClass.mappings[key] || key;
         if (Array.isArray(value)) {
           const resource = singularize(rawResource);
           const element = value.length > 0 ? value[0] : {};
-          const klass = getResourceClass(resource, element);
+          const klass = await getResourceClass(resource, element);
           this[key] = value.map((x) => objetize(klass, client, x));
         } else {
-          const klass = getResourceClass(rawResource, value);
+          const klass = await getResourceClass(rawResource, value);
           this[key] = objetize(klass, client, value);
         }
         this.#attributes.push(key);

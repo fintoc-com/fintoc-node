@@ -3,7 +3,7 @@ import { GenericFunction } from '../types';
 
 import { Client } from './client';
 import * as errors from './errors';
-import * as resources from './resources';
+import { GenericFintocResource } from './resources/genericFintocResource';
 
 /**
  * Transform a string into title case.
@@ -48,10 +48,17 @@ export function isISODate(rawDate: string) {
 /**
  * Gets and returns the resources module interfaced as an IModule.
  *
+ * @param resourceName - Pascal cased string with the name of the resource
  * @returns The resources module interfaced as an IModule
  */
-export function getResourcesModule() {
-  return resources as IModule;
+export async function getResourcesModule(resourceName: string) {
+  const camelCaseName = resourceName.charAt(0).toLowerCase() + resourceName.slice(1);
+  try {
+    const resources = await import(`./resources/${camelCaseName}`);
+    return resources as IModule;
+  } catch {
+    return {};
+  }
 }
 
 /**
@@ -70,12 +77,12 @@ export function getErrorsModule() {
  * @param value - Value of the resource from which to get the corresponding class
  * @returns The class corresponding to the resource
  */
-export function getResourceClass(snakeResourceName: string, value: any = {}) {
+export async function getResourceClass(snakeResourceName: string, value: any = {}) {
   const klass = value?.constructor;
   if (klass === Object) {
-    const resourcesModule = getResourcesModule();
     const resourceName = snakeToPascal(snakeResourceName);
-    return resourcesModule[resourceName] || resourcesModule.GenericFintocResource;
+    const resourcesModule = await getResourcesModule(resourceName);
+    return resourcesModule[resourceName] || GenericFintocResource;
   }
   if ((klass === String) && isISODate(value)) {
     return Date;

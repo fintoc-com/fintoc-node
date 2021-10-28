@@ -102,7 +102,7 @@ export abstract class ManagerMixin<ResourceType extends IResourceMixin> {
     args?: ResourceArguments,
   ): Promise<ResourceType[] | AsyncGenerator<ResourceType>> {
     const innerArgs = args || {};
-    const klass = getResourceClass(this.#originatingClass.resource);
+    const klass = await getResourceClass(this.#originatingClass.resource);
     const objects = await resourceAll<ResourceType>(
       this._client,
       this.#path,
@@ -117,7 +117,7 @@ export abstract class ManagerMixin<ResourceType extends IResourceMixin> {
   @canRaiseHTTPError
   private async _get(identifier: string, args?: ResourceArguments): Promise<ResourceType> {
     const innerArgs = args || {};
-    const klass = getResourceClass(this.#originatingClass.resource);
+    const klass = await getResourceClass(this.#originatingClass.resource);
     const object = await resourceGet<ResourceType>(
       this._client,
       this.#path,
@@ -133,7 +133,7 @@ export abstract class ManagerMixin<ResourceType extends IResourceMixin> {
   @canRaiseHTTPError
   private async _create(args?: ResourceArguments): Promise<ResourceType> {
     const innerArgs = args || {};
-    const klass = getResourceClass(this.#originatingClass.resource);
+    const klass = await getResourceClass(this.#originatingClass.resource);
     const object = await resourceCreate<ResourceType>(
       this._client,
       this.#path,
