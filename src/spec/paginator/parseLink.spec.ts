@@ -43,3 +43,13 @@ test('"parseLink" overwrite object', (t) => {
   t.assert(parsed.next !== currentURL);
   t.assert(parsed.next === nextURL);
 });
+
+test('"parseLink" invalid link', (t) => {
+  const nextURL = 'https://api.fintoc.com/v1/links?page=2';
+  const object = {};
+  const link = `<${nextURL}>; this="is-invalid"`;
+  const parsed = parseLink(object, link);
+  t.assert(isDictLike(parsed));
+  t.assert(!('next' in parsed));
+  t.assert(Object.keys(parsed).length === 0);
+});
