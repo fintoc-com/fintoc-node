@@ -3,6 +3,8 @@ import test from 'ava';
 import { Client } from '../../../lib/client';
 import { mockAxios, restoreAxios } from '../../mocks/initializers';
 
+import { IncompleteMockManager } from './mocks/incompleteMockManager';
+
 test.before((t) => {
   const ctx: any = t.context;
   ctx.axiosMock = mockAxios();
@@ -29,4 +31,24 @@ test.beforeEach((t) => {
   ctx.path = '/resources';
 });
 
-test.todo('Manager Mixin creation');
+test('"ManagerMixin" creation calling invalid methods', async (t) => {
+  const ctx: any = t.context;
+
+  const manager = new IncompleteMockManager(ctx.path, ctx.client);
+
+  const error = await t.throwsAsync(async () => {
+    await manager.all();
+  }, { instanceOf: TypeError });
+
+  t.assert(error.message.includes('.all'));
+});
+
+test('"ManagerMixin" creation calling valid methods', async (t) => {
+  const ctx: any = t.context;
+
+  const manager = new IncompleteMockManager(ctx.path, ctx.client);
+
+  await t.notThrowsAsync(async () => {
+    await manager.get('id');
+  });
+});
