@@ -13,6 +13,7 @@
   ],
   "keywords": [],
   "scripts": {
+    "bump!": "sh scripts/bump.sh",
     "build": "run-p build:*",
     "build:main": "tsc -p tsconfig.json",
     "build:module": "tsc -p tsconfig.module.json",
@@ -23,12 +24,7 @@
     "cov": "run-p cov:*",
     "cov:text": "nyc report --reporter=text",
     "cov:cobertura": "nyc report --reporter=cobertura",
-    "doc": "run-s doc:html && open-cli build/docs/index.html",
-    "doc:html": "typedoc src/ --exclude **/*.spec.ts --target ES6 --mode file --out build/docs",
-    "doc:json": "typedoc src/ --exclude **/*.spec.ts --target ES6 --mode file --json build/docs/typedoc.json",
-    "doc:publish": "gh-pages -m \"[ci skip] Updates\" -d build/docs",
-    "version:get": "node -p \"require('./package.json').version\"",
-    "version": "standard-version"
+    "version:get": "node -p \"require('./package.json').version\""
   },
   "engines": {
     "node": ">=10"
@@ -45,19 +41,14 @@
     "@typescript-eslint/parser": "^4.0.1",
     "ava": "^3.12.1",
     "codecov": "^3.5.0",
-    "cspell": "^4.1.0",
-    "cz-conventional-changelog": "^3.3.0",
     "eslint": "^7.8.0",
     "eslint-config-airbnb-base": "^14.2.1",
     "eslint-plugin-eslint-comments": "^3.2.0",
     "eslint-plugin-import": "^2.24.0",
     "eslint-plugin-tsdoc": "^0.2.14",
-    "gh-pages": "^3.1.0",
     "npm-run-all": "^4.1.5",
     "nyc": "^15.1.0",
-    "open-cli": "^6.0.1",
     "sinon": "^11.1.2",
-    "standard-version": "^9.0.0",
     "ts-node": "^9.0.0",
     "typedoc": "^0.19.0",
     "typescript": "^4.0.2"
@@ -65,9 +56,6 @@
   "files": [
     "build/main",
     "build/module",
-    "!src/spec/**",
-    "!**/*.spec.*",
-    "!**/*.json",
     "LICENSE.md",
     "README.md"
   ]
