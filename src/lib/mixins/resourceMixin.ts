@@ -14,7 +14,8 @@ export abstract class ResourceMixin<ResourceType> {
   #methods: string[];
   #path: string;
   #attributes: string[];
-  #client: Client;
+
+  protected _client: Client;
 
   [anyAttribute: string]: any;
 
@@ -30,7 +31,7 @@ export abstract class ResourceMixin<ResourceType> {
     content: Record<string, any>,
     attributes: string[],
   ) {
-    this.#client = client;
+    this._client = client;
     this.#handlers = handlers;
     this.#methods = methods;
     this.#path = path;
@@ -72,11 +73,11 @@ export abstract class ResourceMixin<ResourceType> {
   }
 
   protected _useClient(): Client {
-    return this.#client;
+    return this._client;
   }
 
   protected _updateClient(newClient: Client) {
-    this.#client = newClient;
+    this._client = newClient;
   }
 
   serialize() {
@@ -123,7 +124,7 @@ export abstract class ResourceMixin<ResourceType> {
     const innerArgs = args || {};
     const id = this[this.#originatingClass.resourceIdentifier];
     let object = await resourceUpdate<ResourceType>(
-      this.#client,
+      this._client,
       this.#path,
       id,
       this.constructor,
@@ -141,7 +142,7 @@ export abstract class ResourceMixin<ResourceType> {
     const innerArgs = args || {};
     const id = this[this.#originatingClass.resourceIdentifier];
     await resourceDelete(
-      this.#client,
+      this._client,
       this.#path,
       id,
       innerArgs,
