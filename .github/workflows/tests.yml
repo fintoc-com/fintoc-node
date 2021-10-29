@@ -1,0 +1,55 @@
+name: tests
+
+on:
+  pull_request:
+    push:
+      branches:
+        - master
+        - stable
+    paths:
+      - ".github/workflows/tests.yml"
+      - "src/**"
+      - "tsconfig.json"
+      - "tsconfig.module.json"
+      - "package.json"
+      - "yarn.lock"
+
+jobs:
+  ava:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v2
+
+      - name: Set up Node.js v14
+        uses: actions/setup-node@v1
+        with:
+          node-version: 14
+
+      # Cache the node_modules directory
+      - name: Set up node_modules cache
+        uses: actions/cache@v2
+        id: node-modules-cache
+        with:
+          key: node-modules-cache-${{ hashFiles('**/yarn.lock') }}
+          path: '**/node_modules'
+
+      - name: Install dependencies
+        if: steps.node-modules-cache.outputs.cache-hit != 'true'
+        run: yarn install --frozen-lockfile
+
+      - name: Build the package
+        run: yarn build
+
+      - name: Test using Ava
+        run: yarn test
+
+      - name: Generate coverage report
+        run: yarn cov
+
+      - name: Upload coverage
+        uses: codecov/codecov-action@v2
+        with:
+          files: coverage/cobertura-coverage.xml
+          fail_ci_if_error: true
+          verbose: true
