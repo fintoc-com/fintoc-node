@@ -40,6 +40,9 @@ test('"LinksManager" post get handler', async (t) => {
   const subManager = link.accounts;
 
   // @ts-ignore: property is protected
+  t.not(link._client, firstManager._client);
+
+  // @ts-ignore: property is protected
   t.assert(!('link_token' in firstManager._client.params));
 
   // @ts-ignore: property is protected
@@ -54,6 +57,9 @@ test('"LinksManager" post update handler', async (t) => {
   const link = await firstManager.update('id');
 
   const subManager = link.accounts;
+
+  // @ts-ignore: property is protected
+  t.not(link._client, firstManager._client);
 
   // @ts-ignore: property is protected
   t.assert(!('link_token' in firstManager._client.params));
