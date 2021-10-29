@@ -29,16 +29,18 @@ export abstract class ResourceMixin<ResourceType> {
     methods: string[],
     path: string,
     content: Record<string, any>,
-    attributes: string[],
   ) {
     this._client = client;
     this.#handlers = handlers;
     this.#methods = methods;
     this.#path = path;
-    this.#attributes = attributes;
+    this.#attributes = [];
 
     Object.entries(content).forEach(([key, value]) => {
-      this[key] = value;
+      try {
+        this[key] = value;
+        this.#attributes.push(key);
+      } catch { } /* eslint-disable-line no-empty */
     });
   }
 
@@ -49,12 +51,11 @@ export abstract class ResourceMixin<ResourceType> {
     path: string,
     data: Record<string, any>,
   ) {
-    const attributes: string[] = [];
     const content: Record<string, any> = {};
     for (const [key, value] of Object.entries(data)) {
       /* eslint-disable no-await-in-loop */
-      try {
-        const rawResource = (this.mappings as Record<string, any>)[key] || key;
+      const rawResource = (this.mappings as Record<string, any>)[key] || key;
+      if (value !== undefined) {
         if (Array.isArray(value)) {
           const resource = singularize(rawResource);
           const element = value.length > 0 ? value[0] : {};
@@ -64,12 +65,12 @@ export abstract class ResourceMixin<ResourceType> {
           const klass = await getResourceClass(rawResource, value);
           content[key] = await objetize(klass, client, value);
         }
-        attributes.push(key);
-      } catch { } /* eslint-disable-line no-empty */
+      }
       /* eslint-enable no-await-in-loop */
     }
+    // console.log(content);
     // @ts-ignore: cannot create an instance of an abstract class
-    return new this(client, handlers, methods, path, content, attributes);
+    return new this(client, handlers, methods, path, content);
   }
 
   protected _useClient(): Client {
@@ -140,13 +141,13 @@ export abstract class ResourceMixin<ResourceType> {
   @canRaiseHTTPError
   private async _delete(args?: ResourceArguments): Promise<string> {
     const innerArgs = args || {};
-    const id = this[this.#originatingClass.resourceIdentifier];
+    const identifier = this[this.#originatingClass.resourceIdentifier];
     await resourceDelete(
       this._client,
       this.#path,
-      id,
+      this.id,
       innerArgs,
     );
-    return this.#handlers.delete(id, innerArgs);
+    return this.#handlers.delete(identifier, innerArgs);
   }
 }

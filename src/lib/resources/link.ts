@@ -23,9 +23,8 @@ export class Link extends ResourceMixin<Link> {
     methods: string[],
     path: string,
     content: Record<string, any>,
-    attributes: string[],
   ) {
-    super(client, handlers, methods, path, content, attributes);
+    super(client, handlers, methods, path, content);
     this.#accountsManager = undefined;
     this.#subscriptionsManager = undefined;
     this.#taxReturnsManager = undefined;

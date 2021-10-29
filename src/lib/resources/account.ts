@@ -12,9 +12,8 @@ export class Account extends ResourceMixin<Account> {
     methods: string[],
     path: string,
     content: Record<string, any>,
-    attributes: string[],
   ) {
-    super(client, handlers, methods, path, content, attributes);
+    super(client, handlers, methods, path, content);
     this.#movementsManager = undefined;
   }
 

@@ -96,7 +96,6 @@ test('"ResourceMixin" creation complex mock resource', async (t) => {
 test('"ResourceMixin" creation update delete methods access', async (t) => {
   const ctx: any = t.context;
 
-  const methods: string[] = ['delete'];
   const data = {
     id: 'id0',
     identifier: 'identifier0',
@@ -107,17 +106,32 @@ test('"ResourceMixin" creation update delete methods access', async (t) => {
     resource: { id: 'id3', identifier: 'identifier3' },
   };
   // @ts-ignore: property is protected
-  const resource = await EmptyMockResource._build(
-    ctx.client, ctx.handlers, methods, ctx.path, data,
+  const deleteAndNoUpdateresource = await EmptyMockResource._build(
+    ctx.client, ctx.handlers, ['delete'], ctx.path, data,
   );
 
-  t.assert(resource instanceof ResourceMixin);
+  t.assert(deleteAndNoUpdateresource instanceof ResourceMixin);
 
   await t.throwsAsync(async () => {
-    await resource.update();
+    await deleteAndNoUpdateresource.update();
   }, { instanceOf: TypeError });
 
   await t.notThrowsAsync(async () => {
-    await resource.delete();
+    await deleteAndNoUpdateresource.delete();
+  });
+
+  // @ts-ignore: property is protected
+  const updateAndNoDeleteResource = await EmptyMockResource._build(
+    ctx.client, ctx.handlers, ['update'], ctx.path, data,
+  );
+
+  t.assert(updateAndNoDeleteResource instanceof ResourceMixin);
+
+  await t.throwsAsync(async () => {
+    await updateAndNoDeleteResource.delete();
+  }, { instanceOf: TypeError });
+
+  await t.notThrowsAsync(async () => {
+    await updateAndNoDeleteResource.update();
   });
 });
