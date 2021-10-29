@@ -31,6 +31,11 @@ jobs:
       - name: Build the package
         run: yarn build
 
+      - name: Configure the npm token
+        run: npm config set '//registry.npmjs.org/:_authToken' "${NPM_TOKEN}"
+        env:
+          NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
+
       - name: Publish the package
         run: npm publish
         env:
