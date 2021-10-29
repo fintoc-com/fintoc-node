@@ -1,0 +1,83 @@
+name: release
+
+on:
+  push:
+    branches:
+      - stable
+
+jobs:
+  npm-release:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+
+      - name: Set up Node.js v14
+        uses: actions/setup-node@v1
+        with:
+          node-version: 14
+
+      # Cache the node_modules directory
+      - name: Set up node_modules cache
+        uses: actions/cache@v2
+        id: node-modules-cache
+        with:
+          key: node-modules-cache-${{ hashFiles('**/yarn.lock') }}
+          path: '**/node_modules'
+
+      - name: Install dependencies
+        if: steps.node-modules-cache.outputs.cache-hit != 'true'
+        run: yarn install --frozen-lockfile
+
+      - name: Build the package
+        run: yarn build
+
+      - name: Publish the package
+        run: npm publish
+        env:
+          NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
+
+  github-release:
+    needs: npm-release
+
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+
+      - name: Set up Node.js v14
+        uses: actions/setup-node@v1
+        with:
+          node-version: 14
+
+      # Cache the node_modules directory
+      - name: Set up node_modules cache
+        uses: actions/cache@v2
+        id: node-modules-cache
+        with:
+          key: node-modules-cache-${{ hashFiles('**/yarn.lock') }}
+          path: '**/node_modules'
+
+      - name: Install dependencies
+        if: steps.node-modules-cache.outputs.cache-hit != 'true'
+        run: yarn install --frozen-lockfile
+
+      - name: Get version
+        id: version
+        run: echo ::set-output name=version::$(yarn --silent version:get)
+
+      - name: Get Pull Request data
+        uses: jwalton/gh-find-current-pr@v1
+        id: find-pr
+        with:
+          state: all
+
+      - name: Tag and Release
+        uses: actions/create-release@latest
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          tag_name: ${{ steps.version.outputs.version }}
+          release_name: ${{ steps.version.outputs.version }}
+          body: |
+            ${{ steps.find-pr.outputs.body }}
+          draft: false
+          prerelease: false

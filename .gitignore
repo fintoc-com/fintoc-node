@@ -1,28 +1,10 @@
-# Logs
-logs
+.idea/*
+.nyc_output
+build
+node_modules
+test
+src/**.js
+src/**.mjs
+coverage
 *.log
-npm-debug.log*
-yarn-debug.log*
-yarn-error.log*
-
-# Dependency directories
-node_modules/
-jspm_packages/
-
-# Optional npm cache directory
-.npm
-
-# Optional eslint cache
-.eslintcache
-
-# Optional REPL history
-.node_repl_history
-
-# Output of 'npm pack'
-*.tgz
-
-# Yarn Integrity file
-.yarn-integrity
-
-# Sketches
-sketch.js
+package-lock.json
