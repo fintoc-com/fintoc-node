@@ -1,7 +1,7 @@
 import { GenericFunction } from '../../types';
 import { Client } from '../client';
 import {
-  AccountsManager, InvoicesManager, SubscriptionsManager, TaxReturnsManager,
+  AccountsManager, InvoicesManager, RefreshIntentsManager, SubscriptionsManager, TaxReturnsManager,
 } from '../managers';
 import { ResourceMixin } from '../mixins/resourceMixin';
 
@@ -12,6 +12,7 @@ export class Link extends ResourceMixin<Link> {
   #subscriptionsManager?: SubscriptionsManager;
   #taxReturnsManager?: TaxReturnsManager;
   #invoicesManager?: InvoicesManager;
+  #refreshIntentsManager?: RefreshIntentsManager;
 
   // @ts-ignore: declared but value is never used
   #linkToken?: string;
@@ -29,6 +30,7 @@ export class Link extends ResourceMixin<Link> {
     this.#subscriptionsManager = undefined;
     this.#taxReturnsManager = undefined;
     this.#invoicesManager = undefined;
+    this.#refreshIntentsManager = undefined;
   }
 
   protected _setLinkToken(newLinkToken: string) {
@@ -88,6 +90,19 @@ export class Link extends ResourceMixin<Link> {
   }
 
   set invoices(newValue) { /* eslint-disable-line class-methods-use-this */
+    throw new ReferenceError('Attribute name corresponds to a manager');
+  }
+
+  get refreshIntents() {
+    if (this.#refreshIntentsManager === undefined) {
+      this.#refreshIntentsManager = new RefreshIntentsManager(
+        '/refresh_intents', this._useClient(),
+      );
+    }
+    return this.#refreshIntentsManager;
+  }
+
+  set refreshIntents(newValue) { /* eslint-disable-line class-methods-use-this */
     throw new ReferenceError('Attribute name corresponds to a manager');
   }
 }

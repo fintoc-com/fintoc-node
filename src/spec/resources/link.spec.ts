@@ -87,3 +87,19 @@ test('"Link" resource invoices manager', async (t) => {
   t.not(link.invoices, null);
   t.assert(link.invoices instanceof ManagerMixin);
 });
+
+test('"Link" resource refresh intents manager', async (t) => {
+  const ctx: any = t.context;
+
+  // @ts-ignore: property is protected
+  const link = await Link._build(ctx.client, ctx.handlers, [], ctx.path, {});
+
+  t.assert(link.refreshIntents instanceof ManagerMixin);
+
+  await t.throwsAsync(async () => {
+    link.refreshIntents = null;
+  }, { instanceOf: ReferenceError });
+
+  t.not(link.refreshIntents, null);
+  t.assert(link.refreshIntents instanceof ManagerMixin);
+});

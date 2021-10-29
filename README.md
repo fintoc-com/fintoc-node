@@ -292,6 +292,7 @@ The Link resource has a lot of **managers**!
 const invoices = await link.invoices.all(); // Invoices
 const taxReturns = await link.taxReturns.all(); // Tax Returns
 const subscriptions = await link.subscriptions.all(); // Subscriptions
+const refreshIntents = await link.refreshIntents.all(); // Refresh Intents
 const accounts = await link.accounts.all(); // Accounts
 ```
 
@@ -329,6 +330,32 @@ Once you have a Link, you can use the `subscriptions` manager to get all the sub
 for await (const subscription of await link.subscriptions.all()) {
   console.log(subscription.id);
 }
+```
+
+#### The `refreshIntents` manager
+
+Available methods: `all`, `get`, `create`.
+
+Refresh intents allow you to control how an account gets refreshed on Fintoc! Once you have a Link, you can use the `refreshIntents` manager to create a new refresh intent:
+
+```javascript
+const refreshIntent = await link.refreshIntents.create()
+console.log(refreshIntent.id)  // ri_5A94DVCJ7xNM3MEo
+```
+
+Notice that the success of this refresh intent will be notified through a Webhook. Now, let's list every refresh intent we have:
+
+```javascript
+for await (const refreshIntent of await link.refreshIntents.all()) {
+  console.log(refreshIntent.id)
+}
+```
+
+If you see a refresh intent you want to use, just use the `get` method!
+
+```javascript
+const refreshIntent = await link.refreshIntents.get('ri_5A94DVCJ7xNM3MEo')
+console.log(refreshIntent.id)  // ri_5A94DVCJ7xNM3MEo
 ```
 
 #### The `accounts` manager
