@@ -8,6 +8,8 @@ on:
 jobs:
   npm-release:
     runs-on: ubuntu-latest
+    env:
+      NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
     steps:
       - uses: actions/checkout@v2
 
@@ -34,8 +36,6 @@ jobs:
 
       - name: Publish the package
         run: npm publish
-        env:
-          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
 
   github-release:
     needs: npm-release
