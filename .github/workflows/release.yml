@@ -15,6 +15,7 @@ jobs:
         uses: actions/setup-node@v2
         with:
           node-version: 14
+          registry-url: https://registry.npmjs.org
 
       # Cache the node_modules directory
       - name: Set up node_modules cache
@@ -34,7 +35,7 @@ jobs:
       - name: Publish the package
         run: npm publish
         env:
-          NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
 
   github-release:
     needs: npm-release
