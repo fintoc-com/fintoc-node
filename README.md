@@ -7,8 +7,8 @@
 </p>
 
 <p align="center">
-<a href="https://pypi.org/project/fintoc" target="_blank">
-    <img src="https://img.shields.io/npm/v/fintoc?label=version&logo=nodedotjs&logoColor=%23fff&color=306998" alt="PyPI - Version">
+<a href="https://www.npmjs.com/package/fintoc" target="_blank">
+    <img src="https://img.shields.io/npm/v/fintoc?label=version&logo=nodedotjs&logoColor=%23fff&color=306998" alt="NPM - Version">
 </a>
 
 <a href="https://github.com/fintoc-com/fintoc-node/actions?query=workflow%3Atests" target="_blank">
