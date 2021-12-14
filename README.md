@@ -7,8 +7,8 @@
 </p>
 
 <p align="center">
-<a href="https://pypi.org/project/fintoc" target="_blank">
-    <img src="https://img.shields.io/npm/v/fintoc?label=version&logo=nodedotjs&logoColor=%23fff&color=306998" alt="PyPI - Version">
+<a href="https://www.npmjs.com/package/fintoc" target="_blank">
+    <img src="https://img.shields.io/npm/v/fintoc?label=version&logo=nodedotjs&logoColor=%23fff&color=306998" alt="NPM - Version">
 </a>
 
 <a href="https://github.com/fintoc-com/fintoc-node/actions?query=workflow%3Atests" target="_blank">
@@ -210,7 +210,7 @@ import { Fintoc } from 'fintoc';
 const fintocClient = new Fintoc('your_api_key');
 ```
 
-This gives us access to a bunch of operations already. The object created using this _snippet_ contains two [managers](#managers): `links` and `webhookEndpoints`.
+This gives us access to a bunch of operations already. The object created using this _snippet_ contains three [managers](#managers): `links`, `paymentIntents` and `webhookEndpoints`.
 
 #### The `webhookEndpoints` manager
 
@@ -262,6 +262,45 @@ If you see a webhook endpoint you want to use, just use the `get` method!
 const webhookEndpoint = await fintocClient.webhookEndpoints.get('we_8anqVLlBC8ROodem');
 
 console.log(webhookEndpoint.id); // we_8anqVLlBC8ROodem
+```
+
+#### The `paymentIntents` manager
+
+Available methods: `all`, `get`, `create`.
+
+Payment intents allow you to start a payment using Fintoc! Start by creating a new payment intent:
+
+```javascript
+const paymentIntent = await fintocClient.paymentIntents.create({
+  currency: 'CLP',
+  amount: 5990,
+  recipient_account: {
+    holder_id: '111111111',
+    number: '123123123',
+    type: 'checking_account',
+    institution_id: 'cl_banco_de_chile',
+  },
+});
+
+console.log(paymentIntent.id);            // pi_BO381oEATXonG6bj
+console.log(paymentIntent.widget_token);  // pi_BO381oEATXonG6bj_sec_a4xK32BanKWYn
+```
+
+Notice that the success of this payment intent will be notified through a Webhook. Now, let's list every payment intent we have:
+
+```javascript
+for await (const paymentIntent of await fintocClient.paymentIntents.all()) {
+  console.log(paymentIntent.id);
+}
+```
+
+If you see a payment intent you want to use, just use the `get` method!
+
+```javascript
+const paymentIntent = fintocClient.paymentIntents.get('pi_BO381oEATXonG6bj')
+
+console.log(paymentIntent.id)      // pi_BO381oEATXonG6bj
+console.log(paymentIntent.status)  // succeeded
 ```
 
 #### The `links` manager
@@ -339,23 +378,26 @@ Available methods: `all`, `get`, `create`.
 Refresh intents allow you to control how an account gets refreshed on Fintoc! Once you have a Link, you can use the `refreshIntents` manager to create a new refresh intent:
 
 ```javascript
-const refreshIntent = await link.refreshIntents.create()
-console.log(refreshIntent.id)  // ri_5A94DVCJ7xNM3MEo
+const refreshIntent = await link.refreshIntents.create();
+
+console.log(refreshIntent.id);  // ri_5A94DVCJ7xNM3MEo
 ```
 
 Notice that the success of this refresh intent will be notified through a Webhook. Now, let's list every refresh intent we have:
 
 ```javascript
 for await (const refreshIntent of await link.refreshIntents.all()) {
-  console.log(refreshIntent.id)
+  console.log(refreshIntent.id);
 }
 ```
 
 If you see a refresh intent you want to use, just use the `get` method!
 
 ```javascript
-const refreshIntent = await link.refreshIntents.get('ri_5A94DVCJ7xNM3MEo')
-console.log(refreshIntent.id)  // ri_5A94DVCJ7xNM3MEo
+const refreshIntent = await link.refreshIntents.get('ri_5A94DVCJ7xNM3MEo');
+
+console.log(refreshIntent.id);      // ri_5A94DVCJ7xNM3MEo
+console.log(refreshIntent.status);  // succeeded
 ```
 
 #### The `accounts` manager
