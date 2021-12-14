@@ -1,7 +1,7 @@
 #!/bin/sh
 
-if [ $(git symbolic-ref --short HEAD) != master ]; then
-    echo "This script is supposed to be run on the \"master\" branch."
+if [ $(git symbolic-ref --short HEAD) != main ]; then
+    echo "This script is supposed to be run on the \"main\" branch."
     exit 1
 fi
 
