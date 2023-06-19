@@ -1,1 +1,3 @@
-export type ResourceArguments = Record<string, string | number | boolean>;
+export type ResourceArguments = {
+  [key: string]: ResourceArguments | string | number | boolean
+}
