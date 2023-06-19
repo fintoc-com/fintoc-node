@@ -7,21 +7,21 @@ on:
 
 jobs:
   npm-release:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-20.04
     env:
       NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
     steps:
-      - uses: actions/checkout@v2
+      - name: Checkout to commit code
+        uses: actions/checkout@v3
 
       - name: Set up Node.js v14
-        uses: actions/setup-node@v2
+        uses: actions/setup-node@v3
         with:
           node-version: 14
           registry-url: https://registry.npmjs.org
 
-      # Cache the node_modules directory
       - name: Set up node_modules cache
-        uses: actions/cache@v2
+        uses: actions/cache@v3
         id: node-modules-cache
         with:
           key: node-modules-cache-${{ hashFiles('**/yarn.lock') }}
@@ -40,18 +40,18 @@ jobs:
   github-release:
     needs: npm-release
 
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-20.04
     steps:
-      - uses: actions/checkout@v2
+      - name: Checkout to commit code
+        uses: actions/checkout@v3
 
       - name: Set up Node.js v14
-        uses: actions/setup-node@v1
+        uses: actions/setup-node@v3
         with:
           node-version: 14
 
-      # Cache the node_modules directory
       - name: Set up node_modules cache
-        uses: actions/cache@v2
+        uses: actions/cache@v3
         id: node-modules-cache
         with:
           key: node-modules-cache-${{ hashFiles('**/yarn.lock') }}
