@@ -12,15 +12,11 @@
 </a>
 
 <a href="https://github.com/fintoc-com/fintoc-node/actions?query=workflow%3Atests" target="_blank">
-    <img src="https://img.shields.io/github/workflow/status/fintoc-com/fintoc-node/tests?label=tests&logo=nodedotjs&logoColor=%23fff" alt="Tests">
-</a>
-
-<a href="https://codecov.io/gh/fintoc-com/fintoc-node" target="_blank">
-    <img src="https://img.shields.io/codecov/c/gh/fintoc-com/fintoc-node?label=coverage&logo=codecov&logoColor=ffffff" alt="Coverage">
+    <img src="https://img.shields.io/github/actions/workflow/status/fintoc-com/fintoc-node/tests.yml?branch=master&label=tests&logo=nodedotjs&logoColor=%23fff" alt="Tests">
 </a>
 
 <a href="https://github.com/fintoc-com/fintoc-node/actions?query=workflow%3Alinters" target="_blank">
-    <img src="https://img.shields.io/github/workflow/status/fintoc-com/fintoc-node/linters?label=linters&logo=github" alt="Linters">
+    <img src="https://img.shields.io/github/actions/workflow/status/fintoc-com/fintoc-node/linters.yml?branch=master&label=linters&logo=github" alt="Tests">
 </a>
 </p>
 
