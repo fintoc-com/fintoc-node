@@ -50,7 +50,7 @@ export class Client {
     options: IRequestOptions,
   ): Promise<Record<string, string> | AsyncGenerator<Record<string, string>, void, unknown>> {
     const {
-      path, paginated = false, method = 'get', params = {}, json = {},
+      path, json, paginated = false, method = 'get', params = {},
     } = options;
     if (paginated) {
       return paginate({
