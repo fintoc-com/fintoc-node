@@ -17,7 +17,12 @@ export class Account extends ResourceMixin<Account> {
     this.#movementsManager = undefined;
   }
 
+  /**
+   * @deprecated This method is deprecated and will be removed in a future version.
+   * Please use the Fintoc client directly to access movements. See: https://github.com/fintoc-com/fintoc-node/pull/34
+   */
   get movements() {
+    console.warn('Warning: Account.movements is deprecated and will be removed in a future version. Please use the Fintoc client directly to access movements. See: https://github.com/fintoc-com/fintoc-node/pull/34');
     if (this.#movementsManager === undefined) {
       this.#movementsManager = new MovementsManager(
         `/accounts/${this.id}/movements`, this._client,
