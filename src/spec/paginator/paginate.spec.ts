@@ -17,7 +17,7 @@ test.after((t) => {
 
 test('"Paginate" pagination', async (t) => {
   const client = axios.create({ baseURL: 'https://test.com' });
-  const data = paginate({ client, path: '/movements' });
+  const data = paginate({ client, path: '/movements', headers: {} });
 
   t.assert(isAsyncGenerator(data));
 

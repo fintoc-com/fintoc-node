@@ -68,7 +68,6 @@ export abstract class ResourceMixin<ResourceType> {
       }
       /* eslint-enable no-await-in-loop */
     }
-    // console.log(content);
     // @ts-ignore: cannot create an instance of an abstract class
     return new this(client, handlers, methods, path, content);
   }
@@ -145,7 +144,7 @@ export abstract class ResourceMixin<ResourceType> {
     await resourceDelete(
       this._client,
       this.#path,
-      this.id,
+      identifier,
       innerArgs,
     );
     return this.#handlers.delete(identifier, innerArgs);

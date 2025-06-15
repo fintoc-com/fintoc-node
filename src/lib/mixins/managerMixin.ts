@@ -15,7 +15,7 @@ export abstract class ManagerMixin<ResourceType extends IResourceMixin> {
 
   constructor(path: string, client: Client) {
     this.#path = path;
-    this._client = client.extend();
+    this._client = client;
     this.#handlers = {
       update: this.postUpdateHandler.bind(this),
       delete: this.postDeleteHandler.bind(this),
