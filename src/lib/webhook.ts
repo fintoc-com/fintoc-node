@@ -2,14 +2,14 @@ import * as crypto from 'crypto';
 
 import { WebhookSignatureError } from './errors';
 
-const DEFAULT_TOLERANCE_SECONDS = 300; // 5 minutes
+const DEFAULT_TOLERANCE_SECONDS = 300;
 
 export class WebhookSignature {
   public static verifyHeader(
     payload: string | Buffer,
     header: string,
     secret: string,
-    toleranceSeconds: number = DEFAULT_TOLERANCE_SECONDS,
+    tolerance: number = DEFAULT_TOLERANCE_SECONDS,
   ): void {
     if (!header) {
       throw new WebhookSignatureError(
@@ -25,7 +25,7 @@ export class WebhookSignature {
 
     const { timestamp, signature } = WebhookSignature.parseHeader(header);
 
-    WebhookSignature.verifyTimestamp(timestamp, toleranceSeconds);
+    WebhookSignature.verifyTimestamp(timestamp, tolerance);
 
     const expectedSignature = WebhookSignature.computeSignature(
       payload,

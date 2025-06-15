@@ -428,6 +428,29 @@ for await (const movement of await account.movements.all()) {
 }
 ```
 
+### Webhook Signature Validation
+
+To ensure the authenticity of incoming webhooks from Fintoc, you should always validate the signature. The SDK provides a `WebhookSignature` class to verify the `Fintoc-Signature` header
+
+```javascript
+WebhookSignature.verifyHeader(
+    req.body,
+    req.headers['fintoc-signature'],
+    'your_webhook_secret'
+)
+```
+
+The `verifyHeader` method takes the following parameters:
+- `payload`: The raw request body as a string
+- `header`: The Fintoc-Signature header value
+- `secret`: Your webhook secret key (found in your Fintoc dashboard)
+- `tolerance`: Number of seconds to tolerate when checking timestamp (default: 300)
+
+If the signature is invalid or the timestamp is outside the tolerance window, a `WebhookSignatureError` will be raised with a descriptive message.
+
+
+For a complete example of handling webhooks, see [examples/webhook.js](examples/webhook.js).
+
 ### Serialization
 
 Any resource of the SDK can be serialized! To get the serialized resource, just call the `serialize` method!

@@ -59,7 +59,7 @@ test('WebhookSignature.verifyHeader should succeed for valid signature and recen
 });
 
 test('WebhookSignature.verifyHeader should throw error for signature mismatch', (t) => {
-  const badHeader = `t=${testTimestamp},v1=bad_signature`; // Incorrect signature
+  const badHeader = `t=${testTimestamp},v1=bad_signature`;
   const largeTolerance = Math.abs(getCurrentTimestamp() - testTimestamp) + 100;
   const error = t.throws(() => {
     WebhookSignature.verifyHeader(testPayload, badHeader, testSecret, largeTolerance);
