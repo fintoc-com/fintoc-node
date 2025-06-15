@@ -7,7 +7,7 @@ on:
 
 jobs:
   npm-release:
-    runs-on: ubuntu-20.04
+    runs-on: ubuntu-24.04
     env:
       NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
     steps:
@@ -40,7 +40,7 @@ jobs:
   github-release:
     needs: npm-release
 
-    runs-on: ubuntu-20.04
+    runs-on: ubuntu-24.04
     steps:
       - name: Checkout to commit code
         uses: actions/checkout@v3
