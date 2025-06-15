@@ -22,10 +22,10 @@ jobs:
       - name: Checkout to commit code
         uses: actions/checkout@v3
 
-      - name: Set up Node.js v14
+      - name: Set up Node.js v18
         uses: actions/setup-node@v3
         with:
-          node-version: 14
+          node-version: 18
 
       - name: Set up node_modules cache
         uses: actions/cache@v3
