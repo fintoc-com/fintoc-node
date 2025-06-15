@@ -25,3 +25,5 @@ export class LinkError extends FintocError {}
 export class InstitutionError extends FintocError {}
 
 export class InvalidRequestError extends FintocError {}
+
+export class WebhookSignatureError extends Error {}
