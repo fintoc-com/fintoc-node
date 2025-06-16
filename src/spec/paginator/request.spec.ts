@@ -28,5 +28,5 @@ test('"Request" request params get passed to next URL', async (t) => {
   const data = await request({ client, path: '/movements', params: { link_token: 'sample_link_token' } });
 
   t.assert('next' in data);
-  t.assert(data.next.includes('link_token=sample_link_token'));
+  t.assert(data.next && data.next.includes('link_token=sample_link_token'));
 });
