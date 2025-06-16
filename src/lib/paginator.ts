@@ -38,23 +38,31 @@ export function parseLinkHeaders(
 }
 
 export async function request(options: IPaginationOptions) {
-  const { client, path, params = {} } = options;
-  const response = await client.request<Array<Record<string, any>>>({ method: 'get', url: path, params: params || {} });
-  const headers = parseLinkHeaders(response.headers.link);
-  const next = headers && headers.next;
+  const {
+    client, path, headers, params = {},
+  } = options;
+  const response = await client.request<Array<Record<string, any>>>({
+    method: 'get', url: path, params: params || {}, headers,
+  });
+  const responseHeaders = parseLinkHeaders(response.headers.link);
+  const next = responseHeaders && responseHeaders.next;
   const elements = response.data;
   return { next, elements };
 }
 
 export async function* paginate(options: IPaginationOptions) {
-  const { client, path, params = {} } = options;
-  let response = await request({ client, path, params });
+  const {
+    client, path, headers, params = {},
+  } = options;
+  let response = await request({
+    client, path, headers, params,
+  });
   /* eslint-disable no-await-in-loop */
   for (const element of response.elements) {
     yield element;
   }
   while (response.next) {
-    response = await request({ client, path: response.next });
+    response = await request({ client, path: response.next, headers });
     for (const element of response.elements) {
       yield element;
     }

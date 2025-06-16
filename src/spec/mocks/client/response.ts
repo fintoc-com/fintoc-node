@@ -43,8 +43,8 @@ export class MockResponse {
     }
 
     const urlParts = this.url.split('/');
-    const hasIdentifier = urlParts.length > 1 && urlParts[1];
-    const id = hasIdentifier ? urlParts[1] : 'idx';
+    const hasIdentifier = urlParts.length > 2 && urlParts[2];
+    const id = hasIdentifier ? urlParts[2] : 'idx';
     return {
       id,
       method: this.method,
