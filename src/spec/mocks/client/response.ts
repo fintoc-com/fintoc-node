@@ -30,6 +30,7 @@ export class MockResponse {
     if (this.method === 'delete') {
       return {};
     }
+
     if (this.method === 'get' && this.url.charAt(this.url.length - 1) === 's') {
       return Array.from(Array(10)).map(() => ({
         id: 'idx',
@@ -40,8 +41,12 @@ export class MockResponse {
         page: this.page,
       }));
     }
+
+    const urlParts = this.url.split('/');
+    const hasIdentifier = urlParts.length > 1 && urlParts[1];
+    const id = hasIdentifier ? urlParts[1] : 'idx';
     return {
-      id: 'idx',
+      id,
       method: this.method,
       url: this.url,
       params: this.params,
