@@ -5,6 +5,16 @@ import { WebhookSignatureError } from './errors';
 const DEFAULT_TOLERANCE_SECONDS = 300;
 
 export class WebhookSignature {
+  /**
+   * Verifies the authenticity of incoming webhooks from Fintoc by validating the signature.
+   *
+   * @param payload - The raw request body as a string or Buffer
+   * @param header - The Fintoc-Signature header value
+   * @param secret - Your webhook secret key (found in your Fintoc dashboard)
+   * @param tolerance - Number of seconds to tolerate when checking timestamp (default: 300)
+   * @throws {WebhookSignatureError} If the signature is invalid or timestamp is outside
+   * tolerance window
+   */
   public static verifyHeader(
     payload: string | Buffer,
     header: string,
