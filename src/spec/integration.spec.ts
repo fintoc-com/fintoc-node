@@ -391,3 +391,145 @@ test('account.movements.get()', async (t) => {
   t.is(movement.url, `v1/accounts/${accountId}/movements/${movementId}`);
   t.is(movement._client.params.link_token, linkToken);
 });
+
+test('fintoc.v2.transfers.all()', async (t) => {
+  const ctx: any = t.context;
+  const transfers = await ctx.fintoc.v2.transfers.all();
+
+  let count = 0;
+  for await (const transfer of transfers) {
+    count += 1;
+    t.is(transfer.method, 'get');
+    t.is(transfer.url, 'v2/transfers');
+  }
+
+  t.true(count > 0);
+});
+
+test('fintoc.v2.transfers.get()', async (t) => {
+  const ctx: any = t.context;
+  const transferId = 'transfer_id';
+  const transfer = await ctx.fintoc.v2.transfers.get(transferId);
+
+  t.is(transfer.method, 'get');
+  t.is(transfer.url, `v2/transfers/${transferId}`);
+});
+
+test('fintoc.v2.transfers.create()', async (t) => {
+  const ctx: any = t.context;
+  const transferData = {
+    amount: 10000,
+    currency: 'MXN',
+    counterparty: {
+      account_number: '012969100000000026',
+    },
+  };
+  const transfer = await ctx.fintoc.v2.transfers.create(transferData);
+
+  t.is(transfer.method, 'post');
+  t.is(transfer.url, 'v2/transfers');
+  t.is(transfer.json.amount, transferData.amount);
+  t.is(transfer.json.currency, transferData.currency);
+  t.is(transfer.json.counterparty.account_number, transferData.counterparty.account_number);
+});
+
+test('fintoc.v2.accounts.all()', async (t) => {
+  const ctx: any = t.context;
+  const accounts = await ctx.fintoc.v2.accounts.all();
+
+  let count = 0;
+  for await (const account of accounts) {
+    count += 1;
+    t.is(account.method, 'get');
+    t.is(account.url, 'v2/accounts');
+  }
+
+  t.true(count > 0);
+});
+
+test('fintoc.v2.accounts.get()', async (t) => {
+  const ctx: any = t.context;
+  const accountId = 'account_id';
+  const account = await ctx.fintoc.v2.accounts.get(accountId);
+
+  t.is(account.method, 'get');
+  t.is(account.url, `v2/accounts/${accountId}`);
+});
+
+test('fintoc.v2.accounts.create()', async (t) => {
+  const ctx: any = t.context;
+  const accountData = {
+    description: 'Test Account',
+  };
+  const account = await ctx.fintoc.v2.accounts.create(accountData);
+
+  t.is(account.method, 'post');
+  t.is(account.url, 'v2/accounts');
+  t.is(account.json.description, accountData.description);
+});
+
+test('fintoc.v2.accountNumbers.all()', async (t) => {
+  const ctx: any = t.context;
+  const accountNumbers = await ctx.fintoc.v2.accountNumbers.all();
+
+  let count = 0;
+  for await (const accountNumber of accountNumbers) {
+    count += 1;
+    t.is(accountNumber.method, 'get');
+    t.is(accountNumber.url, 'v2/account_numbers');
+  }
+
+  t.true(count > 0);
+});
+
+test('fintoc.v2.accountNumbers.get()', async (t) => {
+  const ctx: any = t.context;
+  const accountNumberId = 'account_number_id';
+  const accountNumber = await ctx.fintoc.v2.accountNumbers.get(accountNumberId);
+
+  t.is(accountNumber.method, 'get');
+  t.is(accountNumber.url, `v2/account_numbers/${accountNumberId}`);
+});
+
+test('fintoc.v2.accountNumbers.create()', async (t) => {
+  const ctx: any = t.context;
+  const accountNumberData = {
+    account_id: 'account_123',
+    description: 'test acc number',
+  };
+  const accountNumber = await ctx.fintoc.v2.accountNumbers.create(accountNumberData);
+
+  t.is(accountNumber.method, 'post');
+  t.is(accountNumber.url, 'v2/account_numbers');
+  t.is(accountNumber.json.account_id, accountNumberData.account_id);
+  t.is(accountNumber.json.description, accountNumberData.description);
+});
+
+test('fintoc.v2.accountNumbers.update()', async (t) => {
+  const ctx: any = t.context;
+  const accountNumberId = 'account_number_id';
+  const updateData = {
+    status: 'enabled',
+  };
+  const accountNumber = await ctx.fintoc.v2.accountNumbers.update(accountNumberId, updateData);
+
+  t.is(accountNumber.method, 'patch');
+  t.is(accountNumber.url, `v2/account_numbers/${accountNumberId}`);
+  t.is(accountNumber.json.status, updateData.status);
+});
+
+test('fintoc.v2.simulate.receiveTransfer()', async (t) => {
+  const ctx: any = t.context;
+  const transferData = {
+    amount: 50000,
+    currency: 'MXN',
+    account_number_id: 'account_number_123',
+  };
+  const result = await ctx.fintoc.v2.simulate.receiveTransfer(transferData);
+
+  t.is(result.method, 'post');
+  t.is(result.url, 'v2/simulate/receive_transfer');
+  t.is(result.json.amount, transferData.amount);
+  t.is(result.json.currency, transferData.currency);
+  t.is(result.json.account_number_id, transferData.account_number_id);
+});

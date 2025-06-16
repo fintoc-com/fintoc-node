@@ -48,7 +48,7 @@ export class Link extends ResourceMixin<Link> {
     console.warn('Warning: Link.accounts is deprecated and will be removed in a future version. Please use the Fintoc client directly to access accounts. See: https://github.com/fintoc-com/fintoc-node/pull/34');
     if (this.#accountsManager === undefined) {
       this.#accountsManager = new AccountsManager(
-        '/accounts', this._useClient(),
+        '/v1/accounts', this._useClient(),
       );
     }
     return this.#accountsManager;
@@ -66,7 +66,7 @@ export class Link extends ResourceMixin<Link> {
     console.warn('Warning: Link.subscriptions is deprecated and will be removed in a future version. Please use the Fintoc client directly to access subscriptions. See: https://github.com/fintoc-com/fintoc-node/pull/34');
     if (this.#subscriptionsManager === undefined) {
       this.#subscriptionsManager = new SubscriptionsManager(
-        '/subscriptions', this._useClient(),
+        '/v1/subscriptions', this._useClient(),
       );
     }
     return this.#subscriptionsManager;
@@ -84,7 +84,7 @@ export class Link extends ResourceMixin<Link> {
     console.warn('Warning: Link.taxReturns is deprecated and will be removed in a future version. Please use the Fintoc client directly to access taxReturns. See: https://github.com/fintoc-com/fintoc-node/pull/34');
     if (this.#taxReturnsManager === undefined) {
       this.#taxReturnsManager = new TaxReturnsManager(
-        '/tax_returns', this._useClient(),
+        '/v1/tax_returns', this._useClient(),
       );
     }
     return this.#taxReturnsManager;
@@ -102,7 +102,7 @@ export class Link extends ResourceMixin<Link> {
     console.warn('Warning: Link.invoices is deprecated and will be removed in a future version. Please use the Fintoc client directly to access invoices. See: https://github.com/fintoc-com/fintoc-node/pull/34');
     if (this.#invoicesManager === undefined) {
       this.#invoicesManager = new InvoicesManager(
-        '/invoices', this._useClient(),
+        '/v1/invoices', this._useClient(),
       );
     }
     return this.#invoicesManager;
@@ -120,7 +120,7 @@ export class Link extends ResourceMixin<Link> {
     console.warn('Warning: Link.refreshIntents is deprecated and will be removed in a future version. Please use the Fintoc client directly to access refreshIntents. See: https://github.com/fintoc-com/fintoc-node/pull/34');
     if (this.#refreshIntentsManager === undefined) {
       this.#refreshIntentsManager = new RefreshIntentsManager(
-        '/refresh_intents', this._useClient(),
+        '/v1/refresh_intents', this._useClient(),
       );
     }
     return this.#refreshIntentsManager;
