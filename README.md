@@ -25,7 +25,7 @@
 - [Usage](#usage)
   - [Quickstart](#quickstart)
   - [Calling endpoints](#calling-endpoints)
-    - [all](#all)
+    - [list](#list)
     - [get](#get)
     - [create](#create)
     - [update](#update)
@@ -63,7 +63,7 @@ import { Fintoc } from 'fintoc';
 const fintocClient = new Fintoc('your_api_key');
 
 // List all succeeded payment intents since the beginning of 2025
-const paymentIntents = await fintocClient.paymentIntents.all({ since: '2025-01-01' });
+const paymentIntents = await fintocClient.paymentIntents.list({ since: '2025-01-01' });
 for await (const pi of paymentIntents) {
   console.log(pi.created_at, pi.amount, pi.status);
 }
@@ -79,18 +79,18 @@ The SDK provides direct access to Fintoc API resources following the API structu
 
 Notice that **not every resource has all of the methods**, as they correspond to the API capabilities.
 
-#### `all`
+#### `list`
 
-You can use the `all` method to list all the instances of the resource:
+You can use the `list` method to list all the instances of the resource:
 
 ```javascript
-const webhookEndpoints = await fintocClient.webhookEndpoints.all();
+const webhookEndpoints = await fintocClient.webhookEndpoints.list();
 ```
 
-The `all` method returns an **async generator** with all the instances of the resource. This method can also receive the arguments that the API receives for that specific resource. For example, the `PaymentIntent` resource can be filtered using `since` and `until`, so if you wanted to get a range of `payment intents`, all you need to do is to pass the parameters to the method:
+The `list` method returns an **async generator** with all the instances of the resource. This method can also receive the arguments that the API receives for that specific resource. For example, the `PaymentIntent` resource can be filtered using `since` and `until`, so if you wanted to get a range of `payment intents`, all you need to do is to pass the parameters to the method:
 
 ```javascript
-const paymentIntents = await fintocClient.paymentIntents.all({
+const paymentIntents = await fintocClient.paymentIntents.list({
   since: '2019-07-24',
   until: '2021-05-12',
 });
@@ -99,7 +99,7 @@ const paymentIntents = await fintocClient.paymentIntents.all({
 Notice that, in order to iterate over the async generator, you need to `await` the generator itself **and then** each of the instances:
 
 ```javascript
-const paymentIntents = await fintocClient.paymentIntents.all({
+const paymentIntents = await fintocClient.paymentIntents.list({
   since: '2019-07-24',
   until: '2021-05-12',
 });
@@ -112,7 +112,7 @@ for await (const paymentIntent of paymentIntents) {
 You can also pass the `lazy: false` parameter to the method to force the SDK to return a list of all the instances of the resource instead of the generator. **Beware**: this could take **very long**, depending on the amount of instances that exist of said resource:
 
 ```javascript
-const paymentIntents = await fintocClient.paymentIntents.all({ lazy: false });
+const paymentIntents = await fintocClient.paymentIntents.list({ lazy: false });
 
 Array.isArray(paymentIntents); // true
 ```
@@ -212,7 +212,7 @@ const transfer = await fintoc.v2.transfers.create({
 Any resource of the SDK can be serialized! To get the serialized resource, just call the `serialize` method!
 
 ```javascript
-const account = (await link.accounts.all({ lazy: false }))[0];
+const account = (await link.accounts.list({ lazy: false }))[0];
 
 const serialization = account.serialize();
 ```
