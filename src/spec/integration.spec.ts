@@ -103,6 +103,222 @@ test('fintoc.links.delete()', async (t) => {
   t.is(deletedIdentifier, linkId);
 });
 
+test('fintoc.accounts.all()', async (t) => {
+  const ctx: any = t.context;
+  const accounts = await ctx.fintoc.accounts.all();
+
+  let count = 0;
+  for await (const account of accounts) {
+    count += 1;
+    t.is(account.method, 'get');
+    t.is(account.url, 'v1/accounts');
+  }
+
+  t.true(count > 0);
+});
+
+test('fintoc.accounts.get()', async (t) => {
+  const ctx: any = t.context;
+  const accountId = 'account_id';
+  const account = await ctx.fintoc.accounts.get(accountId);
+
+  t.is(account.method, 'get');
+  t.is(account.url, `v1/accounts/${accountId}`);
+});
+
+test('fintoc.accounts.movements.all()', async (t) => {
+  const ctx: any = t.context;
+  const linkToken = 'link_token_example';
+  const accountId = 'account_id';
+  const movements = await ctx.fintoc.accounts.movements.all({
+    account_id: accountId,
+    link_token: linkToken,
+  });
+
+  let count = 0;
+  for await (const movement of movements) {
+    count += 1;
+    t.is(movement.method, 'get');
+    t.is(movement.url, `v1/accounts/${accountId}/movements`);
+    t.is(movement.params.link_token, linkToken);
+    t.is(movement.params.account_id, accountId);
+  }
+
+  t.true(count > 0);
+});
+
+test('fintoc.accounts.movements.get()', async (t) => {
+  const ctx: any = t.context;
+  const linkToken = 'link_token_example';
+  const accountId = 'account_id';
+
+  const movementId = 'movement_id';
+  const movement = await ctx.fintoc.accounts.movements.get(movementId, {
+    account_id: accountId,
+    link_token: linkToken,
+  });
+
+  t.is(movement.method, 'get');
+  t.is(movement.url, `v1/accounts/${accountId}/movements/${movementId}`);
+  t.is(movement.params.link_token, linkToken);
+  t.is(movement.params.account_id, accountId);
+});
+
+test('fintoc.webhookEndpoints.all()', async (t) => {
+  const ctx: any = t.context;
+  const webhookEndpoints = await ctx.fintoc.webhookEndpoints.all();
+
+  let count = 0;
+  for await (const webhookEndpoint of webhookEndpoints) {
+    count += 1;
+    t.is(webhookEndpoint.method, 'get');
+    t.is(webhookEndpoint.url, 'v1/webhook_endpoints');
+  }
+
+  t.true(count > 0);
+});
+
+test('fintoc.webhookEndpoints.get()', async (t) => {
+  const ctx: any = t.context;
+  const webhookEndpointId = 'we_example_id';
+  const webhookEndpoint = await ctx.fintoc.webhookEndpoints.get(webhookEndpointId);
+
+  t.is(webhookEndpoint.method, 'get');
+  t.is(webhookEndpoint.url, `v1/webhook_endpoints/${webhookEndpointId}`);
+});
+
+test('fintoc.webhookEndpoints.create()', async (t) => {
+  const ctx: any = t.context;
+  const webhookData = {
+    url: 'https://example.com/webhook',
+    enabled_events: ['payment_intent.succeeded'],
+  };
+  const webhookEndpoint = await ctx.fintoc.webhookEndpoints.create(webhookData);
+
+  t.is(webhookEndpoint.method, 'post');
+  t.is(webhookEndpoint.url, 'v1/webhook_endpoints');
+  t.is(webhookEndpoint.json.url, webhookData.url);
+  t.deepEqual(webhookEndpoint.json.enabled_events, webhookData.enabled_events);
+});
+
+test('fintoc.webhookEndpoints.update()', async (t) => {
+  const ctx: any = t.context;
+  const webhookEndpointId = 'we_example_id';
+  const updateData = {
+    enabled_events: ['payment_intent.failed', 'refund.succeeded'],
+  };
+  const webhookEndpoint = await ctx.fintoc.webhookEndpoints.update(webhookEndpointId, updateData);
+
+  t.is(webhookEndpoint.method, 'patch');
+  t.is(webhookEndpoint.url, `v1/webhook_endpoints/${webhookEndpointId}`);
+  t.deepEqual(webhookEndpoint.json.enabled_events, updateData.enabled_events);
+});
+
+test('fintoc.webhookEndpoints.delete()', async (t) => {
+  const ctx: any = t.context;
+  const webhookEndpointId = 'we_example_id';
+  const deletedIdentifier = await ctx.fintoc.webhookEndpoints.delete(webhookEndpointId);
+
+  t.is(deletedIdentifier, webhookEndpointId);
+});
+
+test('fintoc.invoices.all()', async (t) => {
+  const ctx: any = t.context;
+  const invoices = await ctx.fintoc.invoices.all();
+
+  let count = 0;
+  for await (const invoice of invoices) {
+    count += 1;
+    t.is(invoice.method, 'get');
+    t.is(invoice.url, 'v1/invoices');
+  }
+
+  t.true(count > 0);
+});
+
+test('fintoc.refreshIntents.all()', async (t) => {
+  const ctx: any = t.context;
+  const refreshIntents = await ctx.fintoc.refreshIntents.all();
+
+  let count = 0;
+  for await (const refreshIntent of refreshIntents) {
+    count += 1;
+    t.is(refreshIntent.method, 'get');
+    t.is(refreshIntent.url, 'v1/refresh_intents');
+  }
+
+  t.true(count > 0);
+});
+
+test('fintoc.refreshIntents.get()', async (t) => {
+  const ctx: any = t.context;
+  const refreshIntentId = 'refresh_intent_id';
+  const refreshIntent = await ctx.fintoc.refreshIntents.get(refreshIntentId);
+
+  t.is(refreshIntent.method, 'get');
+  t.is(refreshIntent.url, `v1/refresh_intents/${refreshIntentId}`);
+});
+
+test('fintoc.refreshIntents.create()', async (t) => {
+  const ctx: any = t.context;
+  const refreshData = {
+    link_token: 'link_token_example',
+    refresh_type: 'only_last',
+  };
+  const refreshIntent = await ctx.fintoc.refreshIntents.create(refreshData);
+
+  t.is(refreshIntent.method, 'post');
+  t.is(refreshIntent.url, 'v1/refresh_intents');
+  t.is(refreshIntent.json.link_token, refreshData.link_token);
+  t.is(refreshIntent.json.refresh_type, refreshData.refresh_type);
+});
+
+test('fintoc.subscriptions.all()', async (t) => {
+  const ctx: any = t.context;
+  const subscriptions = await ctx.fintoc.subscriptions.all();
+
+  let count = 0;
+  for await (const subscription of subscriptions) {
+    count += 1;
+    t.is(subscription.method, 'get');
+    t.is(subscription.url, 'v1/subscriptions');
+  }
+
+  t.true(count > 0);
+});
+
+test('fintoc.subscriptions.get()', async (t) => {
+  const ctx: any = t.context;
+  const subscriptionId = 'subscription_id';
+  const subscription = await ctx.fintoc.subscriptions.get(subscriptionId);
+
+  t.is(subscription.method, 'get');
+  t.is(subscription.url, `v1/subscriptions/${subscriptionId}`);
+});
+
+test('fintoc.taxReturns.all()', async (t) => {
+  const ctx: any = t.context;
+  const taxReturns = await ctx.fintoc.taxReturns.all();
+
+  let count = 0;
+  for await (const taxReturn of taxReturns) {
+    count += 1;
+    t.is(taxReturn.method, 'get');
+    t.is(taxReturn.url, 'v1/tax_returns');
+  }
+
+  t.true(count > 0);
+});
+
+test('fintoc.taxReturns.get()', async (t) => {
+  const ctx: any = t.context;
+  const taxReturnId = 'tax_return_id';
+  const taxReturn = await ctx.fintoc.taxReturns.get(taxReturnId);
+
+  t.is(taxReturn.method, 'get');
+  t.is(taxReturn.url, `v1/tax_returns/${taxReturnId}`);
+});
+
 test('link.accounts.all()', async (t) => {
   const ctx: any = t.context;
   const linkToken = 'link_token_example';
@@ -174,62 +390,4 @@ test('account.movements.get()', async (t) => {
   t.is(movement.method, 'get');
   t.is(movement.url, `v1/accounts/${accountId}/movements/${movementId}`);
   t.is(movement._client.params.link_token, linkToken);
-});
-
-test('fintoc.webhookEndpoints.all()', async (t) => {
-  const ctx: any = t.context;
-  const webhookEndpoints = await ctx.fintoc.webhookEndpoints.all();
-
-  let count = 0;
-  for await (const webhookEndpoint of webhookEndpoints) {
-    count += 1;
-    t.is(webhookEndpoint.method, 'get');
-    t.is(webhookEndpoint.url, 'v1/webhook_endpoints');
-  }
-
-  t.true(count > 0);
-});
-
-test('fintoc.webhookEndpoints.get()', async (t) => {
-  const ctx: any = t.context;
-  const webhookEndpointId = 'we_example_id';
-  const webhookEndpoint = await ctx.fintoc.webhookEndpoints.get(webhookEndpointId);
-
-  t.is(webhookEndpoint.method, 'get');
-  t.is(webhookEndpoint.url, `v1/webhook_endpoints/${webhookEndpointId}`);
-});
-
-test('fintoc.webhookEndpoints.create()', async (t) => {
-  const ctx: any = t.context;
-  const webhookData = {
-    url: 'https://example.com/webhook',
-    enabled_events: ['payment_intent.succeeded'],
-  };
-  const webhookEndpoint = await ctx.fintoc.webhookEndpoints.create(webhookData);
-
-  t.is(webhookEndpoint.method, 'post');
-  t.is(webhookEndpoint.url, 'v1/webhook_endpoints');
-  t.is(webhookEndpoint.json.url, webhookData.url);
-  t.deepEqual(webhookEndpoint.json.enabled_events, webhookData.enabled_events);
-});
-
-test('fintoc.webhookEndpoints.update()', async (t) => {
-  const ctx: any = t.context;
-  const webhookEndpointId = 'we_example_id';
-  const updateData = {
-    enabled_events: ['payment_intent.failed', 'refund.succeeded'],
-  };
-  const webhookEndpoint = await ctx.fintoc.webhookEndpoints.update(webhookEndpointId, updateData);
-
-  t.is(webhookEndpoint.method, 'patch');
-  t.is(webhookEndpoint.url, `v1/webhook_endpoints/${webhookEndpointId}`);
-  t.deepEqual(webhookEndpoint.json.enabled_events, updateData.enabled_events);
-});
-
-test('fintoc.webhookEndpoints.delete()', async (t) => {
-  const ctx: any = t.context;
-  const webhookEndpointId = 'we_example_id';
-  const deletedIdentifier = await ctx.fintoc.webhookEndpoints.delete(webhookEndpointId);
-
-  t.is(deletedIdentifier, webhookEndpointId);
 });

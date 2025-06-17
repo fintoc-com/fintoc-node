@@ -1,7 +1,13 @@
 import { IManagerMixinConstructor, IResourceMixin } from '../../interfaces/mixins';
 import { GenericFunction, ResourceArguments } from '../../types';
 import { Client } from '../client';
-import { resourceAll, resourceCreate, resourceGet } from '../resourceHandlers';
+import {
+  resourceAll,
+  resourceCreate,
+  resourceDelete,
+  resourceGet,
+  resourceUpdate,
+} from '../resourceHandlers';
 import { canRaiseHTTPError, getResourceClass } from '../utils';
 
 export abstract class ManagerMixin<ResourceType extends IResourceMixin> {
@@ -105,7 +111,7 @@ export abstract class ManagerMixin<ResourceType extends IResourceMixin> {
     const klass = await getResourceClass(this.#originatingClass.resource);
     const objects = await resourceAll<ResourceType>(
       this._client,
-      this.#path,
+      this.buildPath(innerArgs),
       klass,
       this.#handlers,
       this.#originatingClass.methods,
@@ -120,7 +126,7 @@ export abstract class ManagerMixin<ResourceType extends IResourceMixin> {
     const klass = await getResourceClass(this.#originatingClass.resource);
     const object = await resourceGet<ResourceType>(
       this._client,
-      this.#path,
+      this.buildPath(innerArgs),
       identifier,
       klass,
       this.#handlers,
@@ -136,7 +142,7 @@ export abstract class ManagerMixin<ResourceType extends IResourceMixin> {
     const klass = await getResourceClass(this.#originatingClass.resource);
     const object = await resourceCreate<ResourceType>(
       this._client,
-      this.#path,
+      this.buildPath(innerArgs),
       klass,
       this.#handlers,
       this.#originatingClass.methods,
@@ -148,15 +154,29 @@ export abstract class ManagerMixin<ResourceType extends IResourceMixin> {
   @canRaiseHTTPError
   private async _update(identifier: string, args?: ResourceArguments): Promise<ResourceType> {
     const innerArgs = args || {};
-    const object = await this.get(identifier);
-    return object.update(innerArgs);
+    const klass = await getResourceClass(this.#originatingClass.resource);
+    const object = await resourceUpdate<ResourceType>(
+      this._client,
+      this.buildPath(innerArgs),
+      identifier,
+      klass,
+      this.#handlers,
+      this.#originatingClass.methods,
+      innerArgs,
+    );
+    return this.postUpdateHandler(object, identifier, innerArgs);
   }
 
   @canRaiseHTTPError
   private async _delete(identifier: string, args?: ResourceArguments): Promise<string> {
     const innerArgs = args || {};
-    const object = await this.get(identifier);
-    return object.delete(innerArgs);
+    await resourceDelete(
+      this._client,
+      this.buildPath(innerArgs),
+      identifier,
+      this.#handlers,
+    );
+    return this.postDeleteHandler(identifier, innerArgs);
   }
 
   /* eslint-disable class-methods-use-this, @typescript-eslint/no-unused-vars */
@@ -181,6 +201,14 @@ export abstract class ManagerMixin<ResourceType extends IResourceMixin> {
 
   protected postDeleteHandler(identifier: string, args: ResourceArguments) {
     return identifier;
+  }
+
+  protected buildPath(args?: ResourceArguments) {
+    let path = this.#path;
+    for (const [key, value] of Object.entries(args || {})) {
+      path = path.replace(`{${key}}`, value.toString());
+    }
+    return path;
   }
   /* eslint-enable class-methods-use-this, @typescript-eslint/no-unused-vars */
 }
