@@ -4,6 +4,7 @@ import { IConstructorOptions } from '../interfaces/client';
 import { IExtendOptions } from '../interfaces/client/extensionOptions';
 import { IRequestOptions } from '../interfaces/client/requestOptions';
 
+import { JWSSignature } from './jws';
 import { paginate } from './paginator';
 
 export class Client {
@@ -13,15 +14,19 @@ export class Client {
   apiKey: string;
   userAgent: string;
   params: Record<string, any>;
+  jws?: JWSSignature;
 
   constructor(options: IConstructorOptions) {
     const {
-      baseUrl, apiKey, userAgent, params = {},
+      baseUrl, apiKey, userAgent, params = {}, jwsPrivateKey,
     } = options;
     this.baseUrl = baseUrl;
     this.apiKey = apiKey;
     this.userAgent = userAgent;
     this.params = params || {};
+    if (jwsPrivateKey) {
+      this.jws = new JWSSignature(jwsPrivateKey);
+    }
   }
 
   private get client() {
@@ -36,7 +41,7 @@ export class Client {
   }
 
   get headers() {
-    return { Authorization: this.apiKey, 'User-Agent': this.userAgent };
+    return { Authorization: this.apiKey, 'User-Agent': this.userAgent, 'Content-Type': 'application/json' };
   }
 
   // Promise<Record<string, string> | AsyncGenerator<any, void, unknown>>
@@ -61,8 +66,10 @@ export class Client {
         params: allParams,
       });
     }
+    const rawBody = JSON.stringify(json);
+    const headers = { ...this.headers, ...this.buildJWSHeaders(method, rawBody) };
     const response = await this.client.request({
-      method, url, params: allParams, data: json, headers: this.headers,
+      method, url, params: allParams, data: rawBody, headers,
     });
     return response.data;
   }
@@ -77,5 +84,14 @@ export class Client {
       userAgent: userAgent || this.userAgent,
       params: params ? { ...this.params, ...params } : { ...this.params },
     });
+  }
+
+  private buildJWSHeaders(method: string, rawBody: string) {
+    if (this.jws && (method === 'post' || method === 'put' || method === 'patch')) {
+      const signature = this.jws.generateHeader(rawBody);
+      return { 'Fintoc-JWS-Signature': signature };
+    }
+
+    return {};
   }
 }

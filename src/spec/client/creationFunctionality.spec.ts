@@ -49,7 +49,7 @@ test('"Client" headers', (t) => {
   const ctx: any = t.context;
   const client = ctx.createClient();
   t.assert(client instanceof Client);
-  t.assert(Object.keys(client.headers).length === 2);
+  t.assert(Object.keys(client.headers).length === 3);
   t.assert('Authorization' in client.headers);
   t.assert('User-Agent' in client.headers);
   t.assert(client.headers.Authorization === ctx.apiKey);

@@ -104,7 +104,7 @@ export abstract class ManagerMixin<ResourceType extends IResourceMixin> {
   }
 
   @canRaiseHTTPError
-  private async _all(
+  protected async _all(
     args?: ResourceArguments,
   ): Promise<ResourceType[] | AsyncGenerator<ResourceType>> {
     const innerArgs = args || {};
@@ -121,7 +121,7 @@ export abstract class ManagerMixin<ResourceType extends IResourceMixin> {
   }
 
   @canRaiseHTTPError
-  private async _get(identifier: string, args?: ResourceArguments): Promise<ResourceType> {
+  protected async _get(identifier: string, args?: ResourceArguments): Promise<ResourceType> {
     const innerArgs = args || {};
     const klass = await getResourceClass(this.#originatingClass.resource);
     const object = await resourceGet<ResourceType>(
@@ -137,12 +137,13 @@ export abstract class ManagerMixin<ResourceType extends IResourceMixin> {
   }
 
   @canRaiseHTTPError
-  private async _create(args?: ResourceArguments): Promise<ResourceType> {
+  protected async _create(args?: ResourceArguments): Promise<ResourceType> {
     const innerArgs = args || {};
+    const { path_ = this.buildPath() } = innerArgs;
     const klass = await getResourceClass(this.#originatingClass.resource);
     const object = await resourceCreate<ResourceType>(
       this._client,
-      this.buildPath(innerArgs),
+      path_.toString(),
       klass,
       this.#handlers,
       this.#originatingClass.methods,
@@ -152,7 +153,7 @@ export abstract class ManagerMixin<ResourceType extends IResourceMixin> {
   }
 
   @canRaiseHTTPError
-  private async _update(identifier: string, args?: ResourceArguments): Promise<ResourceType> {
+  protected async _update(identifier: string, args?: ResourceArguments): Promise<ResourceType> {
     const innerArgs = args || {};
     const klass = await getResourceClass(this.#originatingClass.resource);
     const object = await resourceUpdate<ResourceType>(
@@ -168,7 +169,7 @@ export abstract class ManagerMixin<ResourceType extends IResourceMixin> {
   }
 
   @canRaiseHTTPError
-  private async _delete(identifier: string, args?: ResourceArguments): Promise<string> {
+  protected async _delete(identifier: string, args?: ResourceArguments): Promise<string> {
     const innerArgs = args || {};
     await resourceDelete(
       this._client,

@@ -35,7 +35,7 @@ export class MockAxiosInstance extends Axios {
       baseURL: usingBaseURL,
       url: usableURL,
       params: completeParams,
-      json: data,
+      json: JSON.parse(data || '{}'),
     });
   }
 }
