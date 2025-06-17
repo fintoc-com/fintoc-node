@@ -31,6 +31,7 @@
     - [update](#update)
     - [delete](#delete)
   - [Webhook Signature Validation](#webhook-signature-validation)
+  - [Idempotency Keys](#idempotency-keys)
   - [Serialization](#serialization)
 - [Acknowledgements](#acknowledgements)
 
@@ -186,6 +187,25 @@ If the signature is invalid or the timestamp is outside the tolerance window, a 
 
 
 For a complete example of handling webhooks, see [examples/webhook.js](examples/webhook.js).
+
+### Idempotency Keys
+
+You can provide an [Idempotency Key](https://docs.fintoc.com/reference/idempotent-requests) using the `idempotency_key` argument. For example:
+
+```javascript
+const transfer = await fintoc.v2.transfers.create({
+    idempotency_key: '12345678',
+    amount: 54123,
+    currency: 'mxn',
+    account_id: 'acc_12345678',
+    counterparty: {
+      account_number: '012969100000000026',
+    },
+    metadata: {
+      customer_id: '19385014'
+    }
+  });
+```
 
 ### Serialization
 
