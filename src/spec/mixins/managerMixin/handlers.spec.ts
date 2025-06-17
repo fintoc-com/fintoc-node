@@ -42,7 +42,7 @@ test.serial('"ManagerMixin" handlers all handler', async (t) => {
   await ctx.manager.all();
 
   // @ts-ignore: property does not exist
-  t.assert(console.log.getCall(0).args[0].includes('all'));
+  t.assert(console.log.getCall(0).args[0].includes('list'));
 });
 
 test.serial('"ManagerMixin" handlers get handler', async (t) => {

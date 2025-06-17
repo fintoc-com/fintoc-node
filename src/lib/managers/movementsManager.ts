@@ -3,5 +3,5 @@ import { Movement } from '../resources/movement';
 
 export class MovementsManager extends ManagerMixin<Movement> {
   static resource = 'movement';
-  static methods = ['all', 'get'];
+  static methods = ['list', 'get'];
 }

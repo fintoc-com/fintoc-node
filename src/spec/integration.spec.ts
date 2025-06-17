@@ -20,7 +20,21 @@ test.beforeEach((t) => {
   ctx.fintoc = new Fintoc(apiKey);
 });
 
-test('fintoc.paymentIntents.all()', async (t) => {
+test('fintoc.paymentIntents.list()', async (t) => {
+  const ctx: any = t.context;
+  const paymentIntents = await ctx.fintoc.paymentIntents.list();
+
+  let count = 0;
+  for await (const paymentIntent of paymentIntents) {
+    count += 1;
+    t.is(paymentIntent.method, 'get');
+    t.is(paymentIntent.url, 'v1/payment_intents');
+  }
+
+  t.true(count > 0);
+});
+
+test('fintoc.paymentIntents.all() - deprecated', async (t) => {
   const ctx: any = t.context;
   const paymentIntents = await ctx.fintoc.paymentIntents.all();
 
@@ -59,7 +73,21 @@ test('fintoc.paymentIntents.create()', async (t) => {
   t.is(paymentIntent.json.payment_method, paymentData.payment_method);
 });
 
-test('fintoc.links.all()', async (t) => {
+test('fintoc.links.list()', async (t) => {
+  const ctx: any = t.context;
+  const links = await ctx.fintoc.links.list();
+
+  let count = 0;
+  for await (const link of links) {
+    count += 1;
+    t.is(link.method, 'get');
+    t.is(link.url, 'v1/links');
+  }
+
+  t.true(count > 0);
+});
+
+test('fintoc.links.all() - deprecated', async (t) => {
   const ctx: any = t.context;
   const links = await ctx.fintoc.links.all();
 
@@ -103,7 +131,21 @@ test('fintoc.links.delete()', async (t) => {
   t.is(deletedIdentifier, linkId);
 });
 
-test('fintoc.accounts.all()', async (t) => {
+test('fintoc.accounts.list()', async (t) => {
+  const ctx: any = t.context;
+  const accounts = await ctx.fintoc.accounts.list();
+
+  let count = 0;
+  for await (const account of accounts) {
+    count += 1;
+    t.is(account.method, 'get');
+    t.is(account.url, 'v1/accounts');
+  }
+
+  t.true(count > 0);
+});
+
+test('fintoc.accounts.all() - deprecated', async (t) => {
   const ctx: any = t.context;
   const accounts = await ctx.fintoc.accounts.all();
 
@@ -126,7 +168,28 @@ test('fintoc.accounts.get()', async (t) => {
   t.is(account.url, `v1/accounts/${accountId}`);
 });
 
-test('fintoc.accounts.movements.all()', async (t) => {
+test('fintoc.accounts.movements.list()', async (t) => {
+  const ctx: any = t.context;
+  const linkToken = 'link_token_example';
+  const accountId = 'account_id';
+  const movements = await ctx.fintoc.accounts.movements.list({
+    account_id: accountId,
+    link_token: linkToken,
+  });
+
+  let count = 0;
+  for await (const movement of movements) {
+    count += 1;
+    t.is(movement.method, 'get');
+    t.is(movement.url, `v1/accounts/${accountId}/movements`);
+    t.is(movement.params.link_token, linkToken);
+    t.is(movement.params.account_id, accountId);
+  }
+
+  t.true(count > 0);
+});
+
+test('fintoc.accounts.movements.all() - deprecated', async (t) => {
   const ctx: any = t.context;
   const linkToken = 'link_token_example';
   const accountId = 'account_id';
@@ -164,7 +227,21 @@ test('fintoc.accounts.movements.get()', async (t) => {
   t.is(movement.params.account_id, accountId);
 });
 
-test('fintoc.webhookEndpoints.all()', async (t) => {
+test('fintoc.webhookEndpoints.list()', async (t) => {
+  const ctx: any = t.context;
+  const webhookEndpoints = await ctx.fintoc.webhookEndpoints.list();
+
+  let count = 0;
+  for await (const webhookEndpoint of webhookEndpoints) {
+    count += 1;
+    t.is(webhookEndpoint.method, 'get');
+    t.is(webhookEndpoint.url, 'v1/webhook_endpoints');
+  }
+
+  t.true(count > 0);
+});
+
+test('fintoc.webhookEndpoints.all() - deprecated', async (t) => {
   const ctx: any = t.context;
   const webhookEndpoints = await ctx.fintoc.webhookEndpoints.all();
 
@@ -222,7 +299,21 @@ test('fintoc.webhookEndpoints.delete()', async (t) => {
   t.is(deletedIdentifier, webhookEndpointId);
 });
 
-test('fintoc.invoices.all()', async (t) => {
+test('fintoc.invoices.list()', async (t) => {
+  const ctx: any = t.context;
+  const invoices = await ctx.fintoc.invoices.list();
+
+  let count = 0;
+  for await (const invoice of invoices) {
+    count += 1;
+    t.is(invoice.method, 'get');
+    t.is(invoice.url, 'v1/invoices');
+  }
+
+  t.true(count > 0);
+});
+
+test('fintoc.invoices.all() - deprecated', async (t) => {
   const ctx: any = t.context;
   const invoices = await ctx.fintoc.invoices.all();
 
@@ -236,7 +327,21 @@ test('fintoc.invoices.all()', async (t) => {
   t.true(count > 0);
 });
 
-test('fintoc.refreshIntents.all()', async (t) => {
+test('fintoc.refreshIntents.list()', async (t) => {
+  const ctx: any = t.context;
+  const refreshIntents = await ctx.fintoc.refreshIntents.list();
+
+  let count = 0;
+  for await (const refreshIntent of refreshIntents) {
+    count += 1;
+    t.is(refreshIntent.method, 'get');
+    t.is(refreshIntent.url, 'v1/refresh_intents');
+  }
+
+  t.true(count > 0);
+});
+
+test('fintoc.refreshIntents.all() - deprecated', async (t) => {
   const ctx: any = t.context;
   const refreshIntents = await ctx.fintoc.refreshIntents.all();
 
@@ -273,7 +378,21 @@ test('fintoc.refreshIntents.create()', async (t) => {
   t.is(refreshIntent.json.refresh_type, refreshData.refresh_type);
 });
 
-test('fintoc.subscriptions.all()', async (t) => {
+test('fintoc.subscriptions.list()', async (t) => {
+  const ctx: any = t.context;
+  const subscriptions = await ctx.fintoc.subscriptions.list();
+
+  let count = 0;
+  for await (const subscription of subscriptions) {
+    count += 1;
+    t.is(subscription.method, 'get');
+    t.is(subscription.url, 'v1/subscriptions');
+  }
+
+  t.true(count > 0);
+});
+
+test('fintoc.subscriptions.all() - deprecated', async (t) => {
   const ctx: any = t.context;
   const subscriptions = await ctx.fintoc.subscriptions.all();
 
@@ -296,7 +415,21 @@ test('fintoc.subscriptions.get()', async (t) => {
   t.is(subscription.url, `v1/subscriptions/${subscriptionId}`);
 });
 
-test('fintoc.taxReturns.all()', async (t) => {
+test('fintoc.taxReturns.list()', async (t) => {
+  const ctx: any = t.context;
+  const taxReturns = await ctx.fintoc.taxReturns.list();
+
+  let count = 0;
+  for await (const taxReturn of taxReturns) {
+    count += 1;
+    t.is(taxReturn.method, 'get');
+    t.is(taxReturn.url, 'v1/tax_returns');
+  }
+
+  t.true(count > 0);
+});
+
+test('fintoc.taxReturns.all() - deprecated', async (t) => {
   const ctx: any = t.context;
   const taxReturns = await ctx.fintoc.taxReturns.all();
 
@@ -319,7 +452,26 @@ test('fintoc.taxReturns.get()', async (t) => {
   t.is(taxReturn.url, `v1/tax_returns/${taxReturnId}`);
 });
 
-test('link.accounts.all()', async (t) => {
+test('link.accounts.list()', async (t) => {
+  const ctx: any = t.context;
+  const linkToken = 'link_token_example';
+  const link = await ctx.fintoc.links.get(linkToken);
+
+  const accounts = await link.accounts.list();
+
+  t.is(link.accounts._client.params.link_token, linkToken);
+
+  let count = 0;
+  for await (const account of accounts) {
+    count += 1;
+    t.is(account.method, 'get');
+    t.is(account.url, 'v1/accounts');
+  }
+
+  t.true(count > 0);
+});
+
+test('link.accounts.all() - deprecated', async (t) => {
   const ctx: any = t.context;
   const linkToken = 'link_token_example';
   const link = await ctx.fintoc.links.get(linkToken);
@@ -353,7 +505,30 @@ test('link.accounts.get()', async (t) => {
   t.is(account._client.params.link_token, linkToken);
 });
 
-test('account.movements.all()', async (t) => {
+test('account.movements.list()', async (t) => {
+  const ctx: any = t.context;
+  const linkToken = 'link_token_example';
+  const link = await ctx.fintoc.links.get(linkToken);
+
+  const accountId = 'account_id';
+  const account = await link.accounts.get(accountId);
+
+  const movements = await account.movements.list();
+
+  t.is(account.movements._client.params.link_token, linkToken);
+
+  let count = 0;
+  for await (const movement of movements) {
+    count += 1;
+    t.is(movement.method, 'get');
+    t.is(movement.url, `v1/accounts/${accountId}/movements`);
+    t.is(movement._client.params.link_token, linkToken);
+  }
+
+  t.true(count > 0);
+});
+
+test('account.movements.all() - deprecated', async (t) => {
   const ctx: any = t.context;
   const linkToken = 'link_token_example';
   const link = await ctx.fintoc.links.get(linkToken);
@@ -392,9 +567,9 @@ test('account.movements.get()', async (t) => {
   t.is(movement._client.params.link_token, linkToken);
 });
 
-test('fintoc.v2.transfers.all()', async (t) => {
+test('fintoc.v2.transfers.list()', async (t) => {
   const ctx: any = t.context;
-  const transfers = await ctx.fintoc.v2.transfers.all();
+  const transfers = await ctx.fintoc.v2.transfers.list();
 
   let count = 0;
   for await (const transfer of transfers) {
@@ -451,9 +626,9 @@ test('fintoc.v2.transfers.create() with idempotency key', async (t) => {
   t.is(transfer.headers['Idempotency-Key'], transferData.idempotency_key);
 });
 
-test('fintoc.v2.accounts.all()', async (t) => {
+test('fintoc.v2.accounts.list()', async (t) => {
   const ctx: any = t.context;
-  const accounts = await ctx.fintoc.v2.accounts.all();
+  const accounts = await ctx.fintoc.v2.accounts.list();
 
   let count = 0;
   for await (const account of accounts) {
@@ -486,9 +661,9 @@ test('fintoc.v2.accounts.create()', async (t) => {
   t.is(account.json.description, accountData.description);
 });
 
-test('fintoc.v2.accountNumbers.all()', async (t) => {
+test('fintoc.v2.accountNumbers.list()', async (t) => {
   const ctx: any = t.context;
-  const accountNumbers = await ctx.fintoc.v2.accountNumbers.all();
+  const accountNumbers = await ctx.fintoc.v2.accountNumbers.list();
 
   let count = 0;
   for await (const accountNumber of accountNumbers) {

@@ -5,7 +5,7 @@ import { Link } from '../resources/link';
 
 export class LinksManager extends ManagerMixin<Link> {
   static resource = 'link';
-  static methods = ['all', 'get', 'update', 'delete'];
+  static methods = ['list', 'get', 'update', 'delete'];
 
   protected postGetHandler(
     object: Link, identifier: string, args: ResourceArguments,

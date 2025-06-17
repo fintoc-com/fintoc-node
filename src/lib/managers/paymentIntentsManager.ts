@@ -3,5 +3,5 @@ import { PaymentIntent } from '../resources/paymentIntent';
 
 export class PaymentIntentsManager extends ManagerMixin<PaymentIntent> {
   static resource = 'payment_intent';
-  static methods = ['all', 'get', 'create'];
+  static methods = ['list', 'get', 'create'];
 }
