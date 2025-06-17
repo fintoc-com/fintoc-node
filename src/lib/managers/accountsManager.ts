@@ -6,7 +6,7 @@ import { MovementsManager } from './movementsManager';
 
 export class AccountsManager extends ManagerMixin<Account> {
   static resource = 'account';
-  static methods = ['all', 'get'];
+  static methods = ['list', 'get'];
 
   movements: MovementsManager;
 

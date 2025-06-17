@@ -38,14 +38,32 @@ export abstract class ManagerMixin<ResourceType extends IResourceMixin> {
    * @param args - Object with the arguments to filter the query, using the API parameters
    * @returns All the instances of the resource
    */
+  list(args?: ResourceArguments & { lazy: true }): Promise<AsyncGenerator<ResourceType>>;
+  list(args?: ResourceArguments & { lazy: false }): Promise<ResourceType[]>;
+  list(args?: ResourceArguments): Promise<AsyncGenerator<ResourceType>>;
+  list(args?: ResourceArguments): Promise<ResourceType[] | AsyncGenerator<ResourceType>> {
+    if (!this.#originatingClass.methods.includes('list')) {
+      throw new TypeError(`${this.#originatingClass.name}.list is not a valid function of of this manager`);
+    }
+    return this._list(args);
+  }
+
+  /**
+   * Return all the instances of the resource being handled by the manager.
+   *
+   * @deprecated Use list() instead
+   * @param args - Object with the arguments to filter the query, using the API parameters
+   * @returns All the instances of the resource
+   */
   all(args?: ResourceArguments & { lazy: true }): Promise<AsyncGenerator<ResourceType>>;
   all(args?: ResourceArguments & { lazy: false }): Promise<ResourceType[]>;
   all(args?: ResourceArguments): Promise<AsyncGenerator<ResourceType>>;
   all(args?: ResourceArguments): Promise<ResourceType[] | AsyncGenerator<ResourceType>> {
-    if (!this.#originatingClass.methods.includes('all')) {
+    console.warn("Warning: The 'all()' method is deprecated. Please use 'list()' instead.");
+    if (!this.#originatingClass.methods.includes('list')) {
       throw new TypeError(`${this.#originatingClass.name}.all is not a valid function of of this manager`);
     }
-    return this._all(args);
+    return this._list(args);
   }
 
   /**
@@ -104,7 +122,7 @@ export abstract class ManagerMixin<ResourceType extends IResourceMixin> {
   }
 
   @canRaiseHTTPError
-  protected async _all(
+  protected async _list(
     args?: ResourceArguments,
   ): Promise<ResourceType[] | AsyncGenerator<ResourceType>> {
     const innerArgs = args || {};
@@ -117,7 +135,7 @@ export abstract class ManagerMixin<ResourceType extends IResourceMixin> {
       this.#originatingClass.methods,
       innerArgs,
     );
-    return this.postAllHandler(objects, innerArgs);
+    return this.postListHandler(objects, innerArgs);
   }
 
   @canRaiseHTTPError
@@ -182,7 +200,7 @@ export abstract class ManagerMixin<ResourceType extends IResourceMixin> {
   }
 
   /* eslint-disable class-methods-use-this, @typescript-eslint/no-unused-vars */
-  protected postAllHandler(
+  protected postListHandler(
     objects: ResourceType[] | AsyncGenerator<ResourceType>,
     args: ResourceArguments,
   ) {

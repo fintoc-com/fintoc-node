@@ -3,5 +3,5 @@ import { Invoice } from '../resources/invoice';
 
 export class InvoicesManager extends ManagerMixin<Invoice> {
   static resource = 'invoice';
-  static methods = ['all'];
+  static methods = ['list'];
 }
