@@ -139,7 +139,7 @@ export abstract class ManagerMixin<ResourceType extends IResourceMixin> {
   @canRaiseHTTPError
   protected async _create(args?: ResourceArguments): Promise<ResourceType> {
     const innerArgs = args || {};
-    const { path_ = this.buildPath() } = innerArgs;
+    const { path_ = this.buildPath(), idempotency_key: idempotencyKey } = innerArgs;
     const klass = await getResourceClass(this.#originatingClass.resource);
     const object = await resourceCreate<ResourceType>(
       this._client,
@@ -148,6 +148,7 @@ export abstract class ManagerMixin<ResourceType extends IResourceMixin> {
       this.#handlers,
       this.#originatingClass.methods,
       innerArgs,
+      idempotencyKey?.toString(),
     );
     return this.postCreateHandler(object, innerArgs);
   }

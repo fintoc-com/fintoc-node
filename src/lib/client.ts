@@ -1,3 +1,5 @@
+import crypto from 'crypto';
+
 import axios, { AxiosInstance } from 'axios';
 
 import { IConstructorOptions } from '../interfaces/client';
@@ -33,14 +35,14 @@ export class Client {
     if (Client.#client === undefined) {
       Client.#client = axios.create({
         baseURL: this.baseUrl,
-        headers: this.headers,
+        headers: this.staticHeaders,
         params: this.params,
       });
     }
     return Client.#client;
   }
 
-  get headers() {
+  get staticHeaders() {
     return { Authorization: this.apiKey, 'User-Agent': this.userAgent, 'Content-Type': 'application/json' };
   }
 
@@ -54,7 +56,7 @@ export class Client {
     options: IRequestOptions,
   ): Promise<Record<string, string> | AsyncGenerator<Record<string, string>, void, unknown>> {
     const {
-      path, json, paginated = false, method = 'get', params = {},
+      path, json, paginated = false, method = 'get', params = {}, idempotencyKey,
     } = options;
     const url = `${this.baseUrl}${path}`;
     const allParams = { ...this.params, ...params };
@@ -62,12 +64,12 @@ export class Client {
       return paginate({
         client: this.client,
         path: url,
-        headers: this.headers,
+        headers: this.staticHeaders,
         params: allParams,
       });
     }
     const rawBody = JSON.stringify(json);
-    const headers = { ...this.headers, ...this.buildJWSHeaders(method, rawBody) };
+    const headers = this.buildHeaders(method, rawBody, idempotencyKey);
     const response = await this.client.request({
       method, url, params: allParams, data: rawBody, headers,
     });
@@ -86,7 +88,23 @@ export class Client {
     });
   }
 
-  private buildJWSHeaders(method: string, rawBody: string) {
+  private buildHeaders(
+    method: string,
+    rawBody: string,
+    idempotencyKey?: string,
+  ): Record<string, string> {
+    const headers: Record<string, string> = {
+      ...this.staticHeaders,
+      ...this.buildJWSHeaders(method, rawBody),
+    };
+
+    if (method === 'post') {
+      headers['Idempotency-Key'] = idempotencyKey || crypto.randomUUID();
+    }
+    return headers;
+  }
+
+  private buildJWSHeaders(method: string, rawBody: string): Record<string, string> {
     if (this.jws && (method === 'post' || method === 'put' || method === 'patch')) {
       const signature = this.jws.generateHeader(rawBody);
       return { 'Fintoc-JWS-Signature': signature };

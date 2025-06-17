@@ -431,6 +431,24 @@ test('fintoc.v2.transfers.create()', async (t) => {
   t.is(transfer.json.amount, transferData.amount);
   t.is(transfer.json.currency, transferData.currency);
   t.is(transfer.json.counterparty.account_number, transferData.counterparty.account_number);
+  t.true(transfer.headers['Idempotency-Key'] && transfer.headers['Idempotency-Key'].length > 0);
+});
+
+test('fintoc.v2.transfers.create() with idempotency key', async (t) => {
+  const ctx: any = t.context;
+  const transferData = {
+    amount: 10000,
+    currency: 'MXN',
+    idempotency_key: 'idempotency_key_123',
+    counterparty: {
+      account_number: '012969100000000026',
+    },
+  };
+  const transfer = await ctx.fintoc.v2.transfers.create(transferData);
+
+  t.is(transfer.method, 'post');
+  t.is(transfer.url, 'v2/transfers');
+  t.is(transfer.headers['Idempotency-Key'], transferData.idempotency_key);
 });
 
 test('fintoc.v2.accounts.all()', async (t) => {

@@ -22,7 +22,7 @@ export class MockAxiosInstance extends Axios {
   // @ts-ignore: return type is not assignable
   async request(config: AxiosRequestConfig) {
     const {
-      method, url, params, data,
+      method, url, params, data, headers,
     } = config;
     const usingMethod = method || 'get';
     const usingBaseURL = this.baseURL || '';
@@ -36,6 +36,7 @@ export class MockAxiosInstance extends Axios {
       url: usableURL,
       params: completeParams,
       json: JSON.parse(data || '{}'),
+      headers: headers || {},
     });
   }
 }
