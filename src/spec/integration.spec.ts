@@ -726,3 +726,26 @@ test('fintoc.v2.simulate.receiveTransfer()', async (t) => {
   t.is(result.json.currency, transferData.currency);
   t.is(result.json.account_number_id, transferData.account_number_id);
 });
+
+test('fintoc.v2.entities.list()', async (t) => {
+  const ctx: any = t.context;
+  const entities = await ctx.fintoc.v2.entities.list();
+
+  let count = 0;
+  for await (const entity of entities) {
+    count += 1;
+    t.is(entity.method, 'get');
+    t.is(entity.url, 'v2/entities');
+  }
+
+  t.true(count > 0);
+});
+
+test('fintoc.v2.entities.get()', async (t) => {
+  const ctx: any = t.context;
+  const entityId = 'entity_id';
+  const entity = await ctx.fintoc.v2.entities.get(entityId);
+
+  t.is(entity.method, 'get');
+  t.is(entity.url, `v2/entities/${entityId}`);
+});

@@ -16,6 +16,7 @@ import {
   SimulateManager,
   TransfersManager,
   AccountsManager as V2AccountsManager,
+  EntitiesManager,
 } from './managers/v2';
 import { version } from './version';
 
@@ -24,12 +25,14 @@ class FintocV2 {
   transfers: TransfersManager;
   accountNumbers: AccountNumbersManager;
   simulate: SimulateManager;
+  entities: EntitiesManager;
 
   constructor(client: Client) {
     this.accounts = new V2AccountsManager('/v2/accounts', client);
     this.transfers = new TransfersManager('/v2/transfers', client);
     this.accountNumbers = new AccountNumbersManager('/v2/account_numbers', client);
     this.simulate = new SimulateManager('/v2/simulate', client);
+    this.entities = new EntitiesManager('/v2/entities', client);
   }
 }
 
