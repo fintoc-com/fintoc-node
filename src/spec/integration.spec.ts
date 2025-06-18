@@ -749,3 +749,40 @@ test('fintoc.v2.entities.get()', async (t) => {
   t.is(entity.method, 'get');
   t.is(entity.url, `v2/entities/${entityId}`);
 });
+
+test('fintoc.v2.accountVerifications.list()', async (t) => {
+  const ctx: any = t.context;
+  const accountVerifications = await ctx.fintoc.v2.accountVerifications.list();
+
+  let count = 0;
+  for await (const accountVerification of accountVerifications) {
+    count += 1;
+    t.is(accountVerification.method, 'get');
+    t.is(accountVerification.url, 'v2/account_verifications');
+  }
+
+  t.true(count > 0);
+});
+
+test('fintoc.v2.accountVerifications.get()', async (t) => {
+  const ctx: any = t.context;
+  const accountVerificationId = 'account_verification_id';
+  const accountVerification = await ctx.fintoc.v2.accountVerifications.get(accountVerificationId);
+
+  t.is(accountVerification.method, 'get');
+  t.is(accountVerification.url, `v2/account_verifications/${accountVerificationId}`);
+});
+
+test('fintoc.v2.accountVerifications.create()', async (t) => {
+  const ctx: any = t.context;
+  const accountVerificationData = {
+    account_number: 'account_123',
+  };
+  const accountVerification = await ctx.fintoc.v2.accountVerifications.create(
+    accountVerificationData,
+  );
+
+  t.is(accountVerification.method, 'post');
+  t.is(accountVerification.url, 'v2/account_verifications');
+  t.is(accountVerification.json.account_number, accountVerificationData.account_number);
+});

@@ -3,3 +3,4 @@ export * from './accountsManager';
 export * from './accountNumbersManager';
 export * from './simulateManager';
 export * from './entitiesManager';
+export * from './accountVerificationsManager';
