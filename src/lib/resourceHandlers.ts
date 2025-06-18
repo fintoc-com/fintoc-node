@@ -98,8 +98,11 @@ export async function resourceCreate<ResourceType>(
   handlers: Record<string, GenericFunction> = {},
   methods: string[],
   params: Record<string, any>,
+  idempotencyKey?: string,
 ): Promise<ResourceType> {
-  const data = await client.request({ path, method: 'post', json: params });
+  const data = await client.request({
+    path, method: 'post', json: params, idempotencyKey,
+  });
   return objetize(
     klass,
     client,

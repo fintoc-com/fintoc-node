@@ -6,4 +6,5 @@ export interface IRequestOptions {
   method?: Method,
   params?: Record<string, any>,
   json?: Record<string, string>,
+  idempotencyKey?: string,
 }

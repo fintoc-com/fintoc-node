@@ -5,14 +5,16 @@ export class MockResponse {
   method: string;
   url: string;
   json: Record<string, any> | undefined;
+  requestHeaders: Record<string, any>;
 
   constructor(config: Record<string, any>) {
     const {
-      method, baseURL, url, params, json,
+      method, baseURL, url, params, json, headers,
     } = config;
 
     this.baseURL = baseURL;
     this.params = params;
+    this.requestHeaders = headers || {};
 
     let page;
     if (method === 'get' && url.charAt(url.length - 1) === 's') {
@@ -30,6 +32,7 @@ export class MockResponse {
     if (this.method === 'delete') {
       return {};
     }
+
     if (this.method === 'get' && this.url.charAt(this.url.length - 1) === 's') {
       return Array.from(Array(10)).map(() => ({
         id: 'idx',
@@ -40,12 +43,17 @@ export class MockResponse {
         page: this.page,
       }));
     }
+
+    const urlParts = this.url.split('/');
+    const hasIdentifier = urlParts.length > 2 && urlParts[2];
+    const id = hasIdentifier ? urlParts[2] : 'idx';
     return {
-      id: 'idx',
+      id,
       method: this.method,
       url: this.url,
       params: this.params,
       json: this.json,
+      headers: this.requestHeaders,
     };
   }
 

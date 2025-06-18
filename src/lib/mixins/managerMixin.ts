@@ -1,7 +1,13 @@
 import { IManagerMixinConstructor, IResourceMixin } from '../../interfaces/mixins';
 import { GenericFunction, ResourceArguments } from '../../types';
 import { Client } from '../client';
-import { resourceAll, resourceCreate, resourceGet } from '../resourceHandlers';
+import {
+  resourceAll,
+  resourceCreate,
+  resourceDelete,
+  resourceGet,
+  resourceUpdate,
+} from '../resourceHandlers';
 import { canRaiseHTTPError, getResourceClass } from '../utils';
 
 export abstract class ManagerMixin<ResourceType extends IResourceMixin> {
@@ -15,7 +21,7 @@ export abstract class ManagerMixin<ResourceType extends IResourceMixin> {
 
   constructor(path: string, client: Client) {
     this.#path = path;
-    this._client = client.extend();
+    this._client = client;
     this.#handlers = {
       update: this.postUpdateHandler.bind(this),
       delete: this.postDeleteHandler.bind(this),
@@ -32,14 +38,32 @@ export abstract class ManagerMixin<ResourceType extends IResourceMixin> {
    * @param args - Object with the arguments to filter the query, using the API parameters
    * @returns All the instances of the resource
    */
+  list(args?: ResourceArguments & { lazy: true }): Promise<AsyncGenerator<ResourceType>>;
+  list(args?: ResourceArguments & { lazy: false }): Promise<ResourceType[]>;
+  list(args?: ResourceArguments): Promise<AsyncGenerator<ResourceType>>;
+  list(args?: ResourceArguments): Promise<ResourceType[] | AsyncGenerator<ResourceType>> {
+    if (!this.#originatingClass.methods.includes('list')) {
+      throw new TypeError(`${this.#originatingClass.name}.list is not a valid function of of this manager`);
+    }
+    return this._list(args);
+  }
+
+  /**
+   * Return all the instances of the resource being handled by the manager.
+   *
+   * @deprecated Use list() instead
+   * @param args - Object with the arguments to filter the query, using the API parameters
+   * @returns All the instances of the resource
+   */
   all(args?: ResourceArguments & { lazy: true }): Promise<AsyncGenerator<ResourceType>>;
   all(args?: ResourceArguments & { lazy: false }): Promise<ResourceType[]>;
   all(args?: ResourceArguments): Promise<AsyncGenerator<ResourceType>>;
   all(args?: ResourceArguments): Promise<ResourceType[] | AsyncGenerator<ResourceType>> {
-    if (!this.#originatingClass.methods.includes('all')) {
+    console.warn("Warning: The 'all()' method is deprecated. Please use 'list()' instead.");
+    if (!this.#originatingClass.methods.includes('list')) {
       throw new TypeError(`${this.#originatingClass.name}.all is not a valid function of of this manager`);
     }
-    return this._all(args);
+    return this._list(args);
   }
 
   /**
@@ -98,29 +122,29 @@ export abstract class ManagerMixin<ResourceType extends IResourceMixin> {
   }
 
   @canRaiseHTTPError
-  private async _all(
+  protected async _list(
     args?: ResourceArguments,
   ): Promise<ResourceType[] | AsyncGenerator<ResourceType>> {
     const innerArgs = args || {};
     const klass = await getResourceClass(this.#originatingClass.resource);
     const objects = await resourceAll<ResourceType>(
       this._client,
-      this.#path,
+      this.buildPath(innerArgs),
       klass,
       this.#handlers,
       this.#originatingClass.methods,
       innerArgs,
     );
-    return this.postAllHandler(objects, innerArgs);
+    return this.postListHandler(objects, innerArgs);
   }
 
   @canRaiseHTTPError
-  private async _get(identifier: string, args?: ResourceArguments): Promise<ResourceType> {
+  protected async _get(identifier: string, args?: ResourceArguments): Promise<ResourceType> {
     const innerArgs = args || {};
     const klass = await getResourceClass(this.#originatingClass.resource);
     const object = await resourceGet<ResourceType>(
       this._client,
-      this.#path,
+      this.buildPath(innerArgs),
       identifier,
       klass,
       this.#handlers,
@@ -131,36 +155,52 @@ export abstract class ManagerMixin<ResourceType extends IResourceMixin> {
   }
 
   @canRaiseHTTPError
-  private async _create(args?: ResourceArguments): Promise<ResourceType> {
+  protected async _create(args?: ResourceArguments): Promise<ResourceType> {
     const innerArgs = args || {};
+    const { path_ = this.buildPath(), idempotency_key: idempotencyKey } = innerArgs;
     const klass = await getResourceClass(this.#originatingClass.resource);
     const object = await resourceCreate<ResourceType>(
       this._client,
-      this.#path,
+      path_.toString(),
       klass,
       this.#handlers,
       this.#originatingClass.methods,
       innerArgs,
+      idempotencyKey?.toString(),
     );
     return this.postCreateHandler(object, innerArgs);
   }
 
   @canRaiseHTTPError
-  private async _update(identifier: string, args?: ResourceArguments): Promise<ResourceType> {
+  protected async _update(identifier: string, args?: ResourceArguments): Promise<ResourceType> {
     const innerArgs = args || {};
-    const object = await this.get(identifier);
-    return object.update(innerArgs);
+    const klass = await getResourceClass(this.#originatingClass.resource);
+    const object = await resourceUpdate<ResourceType>(
+      this._client,
+      this.buildPath(innerArgs),
+      identifier,
+      klass,
+      this.#handlers,
+      this.#originatingClass.methods,
+      innerArgs,
+    );
+    return this.postUpdateHandler(object, identifier, innerArgs);
   }
 
   @canRaiseHTTPError
-  private async _delete(identifier: string, args?: ResourceArguments): Promise<string> {
+  protected async _delete(identifier: string, args?: ResourceArguments): Promise<string> {
     const innerArgs = args || {};
-    const object = await this.get(identifier);
-    return object.delete(innerArgs);
+    await resourceDelete(
+      this._client,
+      this.buildPath(innerArgs),
+      identifier,
+      this.#handlers,
+    );
+    return this.postDeleteHandler(identifier, innerArgs);
   }
 
   /* eslint-disable class-methods-use-this, @typescript-eslint/no-unused-vars */
-  protected postAllHandler(
+  protected postListHandler(
     objects: ResourceType[] | AsyncGenerator<ResourceType>,
     args: ResourceArguments,
   ) {
@@ -181,6 +221,14 @@ export abstract class ManagerMixin<ResourceType extends IResourceMixin> {
 
   protected postDeleteHandler(identifier: string, args: ResourceArguments) {
     return identifier;
+  }
+
+  protected buildPath(args?: ResourceArguments) {
+    let path = this.#path;
+    for (const [key, value] of Object.entries(args || {})) {
+      path = path.replace(`{${key}}`, value.toString());
+    }
+    return path;
   }
   /* eslint-enable class-methods-use-this, @typescript-eslint/no-unused-vars */
 }

@@ -7,13 +7,13 @@ import { GenericMockResource } from './genericMockResource';
 
 export class ComplexMockManager extends ManagerMixin<GenericMockResource> {
   static resource = 'this_resource_does_not_exist';
-  static methods = ['all', 'get', 'create', 'update', 'delete'];
+  static methods = ['list', 'get', 'create', 'update', 'delete'];
 
-  protected postAllHandler(
+  protected postListHandler(
     objects: GenericMockResource[] | AsyncGenerator<GenericMockResource>,
     args: ResourceArguments,
   ) {
-    console.log('Executing the "post all" handler');
+    console.log('Executing the "post list" handler');
     return objects;
   }
 

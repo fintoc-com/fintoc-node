@@ -49,11 +49,11 @@ test('"Client" headers', (t) => {
   const ctx: any = t.context;
   const client = ctx.createClient();
   t.assert(client instanceof Client);
-  t.assert(Object.keys(client.headers).length === 2);
-  t.assert('Authorization' in client.headers);
-  t.assert('User-Agent' in client.headers);
-  t.assert(client.headers.Authorization === ctx.apiKey);
-  t.assert(client.headers['User-Agent'] === ctx.userAgent);
+  t.assert(Object.keys(client.staticHeaders).length === 3);
+  t.assert('Authorization' in client.staticHeaders);
+  t.assert('User-Agent' in client.staticHeaders);
+  t.assert(client.staticHeaders.Authorization === ctx.apiKey);
+  t.assert(client.staticHeaders['User-Agent'] === ctx.userAgent);
 });
 
 test('"Client" extension', (t) => {

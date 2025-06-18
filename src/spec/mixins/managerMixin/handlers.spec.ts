@@ -42,7 +42,7 @@ test.serial('"ManagerMixin" handlers all handler', async (t) => {
   await ctx.manager.all();
 
   // @ts-ignore: property does not exist
-  t.assert(console.log.getCall(0).args[0].includes('all'));
+  t.assert(console.log.getCall(0).args[0].includes('list'));
 });
 
 test.serial('"ManagerMixin" handlers get handler', async (t) => {
@@ -68,11 +68,9 @@ test.serial('"ManagerMixin" handlers update handler', async (t) => {
 
   await ctx.manager.update('my_id');
 
-  // Update handler first gets and then updates
+  // Update handler only calls update, not get first
   // @ts-ignore: property does not exist
-  t.assert(console.log.getCall(3).args[0].includes('get'));
-  // @ts-ignore: property does not exist
-  t.assert(console.log.getCall(4).args[0].includes('update'));
+  t.assert(console.log.getCall(3).args[0].includes('update'));
 });
 
 test.serial('"ManagerMixin" handlers delete handler', async (t) => {
@@ -80,9 +78,7 @@ test.serial('"ManagerMixin" handlers delete handler', async (t) => {
 
   await ctx.manager.delete('my_id');
 
-  // Delete handler first gets and then deletes
+  // Delete handler only calls delete, not get first
   // @ts-ignore: property does not exist
-  t.assert(console.log.getCall(5).args[0].includes('get'));
-  // @ts-ignore: property does not exist
-  t.assert(console.log.getCall(6).args[0].includes('delete'));
+  t.assert(console.log.getCall(4).args[0].includes('delete'));
 });

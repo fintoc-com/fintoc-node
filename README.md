@@ -20,13 +20,20 @@
 </a>
 </p>
 
-## Why?
-
-You can think of [Fintoc API](https://fintoc.com/docs) as a piscola.
-And the key ingredient to a properly made piscola are the ice cubes.
-Sure, you can still have a [piscola without ice cubes](https://curl.haxx.se/).
-But hey… that’s not enjoyable -- why would you do that?
-Do yourself a favor: go grab some ice cubes by installing this refreshing library.
+## Table of Contents
+- [Installation](#installation)
+- [Usage](#usage)
+  - [Quickstart](#quickstart)
+  - [Calling endpoints](#calling-endpoints)
+    - [list](#list)
+    - [get](#get)
+    - [create](#create)
+    - [update](#update)
+    - [delete](#delete)
+  - [Webhook Signature Validation](#webhook-signature-validation)
+  - [Idempotency Keys](#idempotency-keys)
+  - [Serialization](#serialization)
+- [Acknowledgements](#acknowledgements)
 
 ## Installation
 
@@ -48,32 +55,42 @@ The idea behind this SDK is to stick to the API design as much as possible, so t
 
 ### Quickstart
 
-To be able to use this SDK, you first need to have a [Fintoc](https://app.fintoc.com/login) account. You will need to get your secret API key from the dashboard to be able to use the SDK. Once you have your API key, all you need to do is initialize a `Fintoc` object with it and you're ready to start enjoying Fintoc!
+To be able to use this SDK, you first need to get your secret API Key from the [Fintoc Dashboard](https://dashboard.fintoc.com/login). Once you have your API key, all you need to do is initialize a `Fintoc` object with it and you're ready to start enjoying Fintoc!
 
 ```javascript
 import { Fintoc } from 'fintoc';
 
 const fintocClient = new Fintoc('your_api_key');
+
+// List all succeeded payment intents since the beginning of 2025
+const paymentIntents = await fintocClient.paymentIntents.list({ since: '2025-01-01' });
+for await (const pi of paymentIntents) {
+  console.log(pi.created_at, pi.amount, pi.status);
+}
+
+// Get a specific payment intent
+const paymentIntent = await fintocClient.paymentIntents.get('pi_12312312');
+console.log(paymentIntent.created_at, paymentIntent.amount, paymentIntent.status);
 ```
 
-Now you can start using the SDK!
+### Calling endpoints
 
-### Managers
+The SDK provides direct access to Fintoc API resources following the API structure. Simply use the resource name and follow it by the appropriate action you want.
 
-To make the usage of the SDK feel natural, resources are managed by **managers** (_wow_). These **managers** correspond to objects with some methods that allow you to get the resources that you want. Each manager is _attached_ to another resource, following the API structure. For example, the `Fintoc` object has `links` and `webhookEndpoints` managers, while `Link` objects have an `accounts` manager (we will see more examples soon). Notice that **not every manager has all of the methods**, as they correspond to the API capabilities. The methods of the managers are the following (we will use the `webhookEndpoints` manager as an example):
+Notice that **not every resource has all of the methods**, as they correspond to the API capabilities.
 
-#### `all`
+#### `list`
 
-You can use the `all` method of the managers as follows:
+You can use the `list` method to list all the instances of the resource:
 
 ```javascript
-const webhookEndpoints = await fintocClient.webhookEndpoints.all();
+const webhookEndpoints = await fintocClient.webhookEndpoints.list();
 ```
 
-The `all` method of the managers returns **an async generator** with all the instances of the resource. This method can also receive an `options` object! The arguments that can be passed are the arguments that the API receives for that specific resource! For example, the `Movement` resource can be filtered using `since` and `until`, so if you wanted to get a range of `movements` from an `account`, all you need to do is to pass the parameters to the method!
+The `list` method returns an **async generator** with all the instances of the resource. This method can also receive the arguments that the API receives for that specific resource. For example, the `PaymentIntent` resource can be filtered using `since` and `until`, so if you wanted to get a range of `payment intents`, all you need to do is to pass the parameters to the method:
 
 ```javascript
-const movements = await account.movements.all({
+const paymentIntents = await fintocClient.paymentIntents.list({
   since: '2019-07-24',
   until: '2021-05-12',
 });
@@ -82,42 +99,35 @@ const movements = await account.movements.all({
 Notice that, in order to iterate over the async generator, you need to `await` the generator itself **and then** each of the instances:
 
 ```javascript
-const movements = await account.movements.all();
+const paymentIntents = await fintocClient.paymentIntents.list({
+  since: '2019-07-24',
+  until: '2021-05-12',
+});
 
-for await (const movement of movements) {
-  console.log(movement.id);
-}
-```
-
-Or you can abbreviate it a bit:
-
-```javascript
-for await (const movement of await account.movements.all()) {
-  console.log(movement.id);
+for await (const paymentIntent of paymentIntents) {
+  console.log(paymentIntent.id);
 }
 ```
 
 You can also pass the `lazy: false` parameter to the method to force the SDK to return a list of all the instances of the resource instead of the generator. **Beware**: this could take **very long**, depending on the amount of instances that exist of said resource:
 
 ```javascript
-const webhookEndpoints = await fintocClient.webhookEndpoints.all({ lazy: false });
+const paymentIntents = await fintocClient.paymentIntents.list({ lazy: false });
 
-Array.isArray(webhookEndpoints); // true
+Array.isArray(paymentIntents); // true
 ```
 
 #### `get`
 
-You can use the `get` method of the managers as follows:
+You can use the `get` method to get a specific instance of the resource:
 
 ```javascript
-const webhookEndpoint = await fintocClient.webhookEndpoints.get('we_8anqVLlBC8ROodem');
+const paymentIntent = await fintocClient.paymentIntents.get('pi_8anqVLlBC8ROodem');
 ```
-
-The `get` method of the managers returns an existing instance of the resource using its identifier to find it.
 
 #### `create`
 
-You can use the `create` method of the managers as follows:
+You can use the `create` method to create an instance of the resource:
 
 ```javascript
 const webhookEndpoint = await fintocClient.webhookEndpoints.create({
@@ -131,7 +141,7 @@ The `create` method of the managers creates and returns a new instance of the re
 
 #### `update`
 
-You can use the `update` method of the managers as follows:
+You can use the `update` method to update an instance of the resource:
 
 ```javascript
 const webhookEndpoint = await fintocClient.webhookEndpoints.update(
@@ -145,32 +155,9 @@ const webhookEndpoint = await fintocClient.webhookEndpoints.update(
 
 The `update` method of the managers updates and returns an existing instance of the resource using its identifier to find it. The first parameter of the method corresponds to the identifier being used to find the existing instance of the resource. The attributes to be modified are passed as an `options` object, and correspond to the parameters specified by the API documentation for the update action of said resource.
 
-Notice that using the manager to update an instance of a resource is equivalent (in terms of outcome) to calling the `update` directly on the object itself:
-
-
-```javascript
-// Using the manager
-const webhookEndpoint = await fintocClient.webhookEndpoints.update(
-  'we_8anqVLlBC8ROodem',
-  {
-    enabled_events: ['account.refresh_intent.succeeded'],
-    disabled: true,
-  },
-);
-
-// Using the object
-const webhookEndpoint = await fintocClient.webhookEndpoints.get('we_8anqVLlBC8ROodem');
-webhookEndpoint.update({
-  enabled_events: ['account.refresh_intent.succeeded'],
-  disabled: true,
-});
-```
-
-When using the SDK, you will probably almost always want to use the object directly to update, just because it is way less verbose if you already have the object itself. Also, using the `update` method from the manager first needs to `get` the resource and then updates it, so it translates to 2 API calls. If you already have the object to update, using the `update` method directly from the object just updates it, so it translates to just 1 API call.
-
 #### `delete`
 
-You can use the `delete` method of the managers as follows:
+You can use the `delete` method to delete an instance of the resource:
 
 ```javascript
 const deletedIdentifier = await fintocClient.webhookEndpoints.delete('we_8anqVLlBC8ROodem');
@@ -178,254 +165,46 @@ const deletedIdentifier = await fintocClient.webhookEndpoints.delete('we_8anqVLl
 
 The `delete` method of the managers deletes an existing instance of the resource using its identifier to find it and returns the identifier.
 
-Notice that using the manager to delete an instance of a resource is equivalent (in terms of outcome) to calling the `delete` directly on the object itself:
+### Webhook Signature Validation
 
+To ensure the authenticity of incoming webhooks from Fintoc, you should always validate the signature. The SDK provides a `WebhookSignature` class to verify the `Fintoc-Signature` header
 
 ```javascript
-// Using the manager
-const deletedIdentifier = await fintocClient.webhookEndpoints.delete('we_8anqVLlBC8ROodem');
-
-// Using the object
-const webhookEndpoint = await fintocClient.webhookEndpoints.get('we_8anqVLlBC8ROodem');
-const deletedIdentifier = await webhookEndpoint.delete();
+WebhookSignature.verifyHeader(
+    req.body,
+    req.headers['fintoc-signature'],
+    'your_webhook_secret'
+)
 ```
 
-When using the SDK, you will probably almost always want to use the object directly to delete, just because it is way less verbose if you already have the object itself. Also, using the `delete` method from the manager first needs to `get` the resource and then deletes it, so it translates to 2 API calls. If you already have the object to delete, using the `delete` method directly from the object just deletes it, so it translates to just 1 API call.
+The `verifyHeader` method takes the following parameters:
+- `payload`: The raw request body as a string
+- `header`: The Fintoc-Signature header value
+- `secret`: Your webhook secret key (found in your Fintoc dashboard)
+- `tolerance`: Number of seconds to tolerate when checking timestamp (default: 300)
 
-### The shape of the SDK
+If the signature is invalid or the timestamp is outside the tolerance window, a `WebhookSignatureError` will be raised with a descriptive message.
 
-For complete information about the API, head to [the docs](https://fintoc.com/docs). You will notice that the shape of the SDK is very similar to the shape of the API. Let's start with the `Fintoc` object.
 
-#### The `Fintoc` object
+For a complete example of handling webhooks, see [examples/webhook.js](examples/webhook.js).
 
-To create a `Fintoc` object, instantiate it using your secret API key:
+### Idempotency Keys
 
-```javascript
-import { Fintoc } from 'fintoc';
-
-const fintocClient = new Fintoc('your_api_key');
-```
-
-This gives us access to a bunch of operations already. The object created using this _snippet_ contains three [managers](#managers): `links`, `paymentIntents` and `webhookEndpoints`.
-
-#### The `webhookEndpoints` manager
-
-Available methods: `all`, `get`, `create`, `update`, `delete`.
-
-From the Fintoc client, you can manage your webhook endpoints swiftly! Start by creating a new Webhook Endpoint!
+You can provide an [Idempotency Key](https://docs.fintoc.com/reference/idempotent-requests) using the `idempotency_key` argument. For example:
 
 ```javascript
-const webhookEndpoint = await fintocClient.webhookEndpoints.create({
-  url: 'https://webhook.site/58gfb429-c33c-20c7-584b-d5ew3y3202a0',
-  enabled_events: ['account.refresh_intent.succeeded'],
-  disabled: true,
-});
-
-console.log(webhookEndpoint.id); // we_8anqVLlBC8ROodem
-```
-
-You can update this webhook endpoint any time you want! Just run the following command:
-
-```javascript
-const webhookEndpoint = await fintocClient.webhookEndpoints.update(
-  'we_8anqVLlBC8ROodem',
-  {
-    enabled_events: ['link.credentials_changed'],
-    description: 'Fantasting webhook endpoint',
-  },
-);
-
-console.log(webhookEndpoint.status); // disabled
-```
-
-Maybe you no longer want this webhook endpoint. Let's delete it!
-
-```javascript
-fintocClient.webhookEndpoints.delete('we_8anqVLlBC8ROodem');
-```
-
-Now, let's list every webhook endpoint we have:
-
-```javascript
-for await (const webhookEndpoint of await fintocClient.webhookEndpoints.all()) {
-  console.log(webhookEndpoint.id);
-}
-```
-
-If you see a webhook endpoint you want to use, just use the `get` method!
-
-```javascript
-const webhookEndpoint = await fintocClient.webhookEndpoints.get('we_8anqVLlBC8ROodem');
-
-console.log(webhookEndpoint.id); // we_8anqVLlBC8ROodem
-```
-
-#### The `paymentIntents` manager
-
-Available methods: `all`, `get`, `create`.
-
-Payment intents allow you to start a payment using Fintoc! Start by creating a new payment intent:
-
-```javascript
-const paymentIntent = await fintocClient.paymentIntents.create({
-  currency: 'CLP',
-  amount: 5990,
-  recipient_account: {
-    holder_id: '111111111',
-    number: '123123123',
-    type: 'checking_account',
-    institution_id: 'cl_banco_de_chile',
-  },
-});
-
-console.log(paymentIntent.id);            // pi_BO381oEATXonG6bj
-console.log(paymentIntent.widget_token);  // pi_BO381oEATXonG6bj_sec_a4xK32BanKWYn
-```
-
-Notice that the success of this payment intent will be notified through a Webhook. Now, let's list every payment intent we have:
-
-```javascript
-for await (const paymentIntent of await fintocClient.paymentIntents.all()) {
-  console.log(paymentIntent.id);
-}
-```
-
-If you see a payment intent you want to use, just use the `get` method!
-
-```javascript
-const paymentIntent = fintocClient.paymentIntents.get('pi_BO381oEATXonG6bj')
-
-console.log(paymentIntent.id)      // pi_BO381oEATXonG6bj
-console.log(paymentIntent.status)  // succeeded
-```
-
-#### The `links` manager
-
-Available methods: `all`, `get`, `update`, `delete`.
-
-Links are probably the most importat resource. Let's list them!
-
-```javascript
-console.log((await fintocClient.links.all({ lazy: false })).length); // 3
-
-for await (const link of await fintocClient.links.all()) {
-  console.log(link.id);
-}
-```
-
-Links are a bit different than the rest of the resources, because their identifier is not really their `id`, but their `link_token`. This means that, in order to `get`, `update` or `delete` a link, you need to pass the `link_token`, not the `link_id`!
-
-```javascript
-const link = await fintocClient.links.get('link_Y75EXAKiIVj7w489_token_NCqjwRVoTX3cmnx8pnbpqd11');
-```
-
-Notice that the Link objects generated from the `all` method will won't be able to execute `update` or `delete` operations, while any Link object generated from `get` or `update` will have permission to `update` or `delete` (given that the link token is necessary to `get` or `update` in the first place).
-
-The Link resource has a lot of **managers**!
-
-```javascript
-const invoices = await link.invoices.all(); // Invoices
-const taxReturns = await link.taxReturns.all(); // Tax Returns
-const subscriptions = await link.subscriptions.all(); // Subscriptions
-const refreshIntents = await link.refreshIntents.all(); // Refresh Intents
-const accounts = await link.accounts.all(); // Accounts
-```
-
-#### The `invoices` manager
-
-Available methods: `all`.
-
-Once you have a Link, you can use the `invoices` manager to get all the invoices associated to a link!
-
-```javascript
-for await (const invoice of await link.invoices.all()) {
-  console.log(invoice.id);
-}
-```
-
-#### The `taxReturns` manager
-
-Available methods: `all`, `get`.
-
-Once you have a Link, you can use the `taxReturns` manager to get all the tax returns associated to a link!
-
-```javascript
-for await (const taxReturn of await link.taxReturns.all()) {
-  console.log(taxReturn.id);
-}
-```
-
-#### The `subscriptions` manager
-
-Available methods: `all`, `get`.
-
-Once you have a Link, you can use the `subscriptions` manager to get all the subscriptions associated to a link!
-
-```javascript
-for await (const subscription of await link.subscriptions.all()) {
-  console.log(subscription.id);
-}
-```
-
-#### The `refreshIntents` manager
-
-Available methods: `all`, `get`, `create`.
-
-Refresh intents allow you to control how an account gets refreshed on Fintoc! Once you have a Link, you can use the `refreshIntents` manager to create a new refresh intent:
-
-```javascript
-const refreshIntent = await link.refreshIntents.create();
-
-console.log(refreshIntent.id);  // ri_5A94DVCJ7xNM3MEo
-```
-
-Notice that the success of this refresh intent will be notified through a Webhook. Now, let's list every refresh intent we have:
-
-```javascript
-for await (const refreshIntent of await link.refreshIntents.all()) {
-  console.log(refreshIntent.id);
-}
-```
-
-If you see a refresh intent you want to use, just use the `get` method!
-
-```javascript
-const refreshIntent = await link.refreshIntents.get('ri_5A94DVCJ7xNM3MEo');
-
-console.log(refreshIntent.id);      // ri_5A94DVCJ7xNM3MEo
-console.log(refreshIntent.status);  // succeeded
-```
-
-#### The `accounts` manager
-
-Available methods: `all`, `get`.
-
-Once you have a Link, you can use the `accounts` manager to get all the accounts associated to a link!
-
-```javascript
-for await (const account of await link.accounts.all()) {
-  console.log(account.id);
-}
-```
-
-Notice that accounts also have a `movements` manager, to get all of the movements of an account:
-
-```javascript
-const account = (await link.accounts.all({ lazy: false }))[0];
-
-const movements = await account.movements.all({ lazy: false });
-```
-
-#### The `movements` manager
-
-Available methods: `all`, `get`.
-
-Once you have an Account, you can use the `movements` manager to get all the movements associated to that account!
-
-```javascript
-for await (const movement of await account.movements.all()) {
-  console.log(movement.id);
-}
+const transfer = await fintoc.v2.transfers.create({
+    idempotency_key: '12345678',
+    amount: 54123,
+    currency: 'mxn',
+    account_id: 'acc_12345678',
+    counterparty: {
+      account_number: '012969100000000026',
+    },
+    metadata: {
+      customer_id: '19385014'
+    }
+  });
 ```
 
 ### Serialization
@@ -433,7 +212,7 @@ for await (const movement of await account.movements.all()) {
 Any resource of the SDK can be serialized! To get the serialized resource, just call the `serialize` method!
 
 ```javascript
-const account = (await link.accounts.all({ lazy: false }))[0];
+const account = (await link.accounts.list({ lazy: false }))[0];
 
 const serialization = account.serialize();
 ```

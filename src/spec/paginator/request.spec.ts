@@ -16,7 +16,7 @@ test.after((t) => {
 
 test('"Request" request response', async (t) => {
   const client = axios.create({ baseURL: 'https://test.com' });
-  const data = await request({ client, path: '/movements' });
+  const data = await request({ client, path: '/movements', headers: {} });
 
   t.assert('next' in data);
   t.assert('elements' in data);
@@ -25,8 +25,10 @@ test('"Request" request response', async (t) => {
 
 test('"Request" request params get passed to next URL', async (t) => {
   const client = axios.create({ baseURL: 'https://test.com' });
-  const data = await request({ client, path: '/movements', params: { link_token: 'sample_link_token' } });
+  const data = await request({
+    client, path: '/movements', headers: {}, params: { link_token: 'sample_link_token' },
+  });
 
   t.assert('next' in data);
-  t.assert(data.next.includes('link_token=sample_link_token'));
+  t.assert(data.next && data.next.includes('link_token=sample_link_token'));
 });
