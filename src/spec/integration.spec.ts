@@ -711,6 +711,18 @@ test('fintoc.v2.accountNumbers.update()', async (t) => {
   t.is(accountNumber.json.status, updateData.status);
 });
 
+test('fintoc.v2.transfers.return()', async (t) => {
+  const ctx: any = t.context;
+  const returnData = {
+    transfer_id: 'transfer_123',
+  };
+  const result = await ctx.fintoc.v2.transfers.return(returnData);
+
+  t.is(result.method, 'post');
+  t.is(result.url, 'v2/transfers/return');
+  t.is(result.json.transfer_id, returnData.transfer_id);
+});
+
 test('fintoc.v2.simulate.receiveTransfer()', async (t) => {
   const ctx: any = t.context;
   const transferData = {
