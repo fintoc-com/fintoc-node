@@ -13,6 +13,8 @@ import {
 } from './managers';
 import {
   AccountNumbersManager,
+  AccountVerificationsManager,
+  EntitiesManager,
   SimulateManager,
   TransfersManager,
   AccountsManager as V2AccountsManager,
@@ -24,12 +26,16 @@ class FintocV2 {
   transfers: TransfersManager;
   accountNumbers: AccountNumbersManager;
   simulate: SimulateManager;
+  entities: EntitiesManager;
+  accountVerifications: AccountVerificationsManager;
 
   constructor(client: Client) {
     this.accounts = new V2AccountsManager('/v2/accounts', client);
     this.transfers = new TransfersManager('/v2/transfers', client);
     this.accountNumbers = new AccountNumbersManager('/v2/account_numbers', client);
     this.simulate = new SimulateManager('/v2/simulate', client);
+    this.entities = new EntitiesManager('/v2/entities', client);
+    this.accountVerifications = new AccountVerificationsManager('/v2/account_verifications', client);
   }
 }
 
