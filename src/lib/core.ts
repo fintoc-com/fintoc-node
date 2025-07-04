@@ -3,6 +3,7 @@ import { Client } from './client';
 import { API_BASE_URL } from './constants';
 import {
   AccountsManager,
+  ChargesManager,
   InvoicesManager,
   LinksManager,
   PaymentIntentsManager,
@@ -43,6 +44,7 @@ export class Fintoc {
   #client: Client;
 
   accounts: AccountsManager;
+  charges: ChargesManager;
   invoices: InvoicesManager;
   links: LinksManager;
   paymentIntents: PaymentIntentsManager;
@@ -60,6 +62,7 @@ export class Fintoc {
       jwsPrivateKey,
     });
     this.accounts = new AccountsManager('/v1/accounts', this.#client);
+    this.charges = new ChargesManager('/v1/charges', this.#client);
     this.invoices = new InvoicesManager('/v1/invoices', this.#client);
     this.links = new LinksManager('/v1/links', this.#client);
     this.paymentIntents = new PaymentIntentsManager('/v1/payment_intents', this.#client);

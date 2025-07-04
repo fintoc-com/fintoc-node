@@ -452,6 +452,45 @@ test('fintoc.taxReturns.get()', async (t) => {
   t.is(taxReturn.url, `v1/tax_returns/${taxReturnId}`);
 });
 
+test('fintoc.charges.list()', async (t) => {
+  const ctx: any = t.context;
+  const charges = await ctx.fintoc.charges.list();
+
+  let count = 0;
+  for await (const charge of charges) {
+    count += 1;
+    t.is(charge.method, 'get');
+    t.is(charge.url, 'v1/charges');
+  }
+
+  t.true(count > 0);
+});
+
+test('fintoc.charges.get()', async (t) => {
+  const ctx: any = t.context;
+  const chargeId = 'charge_id';
+  const charge = await ctx.fintoc.charges.get(chargeId);
+
+  t.is(charge.method, 'get');
+  t.is(charge.url, `v1/charges/${chargeId}`);
+});
+
+test('fintoc.charges.create()', async (t) => {
+  const ctx: any = t.context;
+  const chargeData = {
+    amount: 1000,
+    currency: 'CLP',
+    payment_method: 'bank_transfer',
+  };
+  const charge = await ctx.fintoc.charges.create(chargeData);
+
+  t.is(charge.method, 'post');
+  t.is(charge.url, 'v1/charges');
+  t.is(charge.json.amount, chargeData.amount);
+  t.is(charge.json.currency, chargeData.currency);
+  t.is(charge.json.payment_method, chargeData.payment_method);
+});
+
 test('link.accounts.list()', async (t) => {
   const ctx: any = t.context;
   const linkToken = 'link_token_example';
