@@ -491,6 +491,43 @@ test('fintoc.charges.create()', async (t) => {
   t.is(charge.json.payment_method, chargeData.payment_method);
 });
 
+test('fintoc.subscriptionIntents.list()', async (t) => {
+  const ctx: any = t.context;
+  const subscriptionIntents = await ctx.fintoc.subscriptionIntents.list();
+
+  let count = 0;
+  for await (const subscriptionIntent of subscriptionIntents) {
+    count += 1;
+    t.is(subscriptionIntent.method, 'get');
+    t.is(subscriptionIntent.url, 'v1/subscription_intents');
+  }
+
+  t.true(count > 0);
+});
+
+test('fintoc.subscriptionIntents.get()', async (t) => {
+  const ctx: any = t.context;
+  const subscriptionIntentId = 'subscription_intent_id';
+  const subscriptionIntent = await ctx.fintoc.subscriptionIntents.get(subscriptionIntentId);
+
+  t.is(subscriptionIntent.method, 'get');
+  t.is(subscriptionIntent.url, `v1/subscription_intents/${subscriptionIntentId}`);
+});
+
+test('fintoc.subscriptionIntents.create()', async (t) => {
+  const ctx: any = t.context;
+  const subscriptionIntentData = {
+    amount: 1000,
+    currency: 'CLP',
+  };
+  const subscriptionIntent = await ctx.fintoc.subscriptionIntents.create(subscriptionIntentData);
+
+  t.is(subscriptionIntent.method, 'post');
+  t.is(subscriptionIntent.url, 'v1/subscription_intents');
+  t.is(subscriptionIntent.json.amount, subscriptionIntentData.amount);
+  t.is(subscriptionIntent.json.currency, subscriptionIntentData.currency);
+});
+
 test('link.accounts.list()', async (t) => {
   const ctx: any = t.context;
   const linkToken = 'link_token_example';

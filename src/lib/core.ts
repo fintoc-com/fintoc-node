@@ -8,6 +8,7 @@ import {
   LinksManager,
   PaymentIntentsManager,
   RefreshIntentsManager,
+  SubscriptionIntentsManager,
   SubscriptionsManager,
   TaxReturnsManager,
   WebhookEndpointsManager,
@@ -50,6 +51,7 @@ export class Fintoc {
   paymentIntents: PaymentIntentsManager;
   refreshIntents: RefreshIntentsManager;
   subscriptions: SubscriptionsManager;
+  subscriptionIntents: SubscriptionIntentsManager;
   taxReturns: TaxReturnsManager;
   webhookEndpoints: WebhookEndpointsManager;
   v2: FintocV2;
@@ -68,6 +70,7 @@ export class Fintoc {
     this.paymentIntents = new PaymentIntentsManager('/v1/payment_intents', this.#client);
     this.refreshIntents = new RefreshIntentsManager('/v1/refresh_intents', this.#client);
     this.subscriptions = new SubscriptionsManager('/v1/subscriptions', this.#client);
+    this.subscriptionIntents = new SubscriptionIntentsManager('/v1/subscription_intents', this.#client);
     this.taxReturns = new TaxReturnsManager('/v1/tax_returns', this.#client);
     this.webhookEndpoints = new WebhookEndpointsManager('/v1/webhook_endpoints', this.#client);
 
