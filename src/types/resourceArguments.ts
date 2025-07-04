@@ -1,3 +1,3 @@
 export type ResourceArguments = {
-  [key: string]: ResourceArguments | string | number | boolean
+  [key: string]: ResourceArguments | string | number | boolean | string[]
 }
