@@ -528,6 +528,42 @@ test('fintoc.subscriptionIntents.create()', async (t) => {
   t.is(subscriptionIntent.json.currency, subscriptionIntentData.currency);
 });
 
+test('fintoc.checkoutSessions.create()', async (t) => {
+  const ctx: any = t.context;
+  const checkoutSessionData = {
+    amount: 5000,
+    currency: 'CLP',
+    success_url: 'https://example.com/success',
+    cancel_url: 'https://example.com/cancel',
+  };
+  const checkoutSession = await ctx.fintoc.checkoutSessions.create(checkoutSessionData);
+
+  t.is(checkoutSession.method, 'post');
+  t.is(checkoutSession.url, 'v1/checkout_sessions');
+  t.is(checkoutSession.json.amount, checkoutSessionData.amount);
+  t.is(checkoutSession.json.currency, checkoutSessionData.currency);
+  t.is(checkoutSession.json.success_url, checkoutSessionData.success_url);
+  t.is(checkoutSession.json.cancel_url, checkoutSessionData.cancel_url);
+});
+
+test('fintoc.checkoutSessions.get()', async (t) => {
+  const ctx: any = t.context;
+  const checkoutSessionId = 'checkout_session_id';
+  const checkoutSession = await ctx.fintoc.checkoutSessions.get(checkoutSessionId);
+
+  t.is(checkoutSession.method, 'get');
+  t.is(checkoutSession.url, `v1/checkout_sessions/${checkoutSessionId}`);
+});
+
+test('fintoc.checkoutSessions.expire()', async (t) => {
+  const ctx: any = t.context;
+  const checkoutSessionId = 'checkout_session_id';
+  const checkoutSession = await ctx.fintoc.checkoutSessions.expire(checkoutSessionId);
+
+  t.is(checkoutSession.method, 'post');
+  t.is(checkoutSession.url, `v1/checkout_sessions/${checkoutSessionId}/expire`);
+});
+
 test('link.accounts.list()', async (t) => {
   const ctx: any = t.context;
   const linkToken = 'link_token_example';
