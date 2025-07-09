@@ -70,7 +70,76 @@ test('fintoc.paymentIntents.create()', async (t) => {
   t.is(paymentIntent.url, 'v1/payment_intents');
   t.is(paymentIntent.json.amount, paymentData.amount);
   t.is(paymentIntent.json.currency, paymentData.currency);
-  t.is(paymentIntent.json.payment_method, paymentData.payment_method);
+  t.is(paymentIntent.json.payment_type, paymentData.payment_method);
+  t.is(paymentIntent.json.payment_method, undefined);
+});
+
+test('fintoc.paymentIntents.create() - cash payment', async (t) => {
+  const ctx: any = t.context;
+  const paymentData = {
+    amount: 1000,
+    currency: 'MXN',
+    payment_method: 'cash',
+  };
+  const paymentIntent = await ctx.fintoc.paymentIntents.create(paymentData);
+
+  t.is(paymentIntent.method, 'post');
+  t.is(paymentIntent.url, 'v1/payment_intents');
+  t.is(paymentIntent.json.amount, paymentData.amount);
+  t.is(paymentIntent.json.currency, paymentData.currency);
+  t.is(paymentIntent.json.payment_type, paymentData.payment_method);
+  t.is(paymentIntent.json.payment_method, undefined);
+});
+
+test('fintoc.paymentIntents.create() - payment_type direct usage', async (t) => {
+  const ctx: any = t.context;
+  const paymentData = {
+    amount: 1000,
+    currency: 'MXN',
+    payment_type: 'cash',
+  };
+  const paymentIntent = await ctx.fintoc.paymentIntents.create(paymentData);
+
+  t.is(paymentIntent.method, 'post');
+  t.is(paymentIntent.url, 'v1/payment_intents');
+  t.is(paymentIntent.json.amount, paymentData.amount);
+  t.is(paymentIntent.json.currency, paymentData.currency);
+  t.is(paymentIntent.json.payment_type, paymentData.payment_type);
+  t.is(paymentIntent.json.payment_method, undefined);
+});
+
+test('fintoc.paymentIntents.create() - no payment method specified', async (t) => {
+  const ctx: any = t.context;
+  const paymentData = {
+    amount: 1000,
+    currency: 'MXN',
+  };
+  const paymentIntent = await ctx.fintoc.paymentIntents.create(paymentData);
+
+  t.is(paymentIntent.method, 'post');
+  t.is(paymentIntent.url, 'v1/payment_intents');
+  t.is(paymentIntent.json.amount, paymentData.amount);
+  t.is(paymentIntent.json.currency, paymentData.currency);
+  t.is(paymentIntent.json.payment_method, undefined);
+  t.is(paymentIntent.json.payment_type, undefined);
+});
+
+test('fintoc.paymentIntents.create() - both payment_method and payment_type provided', async (t) => {
+  const ctx: any = t.context;
+  const paymentData = {
+    amount: 1000,
+    currency: 'MXN',
+    payment_method: 'cash',
+    payment_type: 'bank_transfer',
+  };
+  const paymentIntent = await ctx.fintoc.paymentIntents.create(paymentData);
+
+  t.is(paymentIntent.method, 'post');
+  t.is(paymentIntent.url, 'v1/payment_intents');
+  t.is(paymentIntent.json.amount, paymentData.amount);
+  t.is(paymentIntent.json.currency, paymentData.currency);
+  t.is(paymentIntent.json.payment_type, paymentData.payment_method);
+  t.is(paymentIntent.json.payment_method, undefined);
 });
 
 test('fintoc.links.list()', async (t) => {
