@@ -139,6 +139,22 @@ const webhookEndpoint = await fintocClient.webhookEndpoints.create({
 
 The `create` method of the managers creates and returns a new instance of the resource. The attributes of the created object are passed as an `options` object, and correspond to the parameters specified by the API documentation for the creation of said resource.
 
+For payment intents, you can create cash payments:
+
+```javascript
+const paymentIntent = await fintocClient.paymentIntents.create({
+  amount: 1000,
+  currency: 'MXN',
+  payment_type: 'cash',
+});
+```
+
+You can also expire them:
+
+```javascript
+const expiredPaymentIntent = await fintocClient.paymentIntents.expire('pi_2x9Q2ufili2A5Jw3ugI3CrdDHtS');
+```
+
 #### `update`
 
 You can use the `update` method to update an instance of the resource:
