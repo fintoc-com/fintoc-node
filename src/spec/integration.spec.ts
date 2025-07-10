@@ -73,6 +73,15 @@ test('fintoc.paymentIntents.create()', async (t) => {
   t.is(paymentIntent.json.payment_type, paymentData.payment_type);
 });
 
+test('fintoc.paymentIntents.expire()', async (t) => {
+  const ctx: any = t.context;
+  const paymentIntentId = 'pi_2x9Q2ufili2A5Jw3ugI3CrdDHtS';
+  const expiredPaymentIntent = await ctx.fintoc.paymentIntents.expire(paymentIntentId);
+
+  t.is(expiredPaymentIntent.method, 'post');
+  t.is(expiredPaymentIntent.url, `v1/payment_intents/${paymentIntentId}/expire`);
+});
+
 test('fintoc.links.list()', async (t) => {
   const ctx: any = t.context;
   const links = await ctx.fintoc.links.list();
