@@ -62,7 +62,7 @@ test('fintoc.paymentIntents.create()', async (t) => {
   const paymentData = {
     amount: 1000,
     currency: 'USD',
-    payment_method: 'bank_transfer ',
+    payment_type: 'bank_transfer',
   };
   const paymentIntent = await ctx.fintoc.paymentIntents.create(paymentData);
 
@@ -70,7 +70,7 @@ test('fintoc.paymentIntents.create()', async (t) => {
   t.is(paymentIntent.url, 'v1/payment_intents');
   t.is(paymentIntent.json.amount, paymentData.amount);
   t.is(paymentIntent.json.currency, paymentData.currency);
-  t.is(paymentIntent.json.payment_method, paymentData.payment_method);
+  t.is(paymentIntent.json.payment_type, paymentData.payment_type);
 });
 
 test('fintoc.links.list()', async (t) => {
