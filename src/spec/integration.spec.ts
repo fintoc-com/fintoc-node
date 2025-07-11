@@ -62,7 +62,7 @@ test('fintoc.paymentIntents.create()', async (t) => {
   const paymentData = {
     amount: 1000,
     currency: 'USD',
-    payment_method: 'bank_transfer ',
+    payment_type: 'bank_transfer',
   };
   const paymentIntent = await ctx.fintoc.paymentIntents.create(paymentData);
 
@@ -70,7 +70,16 @@ test('fintoc.paymentIntents.create()', async (t) => {
   t.is(paymentIntent.url, 'v1/payment_intents');
   t.is(paymentIntent.json.amount, paymentData.amount);
   t.is(paymentIntent.json.currency, paymentData.currency);
-  t.is(paymentIntent.json.payment_method, paymentData.payment_method);
+  t.is(paymentIntent.json.payment_type, paymentData.payment_type);
+});
+
+test('fintoc.paymentIntents.expire()', async (t) => {
+  const ctx: any = t.context;
+  const paymentIntentId = 'pi_2x9Q2ufili2A5Jw3ugI3CrdDHtS';
+  const expiredPaymentIntent = await ctx.fintoc.paymentIntents.expire(paymentIntentId);
+
+  t.is(expiredPaymentIntent.method, 'post');
+  t.is(expiredPaymentIntent.url, `v1/payment_intents/${paymentIntentId}/expire`);
 });
 
 test('fintoc.links.list()', async (t) => {
