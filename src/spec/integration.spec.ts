@@ -919,3 +919,34 @@ test('fintoc.v2.accountVerifications.create()', async (t) => {
   t.is(accountVerification.url, 'v2/account_verifications');
   t.is(accountVerification.json.account_number, accountVerificationData.account_number);
 });
+
+test('fintoc.v2.accounts.movements.list()', async (t) => {
+  const ctx: any = t.context;
+  const accountId = 'account_id';
+  const movements = await ctx.fintoc.v2.accounts.movements.list({
+    account_id: accountId,
+  });
+
+  let count = 0;
+  for await (const movement of movements) {
+    count += 1;
+    t.is(movement.method, 'get');
+    t.is(movement.url, `v2/accounts/${accountId}/movements`);
+    t.is(movement.params.account_id, accountId);
+  }
+
+  t.true(count > 0);
+});
+
+test('fintoc.v2.accounts.movements.get()', async (t) => {
+  const ctx: any = t.context;
+  const accountId = 'account_id';
+  const movementId = 'movement_id';
+  const movement = await ctx.fintoc.v2.accounts.movements.get(movementId, {
+    account_id: accountId,
+  });
+
+  t.is(movement.method, 'get');
+  t.is(movement.url, `v2/accounts/${accountId}/movements/${movementId}`);
+  t.is(movement.params.account_id, accountId);
+});
