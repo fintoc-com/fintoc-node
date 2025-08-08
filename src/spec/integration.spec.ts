@@ -500,6 +500,54 @@ test('fintoc.charges.create()', async (t) => {
   t.is(charge.json.payment_method, chargeData.payment_method);
 });
 
+test('fintoc.refunds.list()', async (t) => {
+  const ctx: any = t.context;
+  const refunds = await ctx.fintoc.refunds.list();
+
+  let count = 0;
+  for await (const refund of refunds) {
+    count += 1;
+    t.is(refund.method, 'get');
+    t.is(refund.url, 'v1/refunds');
+  }
+
+  t.true(count > 0);
+});
+
+test('fintoc.refunds.get()', async (t) => {
+  const ctx: any = t.context;
+  const refundId = 'ref_QmbpWzP1HOngN3X7';
+  const refund = await ctx.fintoc.refunds.get(refundId);
+
+  t.is(refund.method, 'get');
+  t.is(refund.url, `v1/refunds/${refundId}`);
+});
+
+test('fintoc.refunds.create()', async (t) => {
+  const ctx: any = t.context;
+  const refundData = {
+    resource_type: 'payment_intent',
+    resource_id: 'pi_30yWq311fOLrAAKkSH1bvODVLGa',
+    amount: 1000,
+  };
+  const refund = await ctx.fintoc.refunds.create(refundData);
+
+  t.is(refund.method, 'post');
+  t.is(refund.url, 'v1/refunds');
+  t.is(refund.json.resource_type, refundData.resource_type);
+  t.is(refund.json.resource_id, refundData.resource_id);
+  t.is(refund.json.amount, refundData.amount);
+});
+
+test('fintoc.refunds.cancel()', async (t) => {
+  const ctx: any = t.context;
+  const refundId = 'ref_QmbpWzP1HOngN3X7';
+  const refund = await ctx.fintoc.refunds.cancel(refundId);
+
+  t.is(refund.method, 'post');
+  t.is(refund.url, `v1/refunds/${refundId}/cancel`);
+});
+
 test('fintoc.subscriptionIntents.list()', async (t) => {
   const ctx: any = t.context;
   const subscriptionIntents = await ctx.fintoc.subscriptionIntents.list();
