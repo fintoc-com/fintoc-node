@@ -6,6 +6,7 @@ export * from './linksManager';
 export * from './movementsManager';
 export * from './paymentIntentsManager';
 export * from './refreshIntentsManager';
+export * from './refundsManager';
 export * from './subscriptionIntentsManager';
 export * from './subscriptionsManager';
 export * from './taxReturnsManager';
