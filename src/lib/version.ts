@@ -1,3 +1,3 @@
-export const versionInfo = [1, 7, 0];
+export const versionInfo = [1, 8, 0];
 
 export const version = versionInfo.join('.');
