@@ -998,3 +998,16 @@ test('fintoc.v2.accounts.movements.get()', async (t) => {
   t.is(movement.url, `v2/accounts/${accountId}/movements/${movementId}`);
   t.is(movement.params.account_id, accountId);
 });
+
+test('fintoc.v2.accounts.update()', async (t) => {
+  const ctx: any = t.context;
+  const entityId = 'entity_123';
+  const updateData = {
+    description: 'Updated account description',
+  };
+  const account = await ctx.fintoc.v2.accounts.update(entityId, updateData);
+
+  t.is(account.method, 'patch');
+  t.is(account.url, `v2/accounts/${entityId}`);
+  t.is(account.json.description, updateData.description);
+});
