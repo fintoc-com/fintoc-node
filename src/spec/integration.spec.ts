@@ -82,6 +82,18 @@ test('fintoc.paymentIntents.expire()', async (t) => {
   t.is(expiredPaymentIntent.url, `v1/payment_intents/${paymentIntentId}/expire`);
 });
 
+test('fintoc.paymentIntents.checkEligibility()', async (t) => {
+  const ctx: any = t.context;
+  const eligibilityData = {
+    amount: 10000,
+    currency: 'CLP',
+  };
+  const result = await ctx.fintoc.paymentIntents.checkEligibility(eligibilityData);
+
+  t.is(result.method, 'post');
+  t.is(result.url, 'v1/payment_intents/check_eligibility');
+});
+
 test('fintoc.paymentLinks.list()', async (t) => {
   const ctx: any = t.context;
   const paymentLinks = await ctx.fintoc.paymentLinks.list();
