@@ -9,6 +9,6 @@ export class PaymentLinksManager extends ManagerMixin<PaymentLink> {
   cancel(paymentLinkId: string, args?: ResourceArguments): Promise<PaymentLink> {
     const innerArgs = args || {};
     const path = `${this.buildPath()}/${paymentLinkId}/cancel`;
-    return this._create({ path_: path, ...innerArgs });
+    return this._update(paymentLinkId,{ path_: path, ...innerArgs });
   }
 }
