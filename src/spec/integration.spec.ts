@@ -82,6 +82,54 @@ test('fintoc.paymentIntents.expire()', async (t) => {
   t.is(expiredPaymentIntent.url, `v1/payment_intents/${paymentIntentId}/expire`);
 });
 
+test('fintoc.paymentLinks.list()', async (t) => {
+  const ctx: any = t.context;
+  const paymentLinks = await ctx.fintoc.paymentLinks.list();
+
+  let count = 0;
+  for await (const paymentLink of paymentLinks) {
+    count += 1;
+    t.is(paymentLink.method, 'get');
+    t.is(paymentLink.url, 'v1/payment_links');
+  }
+
+  t.true(count > 0);
+});
+
+test('fintoc.paymentLinks.get()', async (t) => {
+  const ctx: any = t.context;
+  const paymentLinkId = 'pl_example_id';
+  const paymentLink = await ctx.fintoc.paymentLinks.get(paymentLinkId);
+
+  t.is(paymentLink.method, 'get');
+  t.is(paymentLink.url, `v1/payment_links/${paymentLinkId}`);
+});
+
+test('fintoc.paymentLinks.create()', async (t) => {
+  const ctx: any = t.context;
+  const paymentLinkData = {
+    amount: 5000,
+    currency: 'CLP',
+    description: 'Payment for services',
+  };
+  const paymentLink = await ctx.fintoc.paymentLinks.create(paymentLinkData);
+
+  t.is(paymentLink.method, 'post');
+  t.is(paymentLink.url, 'v1/payment_links');
+  t.is(paymentLink.json.amount, paymentLinkData.amount);
+  t.is(paymentLink.json.currency, paymentLinkData.currency);
+  t.is(paymentLink.json.description, paymentLinkData.description);
+});
+
+test('fintoc.paymentLinks.cancel()', async (t) => {
+  const ctx: any = t.context;
+  const paymentLinkId = 'pl_example_id';
+  const cancelledPaymentLink = await ctx.fintoc.paymentLinks.cancel(paymentLinkId);
+
+  t.is(cancelledPaymentLink.method, 'post');
+  t.is(cancelledPaymentLink.url, `v1/payment_links/${paymentLinkId}/cancel`);
+});
+
 test('fintoc.links.list()', async (t) => {
   const ctx: any = t.context;
   const links = await ctx.fintoc.links.list();

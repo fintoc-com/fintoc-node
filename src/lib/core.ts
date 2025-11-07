@@ -8,6 +8,7 @@ import {
   InvoicesManager,
   LinksManager,
   PaymentIntentsManager,
+  PaymentLinksManager,
   RefreshIntentsManager,
   RefundsManager,
   SubscriptionIntentsManager,
@@ -52,6 +53,7 @@ export class Fintoc {
   invoices: InvoicesManager;
   links: LinksManager;
   paymentIntents: PaymentIntentsManager;
+  paymentLinks: PaymentLinksManager;
   refreshIntents: RefreshIntentsManager;
   refunds: RefundsManager;
   subscriptions: SubscriptionsManager;
@@ -73,6 +75,7 @@ export class Fintoc {
     this.invoices = new InvoicesManager('/v1/invoices', this.#client);
     this.links = new LinksManager('/v1/links', this.#client);
     this.paymentIntents = new PaymentIntentsManager('/v1/payment_intents', this.#client);
+    this.paymentLinks = new PaymentLinksManager('/v1/payment_links', this.#client);
     this.refreshIntents = new RefreshIntentsManager('/v1/refresh_intents', this.#client);
     this.refunds = new RefundsManager('/v1/refunds', this.#client);
     this.subscriptions = new SubscriptionsManager('/v1/subscriptions', this.#client);
