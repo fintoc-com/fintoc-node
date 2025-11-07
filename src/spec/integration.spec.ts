@@ -138,7 +138,7 @@ test('fintoc.paymentLinks.cancel()', async (t) => {
   const paymentLinkId = 'pl_example_id';
   const cancelledPaymentLink = await ctx.fintoc.paymentLinks.cancel(paymentLinkId);
 
-  t.is(cancelledPaymentLink.method, 'post');
+  t.is(cancelledPaymentLink.method, 'patch');
   t.is(cancelledPaymentLink.url, `v1/payment_links/${paymentLinkId}/cancel`);
 });
 
