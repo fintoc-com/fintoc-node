@@ -5,6 +5,7 @@ export * from './invoicesManager';
 export * from './linksManager';
 export * from './movementsManager';
 export * from './paymentIntentsManager';
+export * from './paymentLinksManager';
 export * from './refreshIntentsManager';
 export * from './refundsManager';
 export * from './subscriptionIntentsManager';

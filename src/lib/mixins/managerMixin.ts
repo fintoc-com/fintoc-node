@@ -174,6 +174,7 @@ export abstract class ManagerMixin<ResourceType extends IResourceMixin> {
   @canRaiseHTTPError
   protected async _update(identifier: string, args?: ResourceArguments): Promise<ResourceType> {
     const innerArgs = args || {};
+    const { path_ } = innerArgs;
     const klass = await getResourceClass(this.#originatingClass.resource);
     const object = await resourceUpdate<ResourceType>(
       this._client,
@@ -183,6 +184,7 @@ export abstract class ManagerMixin<ResourceType extends IResourceMixin> {
       this.#handlers,
       this.#originatingClass.methods,
       innerArgs,
+      path_?.toString(),
     );
     return this.postUpdateHandler(object, identifier, innerArgs);
   }

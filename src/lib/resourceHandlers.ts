@@ -133,8 +133,10 @@ export async function resourceUpdate<ResourceType>(
   handlers: Record<string, GenericFunction> = {},
   methods: string[],
   params: Record<string, any>,
+  customPath?: string,
 ): Promise<ResourceType> {
-  const data = await client.request({ path: `${path}/${id}`, method: 'patch', json: params });
+  const updatePath = customPath || `${path}/${id}`;
+  const data = await client.request({ path: updatePath, method: 'patch', json: params });
   return objetize(
     klass,
     client,
