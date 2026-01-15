@@ -1071,3 +1071,40 @@ test('fintoc.v2.accounts.update()', async (t) => {
   t.is(account.url, `v2/accounts/${entityId}`);
   t.is(account.json.description, updateData.description);
 });
+
+test('fintoc.v2.customers.list()', async (t) => {
+  const ctx: any = t.context;
+  const customers = await ctx.fintoc.v2.customers.list();
+
+  let count = 0;
+  for await (const customer of customers) {
+    count += 1;
+    t.is(customer.method, 'get');
+    t.is(customer.url, 'v2/customers');
+  }
+
+  t.true(count > 0);
+});
+
+test('fintoc.v2.customers.get()', async (t) => {
+  const ctx: any = t.context;
+  const customerId = 'customer_id';
+  const customer = await ctx.fintoc.v2.customers.get(customerId);
+
+  t.is(customer.method, 'get');
+  t.is(customer.url, `v2/customers/${customerId}`);
+});
+
+test('fintoc.v2.customers.create()', async (t) => {
+  const ctx: any = t.context;
+  const customerData = {
+    name: 'Test Customer',
+    email: 'test@example.com',
+  };
+  const customer = await ctx.fintoc.v2.customers.create(customerData);
+
+  t.is(customer.method, 'post');
+  t.is(customer.url, 'v2/customers');
+  t.is(customer.json.name, customerData.name);
+  t.is(customer.json.email, customerData.email);
+});
