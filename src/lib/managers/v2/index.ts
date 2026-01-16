@@ -5,3 +5,4 @@ export * from './simulateManager';
 export * from './entitiesManager';
 export * from './accountVerificationsManager';
 export * from './movementsManager';
+export * from './customersManager';

@@ -4,3 +4,4 @@ export * from './accountNumber';
 export * from './entity';
 export * from './accountVerification';
 export * from './movement';
+export * from './customer';
