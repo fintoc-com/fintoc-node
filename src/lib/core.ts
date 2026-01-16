@@ -19,6 +19,7 @@ import {
 import {
   AccountNumbersManager,
   AccountVerificationsManager,
+  CustomersManager,
   EntitiesManager,
   SimulateManager,
   TransfersManager,
@@ -33,6 +34,7 @@ class FintocV2 {
   simulate: SimulateManager;
   entities: EntitiesManager;
   accountVerifications: AccountVerificationsManager;
+  customers: CustomersManager;
 
   constructor(client: Client) {
     this.accounts = new V2AccountsManager('/v2/accounts', client);
@@ -41,6 +43,7 @@ class FintocV2 {
     this.simulate = new SimulateManager('/v2/simulate', client);
     this.entities = new EntitiesManager('/v2/entities', client);
     this.accountVerifications = new AccountVerificationsManager('/v2/account_verifications', client);
+    this.customers = new CustomersManager('/v2/customers', client);
   }
 }
 
