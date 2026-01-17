@@ -8,8 +8,9 @@ on:
 jobs:
   npm-release:
     runs-on: ubuntu-24.04
-    env:
-      NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+    permissions:
+      id-token: write
+      contents: read
     steps:
       - name: Checkout to commit code
         uses: actions/checkout@v3
