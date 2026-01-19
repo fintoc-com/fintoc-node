@@ -8,16 +8,17 @@ on:
 jobs:
   npm-release:
     runs-on: ubuntu-24.04
-    env:
-      NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+    permissions:
+      id-token: write
+      contents: read
     steps:
       - name: Checkout to commit code
         uses: actions/checkout@v3
 
-      - name: Set up Node.js v18
-        uses: actions/setup-node@v3
+      - name: Set up Node.js v22
+        uses: actions/setup-node@v4
         with:
-          node-version: 18
+          node-version: 22
           registry-url: https://registry.npmjs.org
 
       - name: Set up node_modules cache
@@ -45,10 +46,10 @@ jobs:
       - name: Checkout to commit code
         uses: actions/checkout@v3
 
-      - name: Set up Node.js v18
-        uses: actions/setup-node@v3
+      - name: Set up Node.js v22
+        uses: actions/setup-node@v4
         with:
-          node-version: 18
+          node-version: 22
 
       - name: Set up node_modules cache
         uses: actions/cache@v3
