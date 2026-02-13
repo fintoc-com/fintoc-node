@@ -96,6 +96,16 @@ const paymentIntents = await fintocClient.paymentIntents.list({
 });
 ```
 
+The same applies to other resources. For instance, you can filter `refunds` by `since`, `until`, and `status`:
+
+```javascript
+const refunds = await fintocClient.refunds.list({
+  since: '2025-01-01',
+  until: '2025-02-01',
+  status: 'succeeded',
+});
+```
+
 Notice that, in order to iterate over the async generator, you need to `await` the generator itself **and then** each of the instances:
 
 ```javascript
