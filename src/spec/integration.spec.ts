@@ -1108,3 +1108,53 @@ test('fintoc.v2.customers.create()', async (t) => {
   t.is(customer.json.name, customerData.name);
   t.is(customer.json.email, customerData.email);
 });
+
+test('fintoc.v2.checkoutSessions.list()', async (t) => {
+  const ctx: any = t.context;
+  const checkoutSessions = await ctx.fintoc.v2.checkoutSessions.list();
+
+  let count = 0;
+  for await (const checkoutSession of checkoutSessions) {
+    count += 1;
+    t.is(checkoutSession.method, 'get');
+    t.is(checkoutSession.url, 'v2/checkout_sessions');
+  }
+
+  t.true(count > 0);
+});
+
+test('fintoc.v2.checkoutSessions.get()', async (t) => {
+  const ctx: any = t.context;
+  const checkoutSessionId = 'checkout_session_id';
+  const checkoutSession = await ctx.fintoc.v2.checkoutSessions.get(checkoutSessionId);
+
+  t.is(checkoutSession.method, 'get');
+  t.is(checkoutSession.url, `v2/checkout_sessions/${checkoutSessionId}`);
+});
+
+test('fintoc.v2.checkoutSessions.create()', async (t) => {
+  const ctx: any = t.context;
+  const checkoutSessionData = {
+    amount: 5000,
+    currency: 'CLP',
+    success_url: 'https://example.com/success',
+    cancel_url: 'https://example.com/cancel',
+  };
+  const checkoutSession = await ctx.fintoc.v2.checkoutSessions.create(checkoutSessionData);
+
+  t.is(checkoutSession.method, 'post');
+  t.is(checkoutSession.url, 'v2/checkout_sessions');
+  t.is(checkoutSession.json.amount, checkoutSessionData.amount);
+  t.is(checkoutSession.json.currency, checkoutSessionData.currency);
+  t.is(checkoutSession.json.success_url, checkoutSessionData.success_url);
+  t.is(checkoutSession.json.cancel_url, checkoutSessionData.cancel_url);
+});
+
+test('fintoc.v2.checkoutSessions.expire()', async (t) => {
+  const ctx: any = t.context;
+  const checkoutSessionId = 'checkout_session_id';
+  const checkoutSession = await ctx.fintoc.v2.checkoutSessions.expire(checkoutSessionId);
+
+  t.is(checkoutSession.method, 'post');
+  t.is(checkoutSession.url, `v2/checkout_sessions/${checkoutSessionId}/expire`);
+});

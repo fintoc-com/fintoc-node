@@ -3,5 +3,6 @@ export * from './account';
 export * from './accountNumber';
 export * from './entity';
 export * from './accountVerification';
+export * from './checkoutSession';
 export * from './movement';
 export * from './customer';
