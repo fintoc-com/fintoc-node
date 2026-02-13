@@ -24,6 +24,7 @@ import {
   SimulateManager,
   TransfersManager,
   AccountsManager as V2AccountsManager,
+  CheckoutSessionsManager as V2CheckoutSessionsManager,
 } from './managers/v2';
 import { version } from './version';
 
@@ -35,6 +36,7 @@ class FintocV2 {
   entities: EntitiesManager;
   accountVerifications: AccountVerificationsManager;
   customers: CustomersManager;
+  checkoutSessions: V2CheckoutSessionsManager;
 
   constructor(client: Client) {
     this.accounts = new V2AccountsManager('/v2/accounts', client);
@@ -44,6 +46,7 @@ class FintocV2 {
     this.entities = new EntitiesManager('/v2/entities', client);
     this.accountVerifications = new AccountVerificationsManager('/v2/account_verifications', client);
     this.customers = new CustomersManager('/v2/customers', client);
+    this.checkoutSessions = new V2CheckoutSessionsManager('/v2/checkout_sessions', client);
   }
 }
 

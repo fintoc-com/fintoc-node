@@ -1,6 +1,6 @@
 {
   "name": "fintoc",
-  "version": "1.12.0",
+  "version": "1.13.0",
   "description": "The official Node client for the Fintoc API.",
   "main": "build/main/index.js",
   "typings": "build/main/index.d.ts",
@@ -36,7 +36,7 @@
     "axios": "^1.10.0"
   },
   "devDependencies": {
-    "@ava/typescript": "^5.0.0",
+    "@ava/typescript": "^6.0.0",
     "@istanbuljs/nyc-config-typescript": "^1.0.1",
     "@types/sinon": "^10.0.3",
     "@typescript-eslint/eslint-plugin": "^4.0.1",
