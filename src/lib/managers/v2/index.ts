@@ -7,3 +7,4 @@ export * from './accountVerificationsManager';
 export * from './movementsManager';
 export * from './customersManager';
 export * from './checkoutSessionsManager';
+export * from './paymentIntentsManager';

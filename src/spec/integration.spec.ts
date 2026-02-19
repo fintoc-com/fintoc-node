@@ -1158,3 +1158,42 @@ test('fintoc.v2.checkoutSessions.expire()', async (t) => {
   t.is(checkoutSession.method, 'post');
   t.is(checkoutSession.url, `v2/checkout_sessions/${checkoutSessionId}/expire`);
 });
+
+test('fintoc.v2.paymentIntents.list()', async (t) => {
+  const ctx: any = t.context;
+  const paymentIntents = await ctx.fintoc.v2.paymentIntents.list();
+
+  let count = 0;
+  for await (const paymentIntent of paymentIntents) {
+    count += 1;
+    t.is(paymentIntent.method, 'get');
+    t.is(paymentIntent.url, 'v2/payment_intents');
+  }
+
+  t.true(count > 0);
+});
+
+test('fintoc.v2.paymentIntents.get()', async (t) => {
+  const ctx: any = t.context;
+  const paymentIntentId = 'payment_intent_id';
+  const paymentIntent = await ctx.fintoc.v2.paymentIntents.get(paymentIntentId);
+
+  t.is(paymentIntent.method, 'get');
+  t.is(paymentIntent.url, `v2/payment_intents/${paymentIntentId}`);
+});
+
+test('fintoc.v2.paymentIntents.create()', async (t) => {
+  const ctx: any = t.context;
+  const paymentIntentData = {
+    amount: 5000,
+    currency: 'CLP',
+    payment_method: 'payment_method_hashid',
+  };
+  const paymentIntent = await ctx.fintoc.v2.paymentIntents.create(paymentIntentData);
+
+  t.is(paymentIntent.method, 'post');
+  t.is(paymentIntent.url, 'v2/payment_intents');
+  t.is(paymentIntent.json.amount, paymentIntentData.amount);
+  t.is(paymentIntent.json.currency, paymentIntentData.currency);
+  t.is(paymentIntent.json.payment_method, paymentIntentData.payment_method);
+});
