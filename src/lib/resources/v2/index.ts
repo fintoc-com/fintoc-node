@@ -6,3 +6,4 @@ export * from './accountVerification';
 export * from './checkoutSession';
 export * from './movement';
 export * from './customer';
+export * from './paymentIntent';
