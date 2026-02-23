@@ -21,11 +21,14 @@ import {
   AccountVerificationsManager,
   CustomersManager,
   EntitiesManager,
+  PaymentMethodsManager,
   SimulateManager,
   TransfersManager,
   AccountsManager as V2AccountsManager,
   CheckoutSessionsManager as V2CheckoutSessionsManager,
+  InvoicesManager as V2InvoicesManager,
   PaymentIntentsManager as V2PaymentIntentsManager,
+  SubscriptionsManager as V2SubscriptionsManager,
 } from './managers/v2';
 import { version } from './version';
 
@@ -35,10 +38,13 @@ class FintocV2 {
   accountNumbers: AccountNumbersManager;
   simulate: SimulateManager;
   entities: EntitiesManager;
+  invoices: V2InvoicesManager;
   accountVerifications: AccountVerificationsManager;
   customers: CustomersManager;
   checkoutSessions: V2CheckoutSessionsManager;
   paymentIntents: V2PaymentIntentsManager;
+  paymentMethods: PaymentMethodsManager;
+  subscriptions: V2SubscriptionsManager;
 
   constructor(client: Client) {
     this.accounts = new V2AccountsManager('/v2/accounts', client);
@@ -46,10 +52,13 @@ class FintocV2 {
     this.accountNumbers = new AccountNumbersManager('/v2/account_numbers', client);
     this.simulate = new SimulateManager('/v2/simulate', client);
     this.entities = new EntitiesManager('/v2/entities', client);
+    this.invoices = new V2InvoicesManager('/v2/invoices', client);
     this.accountVerifications = new AccountVerificationsManager('/v2/account_verifications', client);
     this.customers = new CustomersManager('/v2/customers', client);
     this.checkoutSessions = new V2CheckoutSessionsManager('/v2/checkout_sessions', client);
     this.paymentIntents = new V2PaymentIntentsManager('/v2/payment_intents', client);
+    this.paymentMethods = new PaymentMethodsManager('/v2/payment_methods', client);
+    this.subscriptions = new V2SubscriptionsManager('/v2/subscriptions', client);
   }
 }
 

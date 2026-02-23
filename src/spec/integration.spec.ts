@@ -1159,6 +1159,29 @@ test('fintoc.v2.checkoutSessions.expire()', async (t) => {
   t.is(checkoutSession.url, `v2/checkout_sessions/${checkoutSessionId}/expire`);
 });
 
+test('fintoc.v2.invoices.list()', async (t) => {
+  const ctx: any = t.context;
+  const invoices = await ctx.fintoc.v2.invoices.list();
+
+  let count = 0;
+  for await (const invoice of invoices) {
+    count += 1;
+    t.is(invoice.method, 'get');
+    t.is(invoice.url, 'v2/invoices');
+  }
+
+  t.true(count > 0);
+});
+
+test('fintoc.v2.invoices.get()', async (t) => {
+  const ctx: any = t.context;
+  const invoiceId = 'invoice_id';
+  const invoice = await ctx.fintoc.v2.invoices.get(invoiceId);
+
+  t.is(invoice.method, 'get');
+  t.is(invoice.url, `v2/invoices/${invoiceId}`);
+});
+
 test('fintoc.v2.paymentIntents.list()', async (t) => {
   const ctx: any = t.context;
   const paymentIntents = await ctx.fintoc.v2.paymentIntents.list();
@@ -1196,4 +1219,59 @@ test('fintoc.v2.paymentIntents.create()', async (t) => {
   t.is(paymentIntent.json.amount, paymentIntentData.amount);
   t.is(paymentIntent.json.currency, paymentIntentData.currency);
   t.is(paymentIntent.json.payment_method, paymentIntentData.payment_method);
+});
+
+test('fintoc.v2.paymentMethods.list()', async (t) => {
+  const ctx: any = t.context;
+  const paymentMethods = await ctx.fintoc.v2.paymentMethods.list();
+
+  let count = 0;
+  for await (const paymentMethod of paymentMethods) {
+    count += 1;
+    t.is(paymentMethod.method, 'get');
+    t.is(paymentMethod.url, 'v2/payment_methods');
+  }
+
+  t.true(count > 0);
+});
+
+test('fintoc.v2.paymentMethods.get()', async (t) => {
+  const ctx: any = t.context;
+  const paymentMethodId = 'payment_method_id';
+  const paymentMethod = await ctx.fintoc.v2.paymentMethods.get(paymentMethodId);
+
+  t.is(paymentMethod.method, 'get');
+  t.is(paymentMethod.url, `v2/payment_methods/${paymentMethodId}`);
+});
+
+test('fintoc.v2.subscriptions.list()', async (t) => {
+  const ctx: any = t.context;
+  const subscriptions = await ctx.fintoc.v2.subscriptions.list();
+
+  let count = 0;
+  for await (const subscription of subscriptions) {
+    count += 1;
+    t.is(subscription.method, 'get');
+    t.is(subscription.url, 'v2/subscriptions');
+  }
+
+  t.true(count > 0);
+});
+
+test('fintoc.v2.subscriptions.get()', async (t) => {
+  const ctx: any = t.context;
+  const subscriptionId = 'subscription_id';
+  const subscription = await ctx.fintoc.v2.subscriptions.get(subscriptionId);
+
+  t.is(subscription.method, 'get');
+  t.is(subscription.url, `v2/subscriptions/${subscriptionId}`);
+});
+
+test('fintoc.v2.subscriptions.cancel()', async (t) => {
+  const ctx: any = t.context;
+  const subscriptionId = 'subscription_id';
+  const subscription = await ctx.fintoc.v2.subscriptions.cancel(subscriptionId);
+
+  t.is(subscription.method, 'post');
+  t.is(subscription.url, `v2/subscriptions/${subscriptionId}/cancel`);
 });
