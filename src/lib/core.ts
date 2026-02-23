@@ -24,6 +24,7 @@ import {
   InvoicesManager as V2InvoicesManager,
   PaymentMethodsManager,
   SimulateManager,
+  SubscriptionsManager as V2SubscriptionsManager,
   TransfersManager,
   AccountsManager as V2AccountsManager,
   CheckoutSessionsManager as V2CheckoutSessionsManager,
@@ -43,6 +44,7 @@ class FintocV2 {
   checkoutSessions: V2CheckoutSessionsManager;
   paymentIntents: V2PaymentIntentsManager;
   paymentMethods: PaymentMethodsManager;
+  subscriptions: V2SubscriptionsManager;
 
   constructor(client: Client) {
     this.accounts = new V2AccountsManager('/v2/accounts', client);
@@ -56,6 +58,7 @@ class FintocV2 {
     this.checkoutSessions = new V2CheckoutSessionsManager('/v2/checkout_sessions', client);
     this.paymentIntents = new V2PaymentIntentsManager('/v2/payment_intents', client);
     this.paymentMethods = new PaymentMethodsManager('/v2/payment_methods', client);
+    this.subscriptions = new V2SubscriptionsManager('/v2/subscriptions', client);
   }
 }
 

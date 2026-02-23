@@ -9,3 +9,4 @@ export * from './movement';
 export * from './customer';
 export * from './paymentIntent';
 export * from './paymentMethod';
+export * from './subscription';

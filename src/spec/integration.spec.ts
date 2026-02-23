@@ -1243,3 +1243,35 @@ test('fintoc.v2.paymentMethods.get()', async (t) => {
   t.is(paymentMethod.method, 'get');
   t.is(paymentMethod.url, `v2/payment_methods/${paymentMethodId}`);
 });
+
+test('fintoc.v2.subscriptions.list()', async (t) => {
+  const ctx: any = t.context;
+  const subscriptions = await ctx.fintoc.v2.subscriptions.list();
+
+  let count = 0;
+  for await (const subscription of subscriptions) {
+    count += 1;
+    t.is(subscription.method, 'get');
+    t.is(subscription.url, 'v2/subscriptions');
+  }
+
+  t.true(count > 0);
+});
+
+test('fintoc.v2.subscriptions.get()', async (t) => {
+  const ctx: any = t.context;
+  const subscriptionId = 'subscription_id';
+  const subscription = await ctx.fintoc.v2.subscriptions.get(subscriptionId);
+
+  t.is(subscription.method, 'get');
+  t.is(subscription.url, `v2/subscriptions/${subscriptionId}`);
+});
+
+test('fintoc.v2.subscriptions.cancel()', async (t) => {
+  const ctx: any = t.context;
+  const subscriptionId = 'subscription_id';
+  const subscription = await ctx.fintoc.v2.subscriptions.cancel(subscriptionId);
+
+  t.is(subscription.method, 'post');
+  t.is(subscription.url, `v2/subscriptions/${subscriptionId}/cancel`);
+});
