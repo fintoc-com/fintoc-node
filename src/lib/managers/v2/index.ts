@@ -9,3 +9,4 @@ export * from './movementsManager';
 export * from './customersManager';
 export * from './checkoutSessionsManager';
 export * from './paymentIntentsManager';
+export * from './paymentMethodsManager';

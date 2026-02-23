@@ -1220,3 +1220,26 @@ test('fintoc.v2.paymentIntents.create()', async (t) => {
   t.is(paymentIntent.json.currency, paymentIntentData.currency);
   t.is(paymentIntent.json.payment_method, paymentIntentData.payment_method);
 });
+
+test('fintoc.v2.paymentMethods.list()', async (t) => {
+  const ctx: any = t.context;
+  const paymentMethods = await ctx.fintoc.v2.paymentMethods.list();
+
+  let count = 0;
+  for await (const paymentMethod of paymentMethods) {
+    count += 1;
+    t.is(paymentMethod.method, 'get');
+    t.is(paymentMethod.url, 'v2/payment_methods');
+  }
+
+  t.true(count > 0);
+});
+
+test('fintoc.v2.paymentMethods.get()', async (t) => {
+  const ctx: any = t.context;
+  const paymentMethodId = 'payment_method_id';
+  const paymentMethod = await ctx.fintoc.v2.paymentMethods.get(paymentMethodId);
+
+  t.is(paymentMethod.method, 'get');
+  t.is(paymentMethod.url, `v2/payment_methods/${paymentMethodId}`);
+});
