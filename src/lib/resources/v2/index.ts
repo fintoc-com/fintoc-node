@@ -4,6 +4,7 @@ export * from './accountNumber';
 export * from './entity';
 export * from './accountVerification';
 export * from './checkoutSession';
+export * from './invoice';
 export * from './movement';
 export * from './customer';
 export * from './paymentIntent';

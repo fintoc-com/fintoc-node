@@ -21,6 +21,7 @@ import {
   AccountVerificationsManager,
   CustomersManager,
   EntitiesManager,
+  InvoicesManager as V2InvoicesManager,
   SimulateManager,
   TransfersManager,
   AccountsManager as V2AccountsManager,
@@ -35,6 +36,7 @@ class FintocV2 {
   accountNumbers: AccountNumbersManager;
   simulate: SimulateManager;
   entities: EntitiesManager;
+  invoices: V2InvoicesManager;
   accountVerifications: AccountVerificationsManager;
   customers: CustomersManager;
   checkoutSessions: V2CheckoutSessionsManager;
@@ -46,6 +48,7 @@ class FintocV2 {
     this.accountNumbers = new AccountNumbersManager('/v2/account_numbers', client);
     this.simulate = new SimulateManager('/v2/simulate', client);
     this.entities = new EntitiesManager('/v2/entities', client);
+    this.invoices = new V2InvoicesManager('/v2/invoices', client);
     this.accountVerifications = new AccountVerificationsManager('/v2/account_verifications', client);
     this.customers = new CustomersManager('/v2/customers', client);
     this.checkoutSessions = new V2CheckoutSessionsManager('/v2/checkout_sessions', client);

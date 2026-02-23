@@ -1159,6 +1159,29 @@ test('fintoc.v2.checkoutSessions.expire()', async (t) => {
   t.is(checkoutSession.url, `v2/checkout_sessions/${checkoutSessionId}/expire`);
 });
 
+test('fintoc.v2.invoices.list()', async (t) => {
+  const ctx: any = t.context;
+  const invoices = await ctx.fintoc.v2.invoices.list();
+
+  let count = 0;
+  for await (const invoice of invoices) {
+    count += 1;
+    t.is(invoice.method, 'get');
+    t.is(invoice.url, 'v2/invoices');
+  }
+
+  t.true(count > 0);
+});
+
+test('fintoc.v2.invoices.get()', async (t) => {
+  const ctx: any = t.context;
+  const invoiceId = 'invoice_id';
+  const invoice = await ctx.fintoc.v2.invoices.get(invoiceId);
+
+  t.is(invoice.method, 'get');
+  t.is(invoice.url, `v2/invoices/${invoiceId}`);
+});
+
 test('fintoc.v2.paymentIntents.list()', async (t) => {
   const ctx: any = t.context;
   const paymentIntents = await ctx.fintoc.v2.paymentIntents.list();
