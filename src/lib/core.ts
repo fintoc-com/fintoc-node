@@ -21,14 +21,14 @@ import {
   AccountVerificationsManager,
   CustomersManager,
   EntitiesManager,
-  InvoicesManager as V2InvoicesManager,
   PaymentMethodsManager,
   SimulateManager,
-  SubscriptionsManager as V2SubscriptionsManager,
   TransfersManager,
   AccountsManager as V2AccountsManager,
   CheckoutSessionsManager as V2CheckoutSessionsManager,
+  InvoicesManager as V2InvoicesManager,
   PaymentIntentsManager as V2PaymentIntentsManager,
+  SubscriptionsManager as V2SubscriptionsManager,
 } from './managers/v2';
 import { version } from './version';
 
