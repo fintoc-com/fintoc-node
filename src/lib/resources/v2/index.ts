@@ -10,3 +10,4 @@ export * from './customer';
 export * from './paymentIntent';
 export * from './paymentMethod';
 export * from './subscription';
+export * from './accountStatement';

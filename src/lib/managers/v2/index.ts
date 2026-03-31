@@ -11,3 +11,4 @@ export * from './checkoutSessionsManager';
 export * from './paymentIntentsManager';
 export * from './paymentMethodsManager';
 export * from './subscriptionsManager';
+export * from './accountStatementsManager';
