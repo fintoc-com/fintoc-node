@@ -940,6 +940,14 @@ test('fintoc.v2.accountNumbers.update()', async (t) => {
   t.is(accountNumber.json.status, updateData.status);
 });
 
+test('fintoc.v2.accountNumbers.delete()', async (t) => {
+  const ctx: any = t.context;
+  const accountNumberId = 'acno_Kasf91034gj1AD';
+  const deletedIdentifier = await ctx.fintoc.v2.accountNumbers.delete(accountNumberId);
+
+  t.is(deletedIdentifier, accountNumberId);
+});
+
 test('fintoc.v2.transfers.return()', async (t) => {
   const ctx: any = t.context;
   const returnData = {
