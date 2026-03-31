@@ -1059,6 +1059,24 @@ test('fintoc.v2.accounts.movements.get()', async (t) => {
   t.is(movement.params.account_id, accountId);
 });
 
+test('fintoc.v2.accounts.accountStatements.list()', async (t) => {
+  const ctx: any = t.context;
+  const accountId = 'acc_12345';
+  const accountStatements = await ctx.fintoc.v2.accounts.accountStatements.list({
+    account_id: accountId,
+  });
+
+  let count = 0;
+  for await (const accountStatement of accountStatements) {
+    count += 1;
+    t.is(accountStatement.method, 'get');
+    t.is(accountStatement.url, `v2/accounts/${accountId}/account_statements`);
+    t.is(accountStatement.params.account_id, accountId);
+  }
+
+  t.true(count > 0);
+});
+
 test('fintoc.v2.accounts.update()', async (t) => {
   const ctx: any = t.context;
   const entityId = 'entity_123';
