@@ -940,6 +940,14 @@ test('fintoc.v2.accountNumbers.update()', async (t) => {
   t.is(accountNumber.json.status, updateData.status);
 });
 
+test('fintoc.v2.accountNumbers.delete()', async (t) => {
+  const ctx: any = t.context;
+  const accountNumberId = 'acno_Kasf91034gj1AD';
+  const deletedIdentifier = await ctx.fintoc.v2.accountNumbers.delete(accountNumberId);
+
+  t.is(deletedIdentifier, accountNumberId);
+});
+
 test('fintoc.v2.transfers.return()', async (t) => {
   const ctx: any = t.context;
   const returnData = {
@@ -1057,6 +1065,24 @@ test('fintoc.v2.accounts.movements.get()', async (t) => {
   t.is(movement.method, 'get');
   t.is(movement.url, `v2/accounts/${accountId}/movements/${movementId}`);
   t.is(movement.params.account_id, accountId);
+});
+
+test('fintoc.v2.accounts.accountStatements.list()', async (t) => {
+  const ctx: any = t.context;
+  const accountId = 'acc_12345';
+  const accountStatements = await ctx.fintoc.v2.accounts.accountStatements.list({
+    account_id: accountId,
+  });
+
+  let count = 0;
+  for await (const accountStatement of accountStatements) {
+    count += 1;
+    t.is(accountStatement.method, 'get');
+    t.is(accountStatement.url, `v2/accounts/${accountId}/account_statements`);
+    t.is(accountStatement.params.account_id, accountId);
+  }
+
+  t.true(count > 0);
 });
 
 test('fintoc.v2.accounts.update()', async (t) => {
