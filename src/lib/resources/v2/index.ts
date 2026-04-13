@@ -9,5 +9,6 @@ export * from './movement';
 export * from './customer';
 export * from './paymentIntent';
 export * from './paymentMethod';
+export * from './product';
 export * from './subscription';
 export * from './accountStatement';

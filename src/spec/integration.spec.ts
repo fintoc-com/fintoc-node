@@ -1301,3 +1301,40 @@ test('fintoc.v2.subscriptions.cancel()', async (t) => {
   t.is(subscription.method, 'post');
   t.is(subscription.url, `v2/subscriptions/${subscriptionId}/cancel`);
 });
+
+test('fintoc.v2.products.list()', async (t) => {
+  const ctx: any = t.context;
+  const products = await ctx.fintoc.v2.products.list();
+
+  let count = 0;
+  for await (const product of products) {
+    count += 1;
+    t.is(product.method, 'get');
+    t.is(product.url, 'v2/products');
+  }
+
+  t.true(count > 0);
+});
+
+test('fintoc.v2.products.get()', async (t) => {
+  const ctx: any = t.context;
+  const productId = 'product_id';
+  const product = await ctx.fintoc.v2.products.get(productId);
+
+  t.is(product.method, 'get');
+  t.is(product.url, `v2/products/${productId}`);
+});
+
+test('fintoc.v2.products.create()', async (t) => {
+  const ctx: any = t.context;
+  const productData = {
+    name: 'Test Product',
+    currency: 'CLP',
+  };
+  const product = await ctx.fintoc.v2.products.create(productData);
+
+  t.is(product.method, 'post');
+  t.is(product.url, 'v2/products');
+  t.is(product.json.name, productData.name);
+  t.is(product.json.currency, productData.currency);
+});
