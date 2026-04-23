@@ -1353,4 +1353,10 @@ test('fintoc.apiKeys.list()', async (t) => {
   t.true(count > 0);
 });
 
+test('fintoc.whoami.get()', async (t) => {
+  const ctx: any = t.context;
+  const whoami = await ctx.fintoc.whoami.get('whoami');
 
+  t.is(whoami.method, 'get');
+  t.is(whoami.url, 'v1/whoami');
+});
