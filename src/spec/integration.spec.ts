@@ -1338,3 +1338,19 @@ test('fintoc.v2.products.create()', async (t) => {
   t.is(product.json.name, productData.name);
   t.is(product.json.currency, productData.currency);
 });
+
+test('fintoc.apiKeys.list()', async (t) => {
+  const ctx: any = t.context;
+  const apiKeys = await ctx.fintoc.apiKeys.list();
+
+  let count = 0;
+  for await (const apiKey of apiKeys) {
+    count += 1;
+    t.is(apiKey.method, 'get');
+    t.is(apiKey.url, 'v1/api_keys');
+  }
+
+  t.true(count > 0);
+});
+
+
