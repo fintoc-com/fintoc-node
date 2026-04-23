@@ -3,6 +3,7 @@ import { Client } from './client';
 import { API_BASE_URL } from './constants';
 import {
   AccountsManager,
+  ApiKeysManager,
   ChargesManager,
   CheckoutSessionsManager,
   InvoicesManager,
@@ -15,6 +16,7 @@ import {
   SubscriptionsManager,
   TaxReturnsManager,
   WebhookEndpointsManager,
+  WhoamiManager,
 } from './managers';
 import {
   AccountNumbersManager,
@@ -81,6 +83,8 @@ export class Fintoc {
   subscriptionIntents: SubscriptionIntentsManager;
   taxReturns: TaxReturnsManager;
   webhookEndpoints: WebhookEndpointsManager;
+  apiKeys: ApiKeysManager;
+  whoami: WhoamiManager;
   v2: FintocV2;
 
   constructor(apiKey: string, jwsPrivateKey?: string) {
@@ -103,6 +107,8 @@ export class Fintoc {
     this.subscriptionIntents = new SubscriptionIntentsManager('/v1/subscription_intents', this.#client);
     this.taxReturns = new TaxReturnsManager('/v1/tax_returns', this.#client);
     this.webhookEndpoints = new WebhookEndpointsManager('/v1/webhook_endpoints', this.#client);
+    this.apiKeys = new ApiKeysManager('/v1/api_keys', this.#client);
+    this.whoami = new WhoamiManager('/v1', this.#client);
 
     this.v2 = new FintocV2(this.#client);
   }

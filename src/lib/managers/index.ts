@@ -12,3 +12,5 @@ export * from './subscriptionIntentsManager';
 export * from './subscriptionsManager';
 export * from './taxReturnsManager';
 export * from './webhookEndpointsManager';
+export * from './apiKeysManager';
+export * from './whoamiManager';
