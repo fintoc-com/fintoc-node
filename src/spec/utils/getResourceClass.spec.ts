@@ -28,6 +28,12 @@ test('"getResourceClass" string resource', async (t) => {
   t.is(klass, String);
 });
 
+test('"getResourceClass" ambiguous string that Date.parse accepts should remain String', async (t) => {
+  const resource = 'any_resource';
+  t.is(await getResourceClass(resource, 'PS 2'), String);
+  t.is(await getResourceClass(resource, 'test 1'), String);
+});
+
 test('"getResourceClass" number resource', async (t) => {
   const resource = 'any_resource';
   const klass = await getResourceClass(resource, 15);
