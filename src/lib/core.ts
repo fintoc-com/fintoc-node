@@ -87,10 +87,10 @@ export class Fintoc {
   whoami: WhoamiManager;
   v2: FintocV2;
 
-  constructor(apiKey: string, jwsPrivateKey?: string) {
+  constructor(apiKey: string, jwsPrivateKey?: string, options?: { userAgent?: string }) {
     this.#client = new Client({
       baseUrl: `${API_BASE_URL}`,
-      userAgent: `fintoc-node/${version}`,
+      userAgent: options?.userAgent || `fintoc-node/${version}`,
       apiKey,
       jwsPrivateKey,
     });
