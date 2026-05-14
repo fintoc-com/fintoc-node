@@ -1,85 +1,58 @@
 name: release
 
 on:
-  push:
-    branches:
-      - stable
+  workflow_dispatch:
+    inputs:
+      bump:
+        description: 'Tipo de bump'
+        type: choice
+        required: true
+        default: minor
+        options: [patch, minor, major]
+      release-notes:
+        description: 'Release notes (markdown, opcional)'
+        type: string
+        required: false
 
 jobs:
-  npm-release:
+  release:
+    if: github.ref == 'refs/heads/master'
     runs-on: ubuntu-24.04
     permissions:
+      contents: write
       id-token: write
-      contents: read
     steps:
-      - name: Checkout to commit code
-        uses: actions/checkout@v3
+      - uses: actions/checkout@v4
 
-      - name: Set up Node.js v24
-        uses: actions/setup-node@v4
+      - uses: actions/setup-node@v4
         with:
           node-version: 24
           registry-url: https://registry.npmjs.org
 
-      - name: Set up node_modules cache
-        uses: actions/cache@v3
+      - uses: actions/cache@v4
         id: node-modules-cache
         with:
           key: node-modules-cache-${{ hashFiles('**/yarn.lock') }}
           path: '**/node_modules'
 
-      - name: Install dependencies
-        if: steps.node-modules-cache.outputs.cache-hit != 'true'
+      - if: steps.node-modules-cache.outputs.cache-hit != 'true'
         run: yarn install --frozen-lockfile
 
-      - name: Build the package
-        run: yarn build
+      - run: yarn build
 
-      - name: Publish the package
-        run: npm publish
-
-  github-release:
-    needs: npm-release
-
-    runs-on: ubuntu-24.04
-    steps:
-      - name: Checkout to commit code
-        uses: actions/checkout@v3
-
-      - name: Set up Node.js v24
-        uses: actions/setup-node@v4
+      - uses: fintoc-com/hermes/.github/actions/release/prepare@main
+        id: prep
         with:
-          node-version: 24
+          bump: ${{ inputs.bump }}
+          version-format: npm
+          app-id: ${{ vars.FIN_RELEASES_APP_ID }}
+          app-private-key: ${{ secrets.FIN_RELEASES_PRIVATE_KEY }}
 
-      - name: Set up node_modules cache
-        uses: actions/cache@v3
-        id: node-modules-cache
+      - run: npm publish
+
+      - uses: fintoc-com/hermes/.github/actions/release/finalize@main
         with:
-          key: node-modules-cache-${{ hashFiles('**/yarn.lock') }}
-          path: '**/node_modules'
-
-      - name: Install dependencies
-        if: steps.node-modules-cache.outputs.cache-hit != 'true'
-        run: yarn install --frozen-lockfile
-
-      - name: Get version
-        id: version
-        run: echo ::set-output name=version::$(yarn --silent version:get)
-
-      - name: Get Pull Request data
-        uses: jwalton/gh-find-current-pr@v1
-        id: find-pr
-        with:
-          state: all
-
-      - name: Tag and Release
-        uses: actions/create-release@latest
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        with:
-          tag_name: ${{ steps.version.outputs.version }}
-          release_name: ${{ steps.version.outputs.version }}
-          body: |
-            ${{ steps.find-pr.outputs.body }}
-          draft: false
-          prerelease: false
+          tag: ${{ steps.prep.outputs.tag }}
+          release-notes: ${{ inputs.release-notes }}
+          app-id: ${{ vars.FIN_RELEASES_APP_ID }}
+          app-private-key: ${{ secrets.FIN_RELEASES_PRIVATE_KEY }}
