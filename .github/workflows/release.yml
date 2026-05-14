@@ -40,17 +40,18 @@ jobs:
 
       - run: yarn build
 
-      - uses: fintoc-com/hermes/.github/actions/release/prepare@main
+      - uses: fintoc-com/release-action/prepare@main
         id: prep
         with:
           bump: ${{ inputs.bump }}
           version-format: npm
+          tag-prefix: v
           app-id: ${{ vars.FIN_RELEASES_APP_ID }}
           app-private-key: ${{ secrets.FIN_RELEASES_PRIVATE_KEY }}
 
       - run: npm publish
 
-      - uses: fintoc-com/hermes/.github/actions/release/finalize@main
+      - uses: fintoc-com/release-action/finalize@main
         with:
           tag: ${{ steps.prep.outputs.tag }}
           release-notes: ${{ inputs.release-notes }}
