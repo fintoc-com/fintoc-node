@@ -368,6 +368,17 @@ test('fintoc.webhookEndpoints.delete()', async (t) => {
   t.is(deletedIdentifier, webhookEndpointId);
 });
 
+test('fintoc.webhookEndpoints.test()', async (t) => {
+  const ctx: any = t.context;
+  const webhookEndpointId = 'we_example_id';
+  const eventType = 'payment_intent.succeeded';
+  const event = await ctx.fintoc.webhookEndpoints.test(webhookEndpointId, { type: eventType });
+
+  t.is(event.method, 'post');
+  t.is(event.url, `v1/webhook_endpoints/${webhookEndpointId}/test`);
+  t.is(event.json.type, eventType);
+});
+
 test('fintoc.invoices.list()', async (t) => {
   const ctx: any = t.context;
   const invoices = await ctx.fintoc.invoices.list();
