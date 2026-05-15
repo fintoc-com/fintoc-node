@@ -2,7 +2,7 @@ import test from 'ava';
 
 import { Client } from '../../lib/client';
 import { WebhookEndpointsManager } from '../../lib/managers';
-import { WebhookEvent } from '../../lib/resources/webhookEvent';
+import { WebhookEndpoint } from '../../lib/resources/webhookEndpoint';
 import { mockAxios, restore } from '../mocks/initializers';
 
 test.before((t) => {
@@ -26,13 +26,13 @@ test.beforeEach((t) => {
   ctx.path = '/v1/webhook_endpoints';
 });
 
-test('"WebhookEndpointsManager.test" returns a WebhookEvent instance', async (t) => {
+test('"WebhookEndpointsManager.test" posts to the test endpoint', async (t) => {
   const ctx: any = t.context;
   const manager = new WebhookEndpointsManager(ctx.path, ctx.client);
 
   const event = await manager.test('we_123', { type: 'payment_intent.succeeded' });
 
-  t.true(event instanceof WebhookEvent);
+  t.true(event instanceof WebhookEndpoint);
   t.is(event.id, 'we_123');
   t.is(event.method, 'post');
   t.is(event.url, 'v1/webhook_endpoints/we_123/test');
