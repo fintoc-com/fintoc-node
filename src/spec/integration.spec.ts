@@ -632,6 +632,67 @@ test('fintoc.refunds.cancel()', async (t) => {
   t.is(refund.url, `v1/refunds/${refundId}/cancel`);
 });
 
+test('fintoc.disputes.list()', async (t) => {
+  const ctx: any = t.context;
+  const disputes = await ctx.fintoc.disputes.list();
+
+  let count = 0;
+  for await (const dispute of disputes) {
+    count += 1;
+    t.is(dispute.method, 'get');
+    t.is(dispute.url, 'v1/disputes');
+  }
+
+  t.true(count > 0);
+});
+
+test('fintoc.disputes.list() with filters', async (t) => {
+  const ctx: any = t.context;
+  const filters = {
+    status: 'open',
+    resource_id: 'pi_30yWq311fOLrAAKkSH1bvODVLGa',
+  };
+  const disputes = await ctx.fintoc.disputes.list(filters);
+
+  let count = 0;
+  for await (const dispute of disputes) {
+    count += 1;
+    t.is(dispute.method, 'get');
+    t.is(dispute.url, 'v1/disputes');
+    t.is(dispute.params.status, filters.status);
+    t.is(dispute.params.resource_id, filters.resource_id);
+  }
+
+  t.true(count > 0);
+});
+
+test('fintoc.disputes.get()', async (t) => {
+  const ctx: any = t.context;
+  const disputeId = 'dp_example_id';
+  const dispute = await ctx.fintoc.disputes.get(disputeId);
+
+  t.is(dispute.method, 'get');
+  t.is(dispute.url, `v1/disputes/${disputeId}`);
+});
+
+test('fintoc.disputes.submitForReview()', async (t) => {
+  const ctx: any = t.context;
+  const disputeId = 'dp_example_id';
+  const dispute = await ctx.fintoc.disputes.submitForReview(disputeId);
+
+  t.is(dispute.method, 'post');
+  t.is(dispute.url, `v1/disputes/${disputeId}/submit_for_review`);
+});
+
+test('fintoc.disputes.createDocument()', async (t) => {
+  const ctx: any = t.context;
+  const disputeId = 'dp_example_id';
+  const document = await ctx.fintoc.disputes.createDocument(disputeId);
+
+  t.is(document.method, 'post');
+  t.is(document.url, `v1/disputes/${disputeId}/documents`);
+});
+
 test('fintoc.subscriptionIntents.list()', async (t) => {
   const ctx: any = t.context;
   const subscriptionIntents = await ctx.fintoc.subscriptionIntents.list();
