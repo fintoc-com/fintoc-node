@@ -1,6 +1,7 @@
 export * from './accountsManager';
 export * from './chargesManager';
 export * from './checkoutSessionsManager';
+export * from './eventsManager';
 export * from './invoicesManager';
 export * from './linksManager';
 export * from './movementsManager';

@@ -6,6 +6,7 @@ import {
   ApiKeysManager,
   ChargesManager,
   CheckoutSessionsManager,
+  EventsManager,
   InvoicesManager,
   LinksManager,
   PaymentIntentsManager,
@@ -73,6 +74,7 @@ export class Fintoc {
   accounts: AccountsManager;
   charges: ChargesManager;
   checkoutSessions: CheckoutSessionsManager;
+  events: EventsManager;
   invoices: InvoicesManager;
   links: LinksManager;
   paymentIntents: PaymentIntentsManager;
@@ -97,6 +99,7 @@ export class Fintoc {
     this.accounts = new AccountsManager('/v1/accounts', this.#client);
     this.charges = new ChargesManager('/v1/charges', this.#client);
     this.checkoutSessions = new CheckoutSessionsManager('/v1/checkout_sessions', this.#client);
+    this.events = new EventsManager('/v1/events', this.#client);
     this.invoices = new InvoicesManager('/v1/invoices', this.#client);
     this.links = new LinksManager('/v1/links', this.#client);
     this.paymentIntents = new PaymentIntentsManager('/v1/payment_intents', this.#client);

@@ -379,6 +379,19 @@ test('fintoc.webhookEndpoints.test()', async (t) => {
   t.is(event.json.type, eventType);
 });
 
+test('fintoc.events.trigger()', async (t) => {
+  const ctx: any = t.context;
+  const event = await ctx.fintoc.events.trigger({
+    type: 'payment_intent.succeeded',
+    overrides: { amount: 1000 },
+  });
+
+  t.is(event.method, 'post');
+  t.is(event.url, 'v1/events/trigger');
+  t.is(event.json.type, 'payment_intent.succeeded');
+  t.is(event.json.overrides.amount, 1000);
+});
+
 test('fintoc.invoices.list()', async (t) => {
   const ctx: any = t.context;
   const invoices = await ctx.fintoc.invoices.list();
