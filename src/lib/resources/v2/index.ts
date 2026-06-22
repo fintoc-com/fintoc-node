@@ -12,3 +12,6 @@ export * from './paymentMethod';
 export * from './product';
 export * from './subscription';
 export * from './accountStatement';
+export * from './onboarding';
+export * from './onboardingShareholder';
+export * from './onboardingDocument';
