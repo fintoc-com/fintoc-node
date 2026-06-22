@@ -1,4 +1,5 @@
 import { Axios, AxiosRequestConfig } from 'axios';
+import FormData from 'form-data';
 
 import { MockResponse } from './response';
 
@@ -30,7 +31,7 @@ export class MockAxiosInstance extends Axios {
     const innerParams = Object.fromEntries(query.map((x) => x.split('=')));
     const completeParams = { ...innerParams, ...(params === undefined ? {} : params) };
     const usableURL = url?.split('//').slice(-1)[0].split('/').slice(1).join('/').split('?')[0] || '';
-    const isMultipart = data !== undefined && typeof data !== 'string';
+    const isMultipart = data instanceof FormData;
     return new MockResponse({
       method: usingMethod,
       baseURL: usingBaseURL,

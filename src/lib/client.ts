@@ -108,7 +108,8 @@ export class Client {
     };
 
     if (form) {
-      // Let FormData set the multipart Content-Type (including the boundary).
+      // form-data is sent as a stream, so axios won't set the multipart
+      // Content-Type itself; replace the default JSON one with the boundary.
       delete headers['Content-Type'];
       Object.assign(headers, form.getHeaders());
     }
