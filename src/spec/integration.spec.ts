@@ -1424,6 +1424,126 @@ test('fintoc.v2.products.create()', async (t) => {
   t.is(product.json.currency, productData.currency);
 });
 
+test('fintoc.v2.entities.onboardings is wired', (t) => {
+  const ctx: any = t.context;
+  t.truthy(ctx.fintoc.v2.entities.onboardings);
+  t.is(typeof ctx.fintoc.v2.entities.onboardings.list, 'function');
+  t.is(typeof ctx.fintoc.v2.entities.onboardings.get, 'function');
+  t.is(typeof ctx.fintoc.v2.entities.onboardings.create, 'function');
+  t.is(typeof ctx.fintoc.v2.entities.onboardings.submit, 'function');
+  t.is(typeof ctx.fintoc.v2.entities.onboardings.uploadDocument, 'function');
+  t.is(typeof ctx.fintoc.v2.entities.onboardings.uploadShareholderDocument, 'function');
+});
+
+test('fintoc.v2.entities.onboardings.list()', async (t) => {
+  const ctx: any = t.context;
+  const entityId = 'ent_12345';
+  const onboardings = await ctx.fintoc.v2.entities.onboardings.list({
+    entity_id: entityId,
+  });
+
+  let count = 0;
+  for await (const onboarding of onboardings) {
+    count += 1;
+    t.is(onboarding.method, 'get');
+    t.is(onboarding.url, `v2/entities/${entityId}/onboardings`);
+    t.is(onboarding.params.entity_id, entityId);
+  }
+
+  t.true(count > 0);
+});
+
+test('fintoc.v2.entities.onboardings.get()', async (t) => {
+  const ctx: any = t.context;
+  const entityId = 'ent_12345';
+  const onboardingId = 'onb_12345';
+  const onboarding = await ctx.fintoc.v2.entities.onboardings.get(onboardingId, {
+    entity_id: entityId,
+  });
+
+  t.is(onboarding.method, 'get');
+  t.is(onboarding.url, `v2/entities/${entityId}/onboardings/${onboardingId}`);
+  t.is(onboarding.params.entity_id, entityId);
+});
+
+test('fintoc.v2.entities.onboardings.create()', async (t) => {
+  const ctx: any = t.context;
+  const entityId = 'ent_12345';
+  const onboardingData = {
+    entity_id: entityId,
+    company_information: { legal_name: 'ACME SpA' },
+    legal_representative: { first_name: 'Jane', last_name: 'Doe' },
+    transactional_profile: {
+      resource_origins: ['sales'],
+      monthly_amount_range: '0-1000',
+      monthly_operations_range: '0-10',
+    },
+    shareholders: [
+      {
+        type: 'natural_person', name: 'Jane', last_name: 'Doe', holder_id: 'h1', nationality: 'CL', percentage: 100,
+      },
+    ],
+  };
+  const onboarding = await ctx.fintoc.v2.entities.onboardings.create(onboardingData);
+
+  t.is(onboarding.method, 'post');
+  t.is(onboarding.url, `v2/entities/${entityId}/onboardings`);
+  t.is(onboarding.json.company_information.legal_name, 'ACME SpA');
+  t.is(onboarding.json.legal_representative.first_name, 'Jane');
+  t.deepEqual(onboarding.json.transactional_profile.resource_origins, ['sales']);
+});
+
+test('fintoc.v2.entities.onboardings.submit()', async (t) => {
+  const ctx: any = t.context;
+  const entityId = 'ent_12345';
+  const onboardingId = 'onb_12345';
+  const onboarding = await ctx.fintoc.v2.entities.onboardings.submit(onboardingId, {
+    entity_id: entityId,
+  });
+
+  t.is(onboarding.method, 'post');
+  t.is(onboarding.url, `v2/entities/${entityId}/onboardings/${onboardingId}/submit`);
+});
+
+test('fintoc.v2.entities.onboardings.uploadDocument()', async (t) => {
+  const ctx: any = t.context;
+  const entityId = 'ent_12345';
+  const onboardingId = 'onb_12345';
+  const slotKey = 'tax_registration_certificate';
+  const file = { data: Buffer.from('fake pdf'), filename: 'cert.pdf', contentType: 'application/pdf' };
+  const onboarding = await ctx.fintoc.v2.entities.onboardings.uploadDocument(
+    onboardingId,
+    slotKey,
+    file,
+    { entity_id: entityId },
+  );
+
+  t.is(onboarding.method, 'put');
+  t.is(onboarding.url, `v2/entities/${entityId}/onboardings/${onboardingId}/documents/${slotKey}`);
+  t.true(onboarding.multipart);
+});
+
+test('fintoc.v2.entities.onboardings.uploadShareholderDocument()', async (t) => {
+  const ctx: any = t.context;
+  const entityId = 'ent_12345';
+  const onboardingId = 'onb_12345';
+  const shareholderId = 'onbsh_abcd';
+  const file = { data: Buffer.from('fake pdf'), filename: 'id.pdf', contentType: 'application/pdf' };
+  const onboarding = await ctx.fintoc.v2.entities.onboardings.uploadShareholderDocument(
+    onboardingId,
+    shareholderId,
+    file,
+    { entity_id: entityId },
+  );
+
+  t.is(onboarding.method, 'put');
+  t.is(
+    onboarding.url,
+    `v2/entities/${entityId}/onboardings/${onboardingId}/shareholders/${shareholderId}/document`,
+  );
+  t.true(onboarding.multipart);
+});
+
 test('fintoc.apiKeys.list()', async (t) => {
   const ctx: any = t.context;
   const apiKeys = await ctx.fintoc.apiKeys.list();

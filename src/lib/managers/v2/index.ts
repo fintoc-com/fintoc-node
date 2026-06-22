@@ -13,3 +13,4 @@ export * from './paymentMethodsManager';
 export * from './productsManager';
 export * from './subscriptionsManager';
 export * from './accountStatementsManager';
+export * from './onboardingsManager';
