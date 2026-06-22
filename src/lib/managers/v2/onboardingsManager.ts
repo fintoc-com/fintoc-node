@@ -1,8 +1,6 @@
 import { ResourceArguments, UploadFile } from '../../../types';
 import { ManagerMixin } from '../../mixins';
-import { resourceUpload } from '../../resourceHandlers';
 import { Onboarding } from '../../resources/v2/onboarding';
-import { canRaiseHTTPError, getResourceClass } from '../../utils';
 
 export class OnboardingsManager extends ManagerMixin<Onboarding> {
   static resource = 'onboarding';
@@ -28,7 +26,7 @@ export class OnboardingsManager extends ManagerMixin<Onboarding> {
   ): Promise<Onboarding> {
     const innerArgs = args || {};
     const path = `${this.buildPath(innerArgs)}/${id}/documents/${slotKey}`;
-    return this.uploadFile(path, file);
+    return this._upload(path, file);
   }
 
   uploadShareholderDocument(
@@ -39,14 +37,6 @@ export class OnboardingsManager extends ManagerMixin<Onboarding> {
   ): Promise<Onboarding> {
     const innerArgs = args || {};
     const path = `${this.buildPath(innerArgs)}/${id}/shareholders/${shareholderId}/document`;
-    return this.uploadFile(path, file);
-  }
-
-  @canRaiseHTTPError
-  private async uploadFile(path: string, file: UploadFile): Promise<Onboarding> {
-    const klass = await getResourceClass(
-      (this.constructor as typeof OnboardingsManager).resource,
-    );
-    return resourceUpload<Onboarding>(this._client, path, klass, file);
+    return this._upload(path, file);
   }
 }
