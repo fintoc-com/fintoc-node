@@ -6,15 +6,17 @@ export class MockResponse {
   url: string;
   json: Record<string, any> | undefined;
   requestHeaders: Record<string, any>;
+  multipart: boolean;
 
   constructor(config: Record<string, any>) {
     const {
-      method, baseURL, url, params, json, headers,
+      method, baseURL, url, params, json, headers, multipart,
     } = config;
 
     this.baseURL = baseURL;
     this.params = params;
     this.requestHeaders = headers || {};
+    this.multipart = multipart || false;
 
     let page;
     if (method === 'get' && url.charAt(url.length - 1) === 's') {
@@ -54,6 +56,7 @@ export class MockResponse {
       params: this.params,
       json: this.json,
       headers: this.requestHeaders,
+      multipart: this.multipart,
     };
   }
 

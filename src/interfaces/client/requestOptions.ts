@@ -1,4 +1,5 @@
 import { Method } from 'axios';
+import FormData from 'form-data';
 
 export interface IRequestOptions {
   path: string,
@@ -7,4 +8,5 @@ export interface IRequestOptions {
   params?: Record<string, any>,
   json?: Record<string, string>,
   idempotencyKey?: string,
+  form?: FormData,
 }

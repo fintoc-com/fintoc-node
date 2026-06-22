@@ -30,12 +30,14 @@ export class MockAxiosInstance extends Axios {
     const innerParams = Object.fromEntries(query.map((x) => x.split('=')));
     const completeParams = { ...innerParams, ...(params === undefined ? {} : params) };
     const usableURL = url?.split('//').slice(-1)[0].split('/').slice(1).join('/').split('?')[0] || '';
+    const isMultipart = data !== undefined && typeof data !== 'string';
     return new MockResponse({
       method: usingMethod,
       baseURL: usingBaseURL,
       url: usableURL,
       params: completeParams,
-      json: JSON.parse(data || '{}'),
+      json: isMultipart ? {} : JSON.parse(data || '{}'),
+      multipart: isMultipart,
       headers: headers || {},
     });
   }
