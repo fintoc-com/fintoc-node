@@ -5,6 +5,7 @@ export * from './simulateManager';
 export * from './entitiesManager';
 export * from './accountVerificationsManager';
 export * from './invoicesManager';
+export * from './linesManager';
 export * from './movementsManager';
 export * from './customersManager';
 export * from './checkoutSessionsManager';
