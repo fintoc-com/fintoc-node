@@ -1,5 +1,5 @@
 import { IManagerMixinConstructor, IResourceMixin } from '../../interfaces/mixins';
-import { GenericFunction, ResourceArguments } from '../../types';
+import { GenericFunction, ResourceArguments, UploadFile } from '../../types';
 import { Client } from '../client';
 import {
   resourceAll,
@@ -7,6 +7,7 @@ import {
   resourceDelete,
   resourceGet,
   resourceUpdate,
+  resourceUpload,
 } from '../resourceHandlers';
 import { canRaiseHTTPError, getResourceClass } from '../utils';
 
@@ -169,6 +170,19 @@ export abstract class ManagerMixin<ResourceType extends IResourceMixin> {
       idempotencyKey?.toString(),
     );
     return this.postCreateHandler(object, innerArgs);
+  }
+
+  @canRaiseHTTPError
+  protected async _upload(path: string, file: UploadFile): Promise<ResourceType> {
+    const klass = await getResourceClass(this.#originatingClass.resource);
+    return resourceUpload<ResourceType>(
+      this._client,
+      path,
+      klass,
+      file,
+      this.#handlers,
+      this.#originatingClass.methods,
+    );
   }
 
   @canRaiseHTTPError

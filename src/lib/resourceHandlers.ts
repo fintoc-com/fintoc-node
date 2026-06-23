@@ -1,4 +1,6 @@
-import { GenericFunction } from '../types';
+import FormData from 'form-data';
+
+import { GenericFunction, UploadFile } from '../types';
 
 import { Client } from './client';
 import { objetize, objetizeGenerator } from './utils';
@@ -103,6 +105,41 @@ export async function resourceCreate<ResourceType>(
   const data = await client.request({
     path, method: 'post', json: params, idempotencyKey,
   });
+  return objetize(
+    klass,
+    client,
+    data,
+    handlers,
+    methods,
+    path,
+  );
+}
+
+/**
+ * Upload a file to a resource endpoint through a multipart/form-data request.
+ *
+ * @param client - The Client object passed to the retrieved object
+ * @param path - The path within the API server for the upload
+ * @param klass - Class that will wrap the instance of the resource
+ * @param file - The file descriptor to upload under the `file` form field
+ * @param handlers - The post-request handlers
+ * @param methods - An array of the methods that the object can execute
+ * @returns - An object of class `klass`
+ */
+export async function resourceUpload<ResourceType>(
+  client: Client,
+  path: string,
+  klass: any,
+  file: UploadFile,
+  handlers: Record<string, GenericFunction> = {},
+  methods: string[] = [],
+): Promise<ResourceType> {
+  const form = new FormData();
+  form.append('file', file.data, {
+    filename: file.filename,
+    contentType: file.contentType,
+  });
+  const data = await client.request({ path, method: 'put', form });
   return objetize(
     klass,
     client,
