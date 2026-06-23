@@ -13,5 +13,6 @@ export * from './paymentIntentsManager';
 export * from './paymentMethodsManager';
 export * from './productsManager';
 export * from './subscriptionsManager';
+export * from './subscriptionItemsManager';
 export * from './accountStatementsManager';
 export * from './onboardingsManager';

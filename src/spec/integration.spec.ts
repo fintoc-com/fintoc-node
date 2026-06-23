@@ -1451,6 +1451,19 @@ test('fintoc.v2.subscriptions.update()', async (t) => {
   t.is(subscription.url, `v2/subscriptions/${subscriptionId}`);
 });
 
+test('fintoc.v2.subscriptions.items.create()', async (t) => {
+  const ctx: any = t.context;
+  const subscriptionId = 'subscription_id';
+  const item = await ctx.fintoc.v2.subscriptions.items.create({
+    subscription_id: subscriptionId,
+    price_data: { product: 'prod_id', amount: 10000, currency: 'CLP' },
+    quantity: 1,
+  });
+
+  t.is(item.method, 'post');
+  t.is(item.url, `v2/subscriptions/${subscriptionId}/items`);
+});
+
 test('fintoc.v2.products.list()', async (t) => {
   const ctx: any = t.context;
   const products = await ctx.fintoc.v2.products.list();
