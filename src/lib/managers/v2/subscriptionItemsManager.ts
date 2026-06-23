@@ -4,7 +4,7 @@ import { SubscriptionItem } from '../../resources/v2/subscriptionItem';
 
 export class SubscriptionItemsManager extends ManagerMixin<SubscriptionItem> {
   static resource = 'subscription_item';
-  static methods = ['create'];
+  static methods = ['create', 'update'];
 
   create(args?: ResourceArguments): Promise<SubscriptionItem> {
     const innerArgs = args || {};
