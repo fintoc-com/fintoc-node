@@ -1309,6 +1309,16 @@ test('fintoc.v2.invoices.addLines()', async (t) => {
   t.is(invoice.url, `v2/invoices/${invoiceId}/add_lines`);
 });
 
+test('fintoc.v2.invoices.removeLines()', async (t) => {
+  const ctx: any = t.context;
+  const invoiceId = 'invoice_id';
+  const lines = ['il_line_id'];
+  const invoice = await ctx.fintoc.v2.invoices.removeLines(invoiceId, { lines });
+
+  t.is(invoice.method, 'post');
+  t.is(invoice.url, `v2/invoices/${invoiceId}/remove_lines`);
+});
+
 test('fintoc.v2.paymentIntents.list()', async (t) => {
   const ctx: any = t.context;
   const paymentIntents = await ctx.fintoc.v2.paymentIntents.list();
