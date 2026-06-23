@@ -1439,6 +1439,18 @@ test('fintoc.v2.subscriptions.create()', async (t) => {
   t.is(subscription.json.customer, subscriptionData.customer);
 });
 
+test('fintoc.v2.subscriptions.update()', async (t) => {
+  const ctx: any = t.context;
+  const subscriptionId = 'subscription_id';
+  const updateData = {
+    trial_end: '2024-12-31T00:00:00Z',
+  };
+  const subscription = await ctx.fintoc.v2.subscriptions.update(subscriptionId, updateData);
+
+  t.is(subscription.method, 'patch');
+  t.is(subscription.url, `v2/subscriptions/${subscriptionId}`);
+});
+
 test('fintoc.v2.products.list()', async (t) => {
   const ctx: any = t.context;
   const products = await ctx.fintoc.v2.products.list();

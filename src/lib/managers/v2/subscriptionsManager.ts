@@ -4,7 +4,7 @@ import { Subscription } from '../../resources/v2/subscription';
 
 export class SubscriptionsManager extends ManagerMixin<Subscription> {
   static resource = 'subscription';
-  static methods = ['list', 'get', 'create', 'cancel'];
+  static methods = ['list', 'get', 'create', 'update', 'cancel'];
 
   cancel(subscriptionId: string, args?: ResourceArguments): Promise<Subscription> {
     const innerArgs = args || {};
