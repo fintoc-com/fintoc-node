@@ -1293,6 +1293,22 @@ test('fintoc.v2.invoices.get()', async (t) => {
   t.is(invoice.url, `v2/invoices/${invoiceId}`);
 });
 
+test('fintoc.v2.invoices.addLines()', async (t) => {
+  const ctx: any = t.context;
+  const invoiceId = 'invoice_id';
+  const lines = [{
+    amount: 10000,
+    currency: 'CLP',
+    period_end: '2024-02-01',
+    period_start: '2024-01-01',
+    quantity: 1,
+  }];
+  const invoice = await ctx.fintoc.v2.invoices.addLines(invoiceId, { lines });
+
+  t.is(invoice.method, 'post');
+  t.is(invoice.url, `v2/invoices/${invoiceId}/add_lines`);
+});
+
 test('fintoc.v2.paymentIntents.list()', async (t) => {
   const ctx: any = t.context;
   const paymentIntents = await ctx.fintoc.v2.paymentIntents.list();
