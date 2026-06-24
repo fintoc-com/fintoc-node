@@ -1293,6 +1293,45 @@ test('fintoc.v2.invoices.get()', async (t) => {
   t.is(invoice.url, `v2/invoices/${invoiceId}`);
 });
 
+test('fintoc.v2.invoices.addLines()', async (t) => {
+  const ctx: any = t.context;
+  const invoiceId = 'invoice_id';
+  const lines = [{
+    amount: 10000,
+    currency: 'CLP',
+    period_end: '2024-02-01',
+    period_start: '2024-01-01',
+    quantity: 1,
+  }];
+  const invoice = await ctx.fintoc.v2.invoices.addLines(invoiceId, { lines });
+
+  t.is(invoice.method, 'post');
+  t.is(invoice.url, `v2/invoices/${invoiceId}/add_lines`);
+});
+
+test('fintoc.v2.invoices.removeLines()', async (t) => {
+  const ctx: any = t.context;
+  const invoiceId = 'invoice_id';
+  const lines = ['il_line_id'];
+  const invoice = await ctx.fintoc.v2.invoices.removeLines(invoiceId, { lines });
+
+  t.is(invoice.method, 'post');
+  t.is(invoice.url, `v2/invoices/${invoiceId}/remove_lines`);
+});
+
+test('fintoc.v2.invoices.lines.update()', async (t) => {
+  const ctx: any = t.context;
+  const invoiceId = 'invoice_id';
+  const lineId = 'il_line_id';
+  const line = await ctx.fintoc.v2.invoices.lines.update(lineId, {
+    invoice_id: invoiceId,
+    quantity: 2,
+  });
+
+  t.is(line.method, 'patch');
+  t.is(line.url, `v2/invoices/${invoiceId}/lines/${lineId}`);
+});
+
 test('fintoc.v2.paymentIntents.list()', async (t) => {
   const ctx: any = t.context;
   const paymentIntents = await ctx.fintoc.v2.paymentIntents.list();
@@ -1385,6 +1424,68 @@ test('fintoc.v2.subscriptions.cancel()', async (t) => {
 
   t.is(subscription.method, 'post');
   t.is(subscription.url, `v2/subscriptions/${subscriptionId}/cancel`);
+});
+
+test('fintoc.v2.subscriptions.create()', async (t) => {
+  const ctx: any = t.context;
+  const subscriptionData = {
+    customer: 'cus_id',
+    items: [{ price: 'price_id', quantity: 1 }],
+  };
+  const subscription = await ctx.fintoc.v2.subscriptions.create(subscriptionData);
+
+  t.is(subscription.method, 'post');
+  t.is(subscription.url, 'v2/subscriptions');
+  t.is(subscription.json.customer, subscriptionData.customer);
+});
+
+test('fintoc.v2.subscriptions.update()', async (t) => {
+  const ctx: any = t.context;
+  const subscriptionId = 'subscription_id';
+  const updateData = {
+    trial_end: '2024-12-31T00:00:00Z',
+  };
+  const subscription = await ctx.fintoc.v2.subscriptions.update(subscriptionId, updateData);
+
+  t.is(subscription.method, 'patch');
+  t.is(subscription.url, `v2/subscriptions/${subscriptionId}`);
+});
+
+test('fintoc.v2.subscriptions.items.create()', async (t) => {
+  const ctx: any = t.context;
+  const subscriptionId = 'subscription_id';
+  const item = await ctx.fintoc.v2.subscriptions.items.create({
+    subscription_id: subscriptionId,
+    price_data: { product: 'prod_id', amount: 10000, currency: 'CLP' },
+    quantity: 1,
+  });
+
+  t.is(item.method, 'post');
+  t.is(item.url, `v2/subscriptions/${subscriptionId}/items`);
+});
+
+test('fintoc.v2.subscriptions.items.update()', async (t) => {
+  const ctx: any = t.context;
+  const subscriptionId = 'subscription_id';
+  const itemId = 'si_item_id';
+  const item = await ctx.fintoc.v2.subscriptions.items.update(itemId, {
+    subscription_id: subscriptionId,
+    quantity: 3,
+  });
+
+  t.is(item.method, 'patch');
+  t.is(item.url, `v2/subscriptions/${subscriptionId}/items/${itemId}`);
+});
+
+test('fintoc.v2.subscriptions.items.delete()', async (t) => {
+  const ctx: any = t.context;
+  const subscriptionId = 'subscription_id';
+  const itemId = 'si_item_id';
+  const deletedIdentifier = await ctx.fintoc.v2.subscriptions.items.delete(itemId, {
+    subscription_id: subscriptionId,
+  });
+
+  t.is(deletedIdentifier, itemId);
 });
 
 test('fintoc.v2.products.list()', async (t) => {
