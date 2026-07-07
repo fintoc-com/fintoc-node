@@ -39,4 +39,16 @@ export class OnboardingsManager extends ManagerMixin<Onboarding> {
     const path = `${this.buildPath(innerArgs)}/${id}/shareholders/${shareholderId}/document`;
     return this._upload(path, file);
   }
+
+  uploadLegalRepresentativeDocument(
+    id: string,
+    legalRepresentativeId: string,
+    slotKey: string,
+    file: UploadFile,
+    args?: ResourceArguments,
+  ): Promise<Onboarding> {
+    const innerArgs = args || {};
+    const path = `${this.buildPath(innerArgs)}/${id}/legal_representatives/${legalRepresentativeId}/documents/${slotKey}`;
+    return this._upload(path, file);
+  }
 }

@@ -1534,6 +1534,7 @@ test('fintoc.v2.entities.onboardings is wired', (t) => {
   t.is(typeof ctx.fintoc.v2.entities.onboardings.submit, 'function');
   t.is(typeof ctx.fintoc.v2.entities.onboardings.uploadDocument, 'function');
   t.is(typeof ctx.fintoc.v2.entities.onboardings.uploadShareholderDocument, 'function');
+  t.is(typeof ctx.fintoc.v2.entities.onboardings.uploadLegalRepresentativeDocument, 'function');
 });
 
 test('fintoc.v2.entities.onboardings.list()', async (t) => {
@@ -1573,7 +1574,16 @@ test('fintoc.v2.entities.onboardings.create()', async (t) => {
   const onboardingData = {
     entity_id: entityId,
     company_information: { legal_name: 'ACME SpA' },
-    legal_representative: { first_name: 'Jane', last_name: 'Doe' },
+    legal_representatives: [
+      {
+        first_name: 'Jane',
+        last_name: 'Doe',
+        email: 'jane@acme.com',
+        nationality: 'cl',
+        identification_number: '12.345.678-9',
+        position: 'Director General',
+      },
+    ],
     transactional_profile: {
       resource_origins: ['sales'],
       monthly_amount_range: '0-1000',
@@ -1590,7 +1600,7 @@ test('fintoc.v2.entities.onboardings.create()', async (t) => {
   t.is(onboarding.method, 'post');
   t.is(onboarding.url, `v2/entities/${entityId}/onboardings`);
   t.is(onboarding.json.company_information.legal_name, 'ACME SpA');
-  t.is(onboarding.json.legal_representative.first_name, 'Jane');
+  t.is(onboarding.json.legal_representatives[0].first_name, 'Jane');
   t.deepEqual(onboarding.json.transactional_profile.resource_origins, ['sales']);
 });
 
@@ -1641,6 +1651,29 @@ test('fintoc.v2.entities.onboardings.uploadShareholderDocument()', async (t) => 
   t.is(
     onboarding.url,
     `v2/entities/${entityId}/onboardings/${onboardingId}/shareholders/${shareholderId}/document`,
+  );
+  t.true(onboarding.multipart);
+});
+
+test('fintoc.v2.entities.onboardings.uploadLegalRepresentativeDocument()', async (t) => {
+  const ctx: any = t.context;
+  const entityId = 'ent_8anBwgZktbZH6ydyHa6Tm0eM';
+  const onboardingId = 'onbprc_0ujsswThIGTUYm2K8FjOOfXtY1K';
+  const legalRepresentativeId = 'onblr_0ujsswThIGTUYm2K8FjOOfXtY1K';
+  const slotKey = 'identification';
+  const file = { data: Buffer.from('fake pdf'), filename: 'id.pdf', contentType: 'application/pdf' };
+  const onboarding = await ctx.fintoc.v2.entities.onboardings.uploadLegalRepresentativeDocument(
+    onboardingId,
+    legalRepresentativeId,
+    slotKey,
+    file,
+    { entity_id: entityId },
+  );
+
+  t.is(onboarding.method, 'put');
+  t.is(
+    onboarding.url,
+    `v2/entities/${entityId}/onboardings/${onboardingId}/legal_representatives/${legalRepresentativeId}/documents/${slotKey}`,
   );
   t.true(onboarding.multipart);
 });
