@@ -30,6 +30,7 @@
     - [create](#create)
     - [update](#update)
     - [delete](#delete)
+  - [Entity onboardings](#entity-onboardings)
   - [Webhook Signature Validation](#webhook-signature-validation)
   - [Idempotency Keys](#idempotency-keys)
   - [Serialization](#serialization)
@@ -164,6 +165,95 @@ const deletedIdentifier = await fintocClient.webhookEndpoints.delete('we_8anqVLl
 ```
 
 The `delete` method of the managers deletes an existing instance of the resource using its identifier to find it and returns the identifier.
+
+### Entity onboardings
+
+[Entity onboardings](https://docs.fintoc.com/reference/entity-onboardings) are nested under an entity, so every call takes the `entity_id` of the entity that owns them.
+
+```javascript
+const entityId = 'ent_8anBwgZktbZH6ydyHa6Tm0eM';
+
+const onboardings = await fintocClient.v2.entities.onboardings.list({ entity_id: entityId });
+const onboarding = await fintocClient.v2.entities.onboardings.get(
+  'onbprc_0ujsswThIGTUYm2K8FjOOfXtY1K',
+  { entity_id: entityId },
+);
+```
+
+To create one, pass the `type` of onboarding to run (`account_holder` or `settlement_recipient`) and the onboarding `data`:
+
+```javascript
+const onboarding = await fintocClient.v2.entities.onboardings.create({
+  entity_id: entityId,
+  type: 'account_holder',
+  data: {
+    company_information: {
+      incorporation_date: '2020-01-15',
+      business_activity: 'Servicios financieros',
+      fiscal_address: 'Av. Reforma 123, CDMX',
+      business_address: 'Av. Insurgentes 456, CDMX',
+      settlement_account: '646180357600000013',
+      phone: '+521111111111',
+    },
+    legal_representatives: [
+      {
+        first_name: 'Ada',
+        last_name: 'Lovelace',
+        email: 'ada@example.com',
+        nationality: 'mx',
+        identification_number: 'AAAA010101HDFAAA01',
+        position: 'Director General',
+      },
+    ],
+    transactional_profile: {
+      resource_origins: ['trusts', 'investments'],
+      monthly_amount_range: '1_500000',
+      monthly_operations_range: '1_15000',
+    },
+    shareholders: [
+      {
+        type: 'natural_person',
+        name: 'Ada',
+        last_name: 'Lovelace',
+        nationality: 'mx',
+        percentage: 100,
+        holder_id: 'AAAA010101AAA',
+      },
+    ],
+  },
+});
+```
+
+Documents are uploaded one slot at a time, as `multipart/form-data`:
+
+```javascript
+const file = {
+  data: fs.readFileSync('csf.pdf'),
+  filename: 'csf.pdf',
+  contentType: 'application/pdf',
+};
+const onboardingId = 'onbprc_0ujsswThIGTUYm2K8FjOOfXtY1K';
+
+await fintocClient.v2.entities.onboardings.uploadDocument(
+  onboardingId, 'tax_registration_certificate', file, { entity_id: entityId },
+);
+await fintocClient.v2.entities.onboardings.uploadShareholderDocument(
+  onboardingId, 'onbsh_0ujsswThIGTUYm2K8FjOOfXtY1K', file, { entity_id: entityId },
+);
+await fintocClient.v2.entities.onboardings.uploadLegalRepresentativeDocument(
+  onboardingId, 'onblr_0ujsswThIGTUYm2K8FjOOfXtY1K', 'identification', file,
+  { entity_id: entityId },
+);
+```
+
+Once every required field and document is complete, `submittable` turns `true` and the onboarding can be sent for review:
+
+```javascript
+const submitted = await fintocClient.v2.entities.onboardings.submit(
+  onboardingId,
+  { entity_id: entityId },
+);
+```
 
 ### Webhook Signature Validation
 

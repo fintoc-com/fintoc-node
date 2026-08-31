@@ -1573,35 +1573,47 @@ test('fintoc.v2.entities.onboardings.create()', async (t) => {
   const entityId = 'ent_12345';
   const onboardingData = {
     entity_id: entityId,
-    company_information: { legal_name: 'ACME SpA' },
-    legal_representatives: [
-      {
-        first_name: 'Jane',
-        last_name: 'Doe',
-        email: 'jane@acme.com',
-        nationality: 'cl',
-        identification_number: '12.345.678-9',
-        position: 'Director General',
+    type: 'account_holder',
+    data: {
+      company_information: { business_activity: 'Servicios financieros' },
+      legal_representatives: [
+        {
+          first_name: 'Jane',
+          last_name: 'Doe',
+          email: 'jane@acme.com',
+          nationality: 'mx',
+          identification_number: 'AAAA010101HDFAAA01',
+          position: 'Director General',
+        },
+      ],
+      transactional_profile: {
+        resource_origins: ['trusts', 'investments'],
+        monthly_amount_range: '1_500000',
+        monthly_operations_range: '1_15000',
       },
-    ],
-    transactional_profile: {
-      resource_origins: ['sales'],
-      monthly_amount_range: '0-1000',
-      monthly_operations_range: '0-10',
+      shareholders: [
+        {
+          type: 'natural_person',
+          name: 'Jane',
+          last_name: 'Doe',
+          holder_id: 'AAAA010101AAA',
+          nationality: 'mx',
+          percentage: 100,
+        },
+      ],
     },
-    shareholders: [
-      {
-        type: 'natural_person', name: 'Jane', last_name: 'Doe', holder_id: 'h1', nationality: 'CL', percentage: 100,
-      },
-    ],
   };
   const onboarding = await ctx.fintoc.v2.entities.onboardings.create(onboardingData);
 
   t.is(onboarding.method, 'post');
   t.is(onboarding.url, `v2/entities/${entityId}/onboardings`);
-  t.is(onboarding.json.company_information.legal_name, 'ACME SpA');
-  t.is(onboarding.json.legal_representatives[0].first_name, 'Jane');
-  t.deepEqual(onboarding.json.transactional_profile.resource_origins, ['sales']);
+  t.is(onboarding.json.type, 'account_holder');
+  t.is(onboarding.json.data.company_information.business_activity, 'Servicios financieros');
+  t.is(onboarding.json.data.legal_representatives[0].first_name, 'Jane');
+  t.deepEqual(
+    onboarding.json.data.transactional_profile.resource_origins,
+    ['trusts', 'investments'],
+  );
 });
 
 test('fintoc.v2.entities.onboardings.submit()', async (t) => {
