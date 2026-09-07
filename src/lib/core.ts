@@ -1,4 +1,3 @@
-/* eslint-disable max-classes-per-file */
 import { Client } from './client';
 import { API_BASE_URL } from './constants';
 import {

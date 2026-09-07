@@ -54,7 +54,7 @@ export class Link extends ResourceMixin<Link> {
     return this.#accountsManager;
   }
 
-  set accounts(newValue) { /* eslint-disable-line class-methods-use-this */
+  set accounts(newValue) {
     throw new ReferenceError('Attribute name corresponds to a manager');
   }
 
@@ -72,7 +72,7 @@ export class Link extends ResourceMixin<Link> {
     return this.#subscriptionsManager;
   }
 
-  set subscriptions(newValue) { /* eslint-disable-line class-methods-use-this */
+  set subscriptions(newValue) {
     throw new ReferenceError('Attribute name corresponds to a manager');
   }
 
@@ -90,7 +90,7 @@ export class Link extends ResourceMixin<Link> {
     return this.#taxReturnsManager;
   }
 
-  set taxReturns(newValue) { /* eslint-disable-line class-methods-use-this */
+  set taxReturns(newValue) {
     throw new ReferenceError('Attribute name corresponds to a manager');
   }
 
@@ -108,7 +108,7 @@ export class Link extends ResourceMixin<Link> {
     return this.#invoicesManager;
   }
 
-  set invoices(newValue) { /* eslint-disable-line class-methods-use-this */
+  set invoices(newValue) {
     throw new ReferenceError('Attribute name corresponds to a manager');
   }
 
@@ -126,7 +126,7 @@ export class Link extends ResourceMixin<Link> {
     return this.#refreshIntentsManager;
   }
 
-  set refreshIntents(newValue) { /* eslint-disable-line class-methods-use-this */
+  set refreshIntents(newValue) {
     throw new ReferenceError('Attribute name corresponds to a manager');
   }
 }

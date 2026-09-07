@@ -57,7 +57,6 @@ export async function* paginate(options: IPaginationOptions) {
   let response = await request({
     client, path, headers, params,
   });
-  /* eslint-disable no-await-in-loop */
   for (const element of response.elements) {
     yield element;
   }
@@ -67,5 +66,4 @@ export async function* paginate(options: IPaginationOptions) {
       yield element;
     }
   }
-  /* eslint-enable no-await-in-loop */
 }

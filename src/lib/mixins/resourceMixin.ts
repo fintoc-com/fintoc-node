@@ -53,7 +53,6 @@ export abstract class ResourceMixin<ResourceType> {
   ) {
     const content: Record<string, any> = {};
     for (const [key, value] of Object.entries(data)) {
-      /* eslint-disable no-await-in-loop */
       const rawResource = (this.mappings as Record<string, any>)[key] || key;
       if (value !== undefined) {
         if (Array.isArray(value)) {
@@ -66,7 +65,6 @@ export abstract class ResourceMixin<ResourceType> {
           content[key] = await objetize(klass, client, value);
         }
       }
-      /* eslint-enable no-await-in-loop */
     }
     // @ts-ignore: cannot create an instance of an abstract class
     return new this(client, handlers, methods, path, content);

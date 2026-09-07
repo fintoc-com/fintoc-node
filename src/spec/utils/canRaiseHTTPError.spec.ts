@@ -1,5 +1,3 @@
-/* eslint-disable class-methods-use-this */
-
 import test from 'ava';
 
 import { FintocError } from '../../lib/errors';
@@ -7,7 +5,7 @@ import { canRaiseHTTPError } from '../../lib/utils';
 
 class Errors {
   @canRaiseHTTPError
-  noError() { } /* eslint-disable-line @typescript-eslint/no-empty-function */
+  noError() { }
 
   @canRaiseHTTPError
   throwHTTPError() {

@@ -215,7 +215,6 @@ export abstract class ManagerMixin<ResourceType extends IResourceMixin> {
     return this.postDeleteHandler(identifier, innerArgs);
   }
 
-  /* eslint-disable class-methods-use-this, @typescript-eslint/no-unused-vars */
   protected postListHandler(
     objects: ResourceType[] | AsyncGenerator<ResourceType>,
     args: ResourceArguments,
@@ -246,5 +245,4 @@ export abstract class ManagerMixin<ResourceType extends IResourceMixin> {
     }
     return path;
   }
-  /* eslint-enable class-methods-use-this, @typescript-eslint/no-unused-vars */
 }

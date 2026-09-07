@@ -79,21 +79,18 @@ test('JWSSignature initialization with file path', (t) => {
 
 test('JWSSignature throws error with invalid input type', (t) => {
   t.throws(() => {
-    // eslint-disable-next-line no-new
     new JWSSignature(123 as any);
   }, { message: /Private key must be a string/ });
 });
 
 test('JWSSignature throws error with non-existent file path', (t) => {
   t.throws(() => {
-    // eslint-disable-next-line no-new
     new JWSSignature('/non/existent/path.pem');
   }, { message: /Failed to read private key file/ });
 });
 
 test('JWSSignature throws error with invalid key format', (t) => {
   t.throws(() => {
-    // eslint-disable-next-line no-new
     new JWSSignature('invalid-key-content');
   }, { message: /Invalid private key format/ });
 });

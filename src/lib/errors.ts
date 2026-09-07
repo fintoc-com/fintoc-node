@@ -1,5 +1,3 @@
-/* eslint-disable max-classes-per-file */
-
 export class FintocError extends Error {
   constructor(errorData: Record<string, string>) {
     const errorType = errorData.type;
