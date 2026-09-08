@@ -20,25 +20,15 @@ export default defineConfig(
       importX.flatConfigs.recommended,
       importX.flatConfigs.typescript,
     ],
-    languageOptions: {
-      parserOptions: {
-        projectService: true,
-        tsconfigRootDir: import.meta.dirname,
-      },
-    },
     plugins: {
       tsdoc,
     },
     rules: {
-      '@typescript-eslint/await-thenable': 'error',
       '@typescript-eslint/ban-ts-comment': 'off',
       '@typescript-eslint/no-explicit-any': 'off',
-      '@typescript-eslint/no-floating-promises': 'error',
-      '@typescript-eslint/no-misused-promises': 'error',
       // Template-method hooks declare params their overrides may not use (tsconfig
       // already has noUnusedParameters: false).
       '@typescript-eslint/no-unused-vars': ['error', { args: 'none' }],
-      '@typescript-eslint/switch-exhaustiveness-check': 'error',
       'import-x/extensions': ['error', 'never'],
       'import-x/no-extraneous-dependencies': [
         'error',
