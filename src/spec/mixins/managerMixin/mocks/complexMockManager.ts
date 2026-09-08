@@ -1,5 +1,3 @@
-/* eslint-disable no-console, class-methods-use-this, @typescript-eslint/no-unused-vars */
-
 import { ManagerMixin } from '../../../../lib/mixins';
 import { ResourceArguments } from '../../../../types';
 

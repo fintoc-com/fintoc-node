@@ -31,7 +31,7 @@ export class Account extends ResourceMixin<Account> {
     return this.#movementsManager;
   }
 
-  set movements(newValue) { /* eslint-disable-line class-methods-use-this */
+  set movements(newValue) {
     throw new ReferenceError('Attribute name corresponds to a manager');
   }
 }

@@ -5,7 +5,7 @@ on:
     paths:
       - ".github/workflows/linters.yml"
       - "src/**"
-      - ".eslintrc.json"
+      - "eslint.config.mjs"
       - "tsconfig.json"
       - "tsconfig.module.json"
       - "package.json"

@@ -1,4 +1,4 @@
-import axios, { AxiosError } from 'axios';
+import axios from 'axios';
 
 import { IModule } from '../interfaces/module';
 import { GenericFunction } from '../types';
@@ -127,7 +127,7 @@ export function canRaiseHTTPError(
   newDescriptor.value = async function wrapper(...args: any[]) {
     try {
       return await descriptor.value.apply(this, args);
-    } catch (exc: any | AxiosError<string>) {
+    } catch (exc: any) {
       if (axios.isAxiosError(exc) && exc.response) {
         const errorData = exc.response.data as Record<string, any>;
         const ErrorKlass = getErrorClass(errorData.error.type);

@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/no-unused-vars */
 import { ResourceArguments } from '../../types';
 import { ManagerMixin } from '../mixins';
 import { Link } from '../resources/link';
