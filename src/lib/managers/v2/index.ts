@@ -16,3 +16,4 @@ export * from './subscriptionsManager';
 export * from './subscriptionItemsManager';
 export * from './accountStatementsManager';
 export * from './onboardingsManager';
+export * from './transferBatchesManager';
