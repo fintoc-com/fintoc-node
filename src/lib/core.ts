@@ -27,6 +27,7 @@ import {
   PaymentMethodsManager,
   ProductsManager,
   SimulateManager,
+  TransferBatchesManager,
   TransfersManager,
   AccountsManager as V2AccountsManager,
   CheckoutSessionsManager as V2CheckoutSessionsManager,
@@ -50,6 +51,7 @@ class FintocV2 {
   paymentMethods: PaymentMethodsManager;
   products: ProductsManager;
   subscriptions: V2SubscriptionsManager;
+  transferBatches: TransferBatchesManager;
 
   constructor(client: Client) {
     this.accounts = new V2AccountsManager('/v2/accounts', client);
@@ -65,6 +67,7 @@ class FintocV2 {
     this.paymentMethods = new PaymentMethodsManager('/v2/payment_methods', client);
     this.products = new ProductsManager('/v2/products', client);
     this.subscriptions = new V2SubscriptionsManager('/v2/subscriptions', client);
+    this.transferBatches = new TransferBatchesManager('/v2/transfer_batches', client);
   }
 }
 

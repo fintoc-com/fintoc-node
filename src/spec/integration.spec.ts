@@ -1045,6 +1045,103 @@ test('fintoc.v2.transfers.return()', async (t) => {
   t.is(result.json.transfer_id, returnData.transfer_id);
 });
 
+test('fintoc.v2.transferBatches.list()', async (t) => {
+  const ctx: any = t.context;
+  const transferBatches = await ctx.fintoc.v2.transferBatches.list();
+
+  let count = 0;
+  for await (const transferBatch of transferBatches) {
+    count += 1;
+    t.is(transferBatch.method, 'get');
+    t.is(transferBatch.url, 'v2/transfer_batches');
+  }
+
+  t.true(count > 0);
+});
+
+test('fintoc.v2.transferBatches.list() with filters', async (t) => {
+  const ctx: any = t.context;
+  const filters = {
+    status: ['succeeded', 'partially_succeeded'],
+    since: '2025-01-01',
+    until: '2025-01-31',
+  };
+  const transferBatches = await ctx.fintoc.v2.transferBatches.list(filters);
+
+  let count = 0;
+  for await (const transferBatch of transferBatches) {
+    count += 1;
+    t.is(transferBatch.method, 'get');
+    t.is(transferBatch.url, 'v2/transfer_batches');
+    t.deepEqual(transferBatch.params.status, filters.status);
+    t.deepEqual(transferBatch.params.since, new Date(filters.since));
+    t.deepEqual(transferBatch.params.until, new Date(filters.until));
+  }
+
+  t.true(count > 0);
+});
+
+test('fintoc.v2.transferBatches.get()', async (t) => {
+  const ctx: any = t.context;
+  const transferBatchId = 'transfer_batch_id';
+  const transferBatch = await ctx.fintoc.v2.transferBatches.get(transferBatchId);
+
+  t.is(transferBatch.method, 'get');
+  t.is(transferBatch.url, `v2/transfer_batches/${transferBatchId}`);
+});
+
+test('fintoc.v2.transferBatches.create()', async (t) => {
+  const ctx: any = t.context;
+  const transferBatchData = {
+    description: 'Payroll',
+    currency: 'MXN',
+    transfers: [
+      {
+        amount: 10000,
+        account_id: 'acc_123',
+        counterparty: {
+          account_number: '012969100000000026',
+        },
+      },
+    ],
+  };
+  const transferBatch = await ctx.fintoc.v2.transferBatches.create(transferBatchData);
+
+  t.is(transferBatch.method, 'post');
+  t.is(transferBatch.url, 'v2/transfer_batches');
+  t.is(transferBatch.json.description, transferBatchData.description);
+  t.is(transferBatch.json.currency, transferBatchData.currency);
+  t.is(transferBatch.json.transfers[0].amount, transferBatchData.transfers[0].amount);
+  t.is(
+    transferBatch.json.transfers[0].counterparty.account_number,
+    transferBatchData.transfers[0].counterparty.account_number,
+  );
+  t.true(transferBatch.headers['Idempotency-Key'] && transferBatch.headers['Idempotency-Key'].length > 0);
+});
+
+test('fintoc.v2.transferBatches.create() with idempotency key', async (t) => {
+  const ctx: any = t.context;
+  const transferBatchData = {
+    description: 'Payroll',
+    currency: 'MXN',
+    idempotency_key: 'idempotency_key_123',
+    transfers: [
+      {
+        amount: 10000,
+        account_id: 'acc_123',
+        counterparty: {
+          account_number: '012969100000000026',
+        },
+      },
+    ],
+  };
+  const transferBatch = await ctx.fintoc.v2.transferBatches.create(transferBatchData);
+
+  t.is(transferBatch.method, 'post');
+  t.is(transferBatch.url, 'v2/transfer_batches');
+  t.is(transferBatch.headers['Idempotency-Key'], transferBatchData.idempotency_key);
+});
+
 test('fintoc.v2.simulate.receiveTransfer()', async (t) => {
   const ctx: any = t.context;
   const transferData = {

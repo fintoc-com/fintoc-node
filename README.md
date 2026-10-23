@@ -31,6 +31,7 @@
     - [update](#update)
     - [delete](#delete)
   - [Entity onboardings](#entity-onboardings)
+  - [Transfer batches](#transfer-batches)
   - [Webhook Signature Validation](#webhook-signature-validation)
   - [Idempotency Keys](#idempotency-keys)
   - [Serialization](#serialization)
@@ -253,6 +254,38 @@ const submitted = await fintocClient.v2.entities.onboardings.submit(
   onboardingId,
   { entity_id: entityId },
 );
+```
+
+### Transfer batches
+
+Creating a transfer batch requires a JWS private key, just like transfers:
+
+```javascript
+const fintocClient = new Fintoc('your_api_key', 'path/to/private_key.pem');
+
+const transferBatch = await fintocClient.v2.transferBatches.create({
+  idempotency_key: '12345678',
+  description: 'Payroll',
+  currency: 'MXN',
+  transfers: [
+    {
+      amount: 54123,
+      account_id: 'acc_12345678',
+      counterparty: {
+        account_number: '012969100000000026',
+      },
+    },
+  ],
+});
+```
+
+You can list batches filtering by `status`, `since` and `until`:
+
+```javascript
+const transferBatches = await fintocClient.v2.transferBatches.list({
+  status: ['succeeded', 'partially_succeeded'],
+  since: '2025-01-01',
+});
 ```
 
 ### Webhook Signature Validation
