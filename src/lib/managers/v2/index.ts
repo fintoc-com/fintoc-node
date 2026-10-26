@@ -8,6 +8,7 @@ export * from './invoicesManager';
 export * from './linesManager';
 export * from './movementsManager';
 export * from './customersManager';
+export * from './recipientsManager';
 export * from './checkoutSessionsManager';
 export * from './paymentIntentsManager';
 export * from './paymentMethodsManager';

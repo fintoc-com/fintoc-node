@@ -8,6 +8,7 @@ export * from './invoice';
 export * from './line';
 export * from './movement';
 export * from './customer';
+export * from './recipient';
 export * from './paymentIntent';
 export * from './paymentMethod';
 export * from './product';

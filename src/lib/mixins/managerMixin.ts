@@ -241,7 +241,9 @@ export abstract class ManagerMixin<ResourceType extends IResourceMixin> {
   protected buildPath(args?: ResourceArguments) {
     let path = this.#path;
     for (const [key, value] of Object.entries(args || {})) {
-      path = path.replace(`{${key}}`, value.toString());
+      if (path.includes(`{${key}}`)) {
+        path = path.replace(`{${key}}`, String(value));
+      }
     }
     return path;
   }
