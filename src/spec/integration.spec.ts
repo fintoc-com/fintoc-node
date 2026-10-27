@@ -1,6 +1,7 @@
 import test from 'ava';
 
 import { Fintoc } from '../lib/core';
+import { AccountVerification, TransferBatch } from '../lib/resources/v2';
 
 import { mockAxios, restore } from './mocks/initializers';
 
@@ -1086,6 +1087,7 @@ test('fintoc.v2.transferBatches.get()', async (t) => {
   const transferBatchId = 'transfer_batch_id';
   const transferBatch = await ctx.fintoc.v2.transferBatches.get(transferBatchId);
 
+  t.true(transferBatch instanceof TransferBatch);
   t.is(transferBatch.method, 'get');
   t.is(transferBatch.url, `v2/transfer_batches/${transferBatchId}`);
 });
@@ -1200,6 +1202,7 @@ test('fintoc.v2.accountVerifications.get()', async (t) => {
   const accountVerificationId = 'account_verification_id';
   const accountVerification = await ctx.fintoc.v2.accountVerifications.get(accountVerificationId);
 
+  t.true(accountVerification instanceof AccountVerification);
   t.is(accountVerification.method, 'get');
   t.is(accountVerification.url, `v2/account_verifications/${accountVerificationId}`);
 });
