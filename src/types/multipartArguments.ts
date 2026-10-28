@@ -1,5 +1,5 @@
 import { UploadFile } from './uploadFile';
 
 export type MultipartArguments = {
-  [key: string]: MultipartArguments | UploadFile | string | number | boolean | string[]
+  [key: string]: MultipartArguments | UploadFile | string | number | boolean | string[] | MultipartArguments[]
 }
