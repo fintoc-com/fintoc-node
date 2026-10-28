@@ -1811,3 +1811,190 @@ test('fintoc.whoami.get()', async (t) => {
   t.is(whoami.method, 'get');
   t.is(whoami.url, 'v1/whoami');
 });
+
+test('fintoc.charges.update()', async (t) => {
+  const ctx: any = t.context;
+  const chargeId = 'ch_12345';
+  const charge = await ctx.fintoc.charges.update(chargeId, { amount: 2000, currency: 'CLP' });
+
+  t.is(charge.method, 'patch');
+  t.is(charge.url, `v1/charges/${chargeId}`);
+  t.is(charge.json.amount, 2000);
+  t.is(charge.json.currency, 'CLP');
+});
+
+test('fintoc.charges.cancel()', async (t) => {
+  const ctx: any = t.context;
+  const chargeId = 'ch_12345';
+  const charge = await ctx.fintoc.charges.cancel(chargeId);
+
+  t.is(charge.method, 'post');
+  t.is(charge.url, `v1/charges/${chargeId}/cancel`);
+  t.true(charge.headers['Idempotency-Key'] && charge.headers['Idempotency-Key'].length > 0);
+});
+
+test('fintoc.charges.cancel() with idempotency key', async (t) => {
+  const ctx: any = t.context;
+  const chargeId = 'ch_12345';
+  const charge = await ctx.fintoc.charges.cancel(chargeId, { idempotency_key: 'idem_123' });
+
+  t.is(charge.url, `v1/charges/${chargeId}/cancel`);
+  t.is(charge.headers['Idempotency-Key'], 'idem_123');
+});
+
+test('fintoc.charges.cancel() does not send its options in the body', async (t) => {
+  const ctx: any = t.context;
+  const charge = await ctx.fintoc.charges.cancel('ch_12345', { idempotency_key: 'idem_123' });
+
+  t.is(charge.json.path_, undefined);
+  t.is(charge.json.idempotency_key, undefined);
+});
+
+test('fintoc.charges.cancel() returns a charge that updates on its own path', async (t) => {
+  const ctx: any = t.context;
+  const chargeId = 'ch_12345';
+  const charge = await ctx.fintoc.charges.cancel(chargeId);
+  await charge.update({ amount: 2000 });
+
+  t.is(charge.method, 'patch');
+  t.is(charge.url, `v1/charges/${chargeId}`);
+  t.is(charge.json.amount, 2000);
+});
+
+test('fintoc.refunds.voucherUrl()', async (t) => {
+  const ctx: any = t.context;
+  const refundId = 'ref_12345';
+  const voucher = await ctx.fintoc.refunds.voucherUrl(refundId);
+
+  t.is(voucher.constructor.name, 'GenericFintocResource');
+  t.is(voucher.method, 'get');
+  t.is(voucher.url, `v1/refunds/${refundId}/voucher_url`);
+});
+
+test('fintoc.invoices.get()', async (t) => {
+  const ctx: any = t.context;
+  const invoiceId = 'in_12345';
+  const invoice = await ctx.fintoc.invoices.get(invoiceId, { link_token: 'link_token' });
+
+  t.is(invoice.method, 'get');
+  t.is(invoice.url, `v1/invoices/${invoiceId}`);
+  t.is(invoice.params.link_token, 'link_token');
+});
+
+test('fintoc.links.exchange()', async (t) => {
+  const ctx: any = t.context;
+  const link = await ctx.fintoc.links.exchange({ exchange_token: 'exchange_token' });
+
+  t.is(link.constructor.name, 'Link');
+  t.is(link.method, 'get');
+  t.is(link.url, 'v1/links/exchange');
+  t.is(link.params.exchange_token, 'exchange_token');
+});
+
+test('fintoc.institutions.list()', async (t) => {
+  const ctx: any = t.context;
+  const institutions = await ctx.fintoc.institutions.list({ country: 'cl' });
+
+  let count = 0;
+  for await (const institution of institutions) {
+    count += 1;
+    t.is(institution.constructor.name, 'Institution');
+    t.is(institution.method, 'get');
+    t.is(institution.url, 'v1/institutions');
+    t.is(institution.params.country, 'cl');
+  }
+
+  t.true(count > 0);
+});
+
+test('fintoc.linkIntents.create()', async (t) => {
+  const ctx: any = t.context;
+  const linkIntentData = { country: 'cl', holder_type: 'individual', product: 'movements' };
+  const linkIntent = await ctx.fintoc.linkIntents.create(linkIntentData);
+
+  t.is(linkIntent.constructor.name, 'LinkIntent');
+  t.is(linkIntent.method, 'post');
+  t.is(linkIntent.url, 'v1/link_intents');
+  t.is(linkIntent.json.country, linkIntentData.country);
+  t.is(linkIntent.json.holder_type, linkIntentData.holder_type);
+  t.is(linkIntent.json.product, linkIntentData.product);
+  t.true(linkIntent.headers['Idempotency-Key'] && linkIntent.headers['Idempotency-Key'].length > 0);
+});
+
+test('fintoc.linkIntents.create() with idempotency key', async (t) => {
+  const ctx: any = t.context;
+  const linkIntent = await ctx.fintoc.linkIntents.create({
+    country: 'cl', holder_type: 'individual', product: 'movements', idempotency_key: 'idem_123',
+  });
+
+  t.is(linkIntent.headers['Idempotency-Key'], 'idem_123');
+});
+
+test('fintoc.payouts.list()', async (t) => {
+  const ctx: any = t.context;
+  const payouts = await ctx.fintoc.payouts.list({ status: 'succeeded' });
+
+  let count = 0;
+  for await (const payout of payouts) {
+    count += 1;
+    t.is(payout.constructor.name, 'Payout');
+    t.is(payout.method, 'get');
+    t.is(payout.url, 'v1/payouts');
+    t.is(payout.params.status, 'succeeded');
+  }
+
+  t.true(count > 0);
+});
+
+test('fintoc.payouts.get()', async (t) => {
+  const ctx: any = t.context;
+  const payoutId = 'po_12345';
+  const payout = await ctx.fintoc.payouts.get(payoutId);
+
+  t.is(payout.constructor.name, 'Payout');
+  t.is(payout.method, 'get');
+  t.is(payout.url, `v1/payouts/${payoutId}`);
+});
+
+test('fintoc.payouts.listResources()', async (t) => {
+  const ctx: any = t.context;
+  const payoutId = 'po_12345';
+  const resources = await ctx.fintoc.payouts.listResources(payoutId, { resource_type: 'refund' });
+
+  let count = 0;
+  for await (const resource of resources) {
+    count += 1;
+    t.is(resource.constructor.name, 'Refund');
+    t.is(resource.method, 'get');
+    t.is(resource.url, `v1/payouts/${payoutId}/resources`);
+    t.is(resource.params.resource_type, 'refund');
+  }
+
+  t.true(count > 0);
+});
+
+test('fintoc.taxStatements.list()', async (t) => {
+  const ctx: any = t.context;
+  const taxStatements = await ctx.fintoc.taxStatements.list({ link_token: 'link_token' });
+
+  let count = 0;
+  for await (const taxStatement of taxStatements) {
+    count += 1;
+    t.is(taxStatement.constructor.name, 'TaxStatement');
+    t.is(taxStatement.method, 'get');
+    t.is(taxStatement.url, 'v1/tax_statements');
+    t.is(taxStatement.params.link_token, 'link_token');
+  }
+
+  t.true(count > 0);
+});
+
+test('fintoc.taxStatements.get()', async (t) => {
+  const ctx: any = t.context;
+  const taxStatementId = 'ts_12345';
+  const taxStatement = await ctx.fintoc.taxStatements.get(taxStatementId, { link_token: 'link_token' });
+
+  t.is(taxStatement.method, 'get');
+  t.is(taxStatement.url, `v1/tax_statements/${taxStatementId}`);
+  t.is(taxStatement.params.link_token, 'link_token');
+});

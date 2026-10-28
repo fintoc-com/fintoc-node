@@ -7,15 +7,19 @@ import {
   CheckoutSessionsManager,
   DisputesManager,
   EventsManager,
+  InstitutionsManager,
   InvoicesManager,
+  LinkIntentsManager,
   LinksManager,
   PaymentIntentsManager,
   PaymentLinksManager,
+  PayoutsManager,
   RefreshIntentsManager,
   RefundsManager,
   SubscriptionIntentsManager,
   SubscriptionsManager,
   TaxReturnsManager,
+  TaxStatementsManager,
   WebhookEndpointsManager,
   WhoamiManager,
 } from './managers';
@@ -82,15 +86,19 @@ export class Fintoc {
   checkoutSessions: CheckoutSessionsManager;
   disputes: DisputesManager;
   events: EventsManager;
+  institutions: InstitutionsManager;
   invoices: InvoicesManager;
+  linkIntents: LinkIntentsManager;
   links: LinksManager;
   paymentIntents: PaymentIntentsManager;
   paymentLinks: PaymentLinksManager;
+  payouts: PayoutsManager;
   refreshIntents: RefreshIntentsManager;
   refunds: RefundsManager;
   subscriptions: SubscriptionsManager;
   subscriptionIntents: SubscriptionIntentsManager;
   taxReturns: TaxReturnsManager;
+  taxStatements: TaxStatementsManager;
   webhookEndpoints: WebhookEndpointsManager;
   apiKeys: ApiKeysManager;
   whoami: WhoamiManager;
@@ -108,15 +116,19 @@ export class Fintoc {
     this.checkoutSessions = new CheckoutSessionsManager('/v1/checkout_sessions', this.#client);
     this.disputes = new DisputesManager('/v1/disputes', this.#client);
     this.events = new EventsManager('/v1/events', this.#client);
+    this.institutions = new InstitutionsManager('/v1/institutions', this.#client);
     this.invoices = new InvoicesManager('/v1/invoices', this.#client);
+    this.linkIntents = new LinkIntentsManager('/v1/link_intents', this.#client);
     this.links = new LinksManager('/v1/links', this.#client);
     this.paymentIntents = new PaymentIntentsManager('/v1/payment_intents', this.#client);
     this.paymentLinks = new PaymentLinksManager('/v1/payment_links', this.#client);
+    this.payouts = new PayoutsManager('/v1/payouts', this.#client);
     this.refreshIntents = new RefreshIntentsManager('/v1/refresh_intents', this.#client);
     this.refunds = new RefundsManager('/v1/refunds', this.#client);
     this.subscriptions = new SubscriptionsManager('/v1/subscriptions', this.#client);
     this.subscriptionIntents = new SubscriptionIntentsManager('/v1/subscription_intents', this.#client);
     this.taxReturns = new TaxReturnsManager('/v1/tax_returns', this.#client);
+    this.taxStatements = new TaxStatementsManager('/v1/tax_statements', this.#client);
     this.webhookEndpoints = new WebhookEndpointsManager('/v1/webhook_endpoints', this.#client);
     this.apiKeys = new ApiKeysManager('/v1/api_keys', this.#client);
     this.whoami = new WhoamiManager('/v1', this.#client);

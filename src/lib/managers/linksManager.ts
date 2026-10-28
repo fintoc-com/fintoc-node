@@ -4,7 +4,20 @@ import { Link } from '../resources/link';
 
 export class LinksManager extends ManagerMixin<Link> {
   static resource = 'link';
-  static methods = ['list', 'get', 'update', 'delete'];
+  static methods = ['list', 'get', 'update', 'delete', 'exchange'];
+
+  async exchange(args: ResourceArguments & { exchange_token: string }): Promise<Link> {
+    const path = `${this.buildPath()}/exchange`;
+    const link = await this._action<Link>('get', path, {
+      args,
+      methods: LinksManager.methods,
+      objectPath: this.buildPath(),
+    });
+    if (typeof link.link_token === 'string') {
+      return this.postGetHandler(link, link.link_token, args);
+    }
+    return link;
+  }
 
   protected postGetHandler(
     object: Link, identifier: string, args: ResourceArguments,
