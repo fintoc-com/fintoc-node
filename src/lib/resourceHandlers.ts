@@ -1,6 +1,6 @@
 import FormData from 'form-data';
 
-import { GenericFunction, UploadFile } from '../types';
+import { GenericFunction, MultipartArguments, UploadFile } from '../types';
 
 import { Client } from './client';
 import { objetize, objetizeGenerator } from './utils';
@@ -115,31 +115,65 @@ export async function resourceCreate<ResourceType>(
   );
 }
 
-/**
- * Upload a file to a resource endpoint through a multipart/form-data request.
- *
- * @param client - The Client object passed to the retrieved object
- * @param path - The path within the API server for the upload
- * @param klass - Class that will wrap the instance of the resource
- * @param file - The file descriptor to upload under the `file` form field
- * @param handlers - The post-request handlers
- * @param methods - An array of the methods that the object can execute
- * @returns - An object of class `klass`
- */
-export async function resourceUpload<ResourceType>(
+type MultipartFile = Omit<UploadFile, 'filename'> & { filename?: string };
+
+function isUploadFile(value: unknown): value is MultipartFile {
+  return (
+    typeof value === 'object'
+    && value !== null
+    && 'data' in value
+    && (
+      typeof (value as MultipartFile).filename === 'string'
+      || Buffer.isBuffer((value as MultipartFile).data)
+      || typeof (value as { data?: NodeJS.ReadableStream }).data?.pipe === 'function'
+    )
+  );
+}
+
+function appendFormValue(form: FormData, key: string, value: unknown) {
+  if (value === undefined || value === null) {
+    return;
+  }
+  if (isUploadFile(value)) {
+    form.append(key, value.data, {
+      filename: value.filename,
+      contentType: value.contentType,
+    });
+  } else if (Array.isArray(value)) {
+    value.forEach((element) => appendFormValue(form, `${key}[]`, element));
+  } else if (typeof value === 'object') {
+    const prototype = Object.getPrototypeOf(value);
+    if (prototype !== Object.prototype && prototype !== null) {
+      throw new TypeError(`Unsupported multipart value for "${key}"`);
+    }
+    Object.entries(value as Record<string, unknown>).forEach(([innerKey, innerValue]) => {
+      appendFormValue(form, `${key}[${innerKey}]`, innerValue);
+    });
+  } else {
+    form.append(key, String(value));
+  }
+}
+
+export function buildForm(fields: MultipartArguments) {
+  const form = new FormData();
+  Object.entries(fields).forEach(([key, value]) => appendFormValue(form, key, value));
+  return form;
+}
+
+export async function resourceMultipart<ResourceType>(
   client: Client,
   path: string,
   klass: any,
-  file: UploadFile,
+  fields: MultipartArguments,
   handlers: Record<string, GenericFunction> = {},
   methods: string[] = [],
+  method: 'post' | 'put' = 'post',
+  idempotencyKey?: string,
 ): Promise<ResourceType> {
-  const form = new FormData();
-  form.append('file', file.data, {
-    filename: file.filename,
-    contentType: file.contentType,
+  const form = buildForm(fields);
+  const data = await client.request({
+    path, method, form, idempotencyKey,
   });
-  const data = await client.request({ path, method: 'put', form });
   return objetize(
     klass,
     client,
@@ -147,6 +181,26 @@ export async function resourceUpload<ResourceType>(
     handlers,
     methods,
     path,
+  );
+}
+
+export async function resourceUpload<ResourceType>(
+  client: Client,
+  path: string,
+  klass: any,
+  file: UploadFile,
+  handlers: Record<string, GenericFunction> = {},
+  methods: string[] = [],
+  method: 'post' | 'put' = 'put',
+): Promise<ResourceType> {
+  return resourceMultipart<ResourceType>(
+    client,
+    path,
+    klass,
+    { file },
+    handlers,
+    methods,
+    method,
   );
 }
 

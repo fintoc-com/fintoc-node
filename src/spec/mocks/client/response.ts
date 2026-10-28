@@ -7,16 +7,18 @@ export class MockResponse {
   json: Record<string, any> | undefined;
   requestHeaders: Record<string, any>;
   multipart: boolean;
+  multipartFields: string[];
 
   constructor(config: Record<string, any>) {
     const {
-      method, baseURL, url, params, json, headers, multipart,
+      method, baseURL, url, params, json, headers, multipart, multipartFields,
     } = config;
 
     this.baseURL = baseURL;
     this.params = params;
     this.requestHeaders = headers || {};
     this.multipart = multipart || false;
+    this.multipartFields = multipartFields || [];
 
     let page;
     if (method === 'get' && url.charAt(url.length - 1) === 's') {
@@ -31,7 +33,7 @@ export class MockResponse {
   }
 
   get data() {
-    if (this.method === 'delete') {
+    if (this.method === 'delete' && this.url.split('/').length <= 3) {
       return {};
     }
 
@@ -57,6 +59,7 @@ export class MockResponse {
       json: this.json,
       headers: this.requestHeaders,
       multipart: this.multipart,
+      multipartFields: this.multipartFields,
     };
   }
 
