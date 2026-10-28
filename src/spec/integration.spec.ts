@@ -2241,3 +2241,123 @@ test('fintoc.v2.subscriptions.detachPaymentMethod()', async (t) => {
   t.is(subscription.method, 'delete');
   t.is(subscription.url, `v2/subscriptions/${subscriptionId}/payment_method`);
 });
+
+test('fintoc.v2.transfers.receipt()', async (t) => {
+  const ctx: any = t.context;
+  const transferId = 'tr_12345';
+  const receipt = await ctx.fintoc.v2.transfers.receipt(transferId);
+
+  t.is(receipt.constructor.name, 'TransferReceipt');
+  t.is(receipt.method, 'get');
+  t.is(receipt.url, `v2/transfers/${transferId}/receipt`);
+});
+
+test('fintoc.v2.entities.settlementAccount()', async (t) => {
+  const ctx: any = t.context;
+  const entityId = 'ent_12345';
+  const settlementAccount = await ctx.fintoc.v2.entities.settlementAccount(entityId);
+
+  t.is(settlementAccount.constructor.name, 'SettlementAccount');
+  t.is(settlementAccount.method, 'get');
+  t.is(settlementAccount.url, `v2/entities/${entityId}/settlement_account`);
+});
+
+test('fintoc.v2.entities.create()', async (t) => {
+  const ctx: any = t.context;
+  const entity = await ctx.fintoc.v2.entities.create({ holder_name: 'Test' });
+
+  t.is(entity.method, 'post');
+  t.is(entity.url, 'v2/entities');
+});
+
+test('fintoc.v2.entities.onboardings.addDocument()', async (t) => {
+  const ctx: any = t.context;
+  const entityId = 'ent_12345';
+  const onboardingId = 'onb_12345';
+  const slotKey = 'incorporation_amendments';
+  const file = { data: Buffer.from('fake pdf'), filename: 'cert.pdf', contentType: 'application/pdf' };
+  const onboarding = await ctx.fintoc.v2.entities.onboardings.addDocument(
+    onboardingId,
+    slotKey,
+    file,
+    { entity_id: entityId },
+  );
+
+  t.is(onboarding.method, 'post');
+  t.is(onboarding.url, `v2/entities/${entityId}/onboardings/${onboardingId}/documents/${slotKey}`);
+  t.true(onboarding.multipart);
+  t.deepEqual(onboarding.multipartFields, ['file']);
+  t.true(onboarding.headers['Idempotency-Key'] && onboarding.headers['Idempotency-Key'].length > 0);
+});
+
+test('fintoc.v2.entities.onboardings.addDocument() preserves the idempotency key on retries', async (t) => {
+  const { fintoc } = t.context as { fintoc: Fintoc };
+  const file = { data: Buffer.from('fake pdf'), filename: 'amendment.pdf', contentType: 'application/pdf' };
+
+  for (let attempt = 0; attempt < 2; attempt += 1) {
+    const onboarding = await fintoc.v2.entities.onboardings.addDocument(
+      'onb_12345',
+      'incorporation_amendments',
+      file,
+      { entity_id: 'ent_12345', idempotency_key: 'idem_123' },
+    );
+
+    t.is(onboarding.headers['Idempotency-Key'], 'idem_123');
+    t.deepEqual(onboarding.multipartFields, ['file']);
+  }
+});
+
+test('fintoc.v2.entities.onboardings.deleteDocument()', async (t) => {
+  const ctx: any = t.context;
+  const entityId = 'ent_12345';
+  const onboardingId = 'onb_12345';
+  const slotKey = 'tax_registration_certificate';
+  const documentId = 'onbdoc_12345';
+  const onboarding = await ctx.fintoc.v2.entities.onboardings.deleteDocument(
+    onboardingId,
+    slotKey,
+    documentId,
+    { entity_id: entityId },
+  );
+
+  t.is(onboarding.method, 'delete');
+  t.is(
+    onboarding.url,
+    `v2/entities/${entityId}/onboardings/${onboardingId}/documents/${slotKey}/${documentId}`,
+  );
+  t.is(onboarding.params.entity_id, undefined);
+});
+
+test('fintoc.v2.events.list()', async (t) => {
+  const ctx: any = t.context;
+  const events = await ctx.fintoc.v2.events.list({ type: 'payment_intent.succeeded' });
+
+  let count = 0;
+  for await (const event of events) {
+    count += 1;
+    t.is(event.method, 'get');
+    t.is(event.url, 'v2/events');
+    t.is(event.params.type, 'payment_intent.succeeded');
+  }
+
+  t.true(count > 0);
+});
+
+test('fintoc.v2.events.get()', async (t) => {
+  const ctx: any = t.context;
+  const eventId = 'evt_12345';
+  const event = await ctx.fintoc.v2.events.get(eventId);
+
+  t.is(event.method, 'get');
+  t.is(event.url, `v2/events/${eventId}`);
+});
+
+test('fintoc.v2.setupIntents.get()', async (t) => {
+  const ctx: any = t.context;
+  const setupIntentId = 'seti_12345';
+  const setupIntent = await ctx.fintoc.v2.setupIntents.get(setupIntentId);
+
+  t.is(setupIntent.constructor.name, 'SetupIntent');
+  t.is(setupIntent.method, 'get');
+  t.is(setupIntent.url, `v2/setup_intents/${setupIntentId}`);
+});

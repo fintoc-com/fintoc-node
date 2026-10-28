@@ -20,3 +20,6 @@ export * from './onboardingShareholder';
 export * from './onboardingLegalRepresentative';
 export * from './onboardingDocument';
 export * from './transferBatch';
+export * from './setupIntent';
+export * from './settlementAccount';
+export * from './transferReceipt';
