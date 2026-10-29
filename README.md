@@ -32,6 +32,9 @@
     - [delete](#delete)
   - [Entity onboardings](#entity-onboardings)
   - [Transfer batches](#transfer-batches)
+  - [Payment methods](#payment-methods)
+  - [Payouts](#payouts)
+  - [Links](#links)
   - [Webhook Signature Validation](#webhook-signature-validation)
   - [Idempotency Keys](#idempotency-keys)
   - [Serialization](#serialization)
@@ -247,6 +250,18 @@ await fintocClient.v2.entities.onboardings.uploadLegalRepresentativeDocument(
 );
 ```
 
+`uploadDocument` replaces the documents of a slot. To add a document while keeping the ones already in the slot, or to delete one of them:
+
+```javascript
+await fintocClient.v2.entities.onboardings.addDocument(
+  onboardingId, 'tax_registration_certificate', file, { entity_id: entityId },
+);
+await fintocClient.v2.entities.onboardings.deleteDocument(
+  onboardingId, 'tax_registration_certificate', 'onbdoc_0ujsswThIGTUYm2K8FjOOfXtY1K',
+  { entity_id: entityId },
+);
+```
+
 Once every required field and document is complete, `submittable` turns `true` and the onboarding can be sent for review:
 
 ```javascript
@@ -286,6 +301,60 @@ const transferBatches = await fintocClient.v2.transferBatches.list({
   status: ['succeeded', 'partially_succeeded'],
   since: '2025-01-01',
 });
+```
+
+### Payment methods
+
+Mexican direct debit mandates are created as `multipart/form-data`. Nested fields are sent as `parent[child]` and the consent documents are passed as file descriptors:
+
+```javascript
+const document = (path) => ({
+  data: fs.readFileSync(path),
+  filename: path,
+  contentType: 'application/pdf',
+});
+
+const paymentMethod = await fintocClient.v2.paymentMethods.create({
+  type: 'mx_direct_debit',
+  customer: 'cus_0ujsswThIGTUYm2K8FjOOfXtY1K',
+  mx_direct_debit: {
+    account_number: '000000000000000000',
+    account_type: 'clabe',
+    interval: 'month',
+    max_amount: 100000,
+    consent_documents: {
+      contract: document('contract.pdf'),
+      selfie: document('selfie.pdf'),
+      id_front: document('id_front.pdf'),
+      id_back: document('id_back.pdf'),
+    },
+  },
+});
+
+const mandate = await fintocClient.v2.paymentMethods.mandateDocument(paymentMethod.id);
+console.log(mandate.download_url);
+```
+
+### Payouts
+
+The resources of a payout are listed by `resource_type` (`payment_intent`, `charge`, `refund` or `refund_adjustment`):
+
+```javascript
+const refunds = await fintocClient.payouts.listResources('po_0ujsswThIGTUYm2K8FjOOfXtY1K', {
+  resource_type: 'refund',
+});
+for await (const refund of refunds) {
+  console.log(refund.id, refund.amount);
+}
+```
+
+### Links
+
+After the widget finishes, exchange the `exchange_token` for the link. The returned link carries its `link_token`:
+
+```javascript
+const link = await fintocClient.links.exchange({ exchange_token: 'exchange_token' });
+console.log(link.link_token);
 ```
 
 ### Webhook Signature Validation

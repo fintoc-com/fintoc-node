@@ -16,3 +16,7 @@ export * from './taxReturnsManager';
 export * from './webhookEndpointsManager';
 export * from './apiKeysManager';
 export * from './whoamiManager';
+export * from './institutionsManager';
+export * from './linkIntentsManager';
+export * from './payoutsManager';
+export * from './taxStatementsManager';

@@ -7,7 +7,7 @@ import { SubscriptionItemsManager } from './subscriptionItemsManager';
 
 export class SubscriptionsManager extends ManagerMixin<Subscription> {
   static resource = 'subscription';
-  static methods = ['list', 'get', 'create', 'update', 'cancel'];
+  static methods = ['list', 'get', 'create', 'update', 'cancel', 'detachPaymentMethod'];
 
   items: SubscriptionItemsManager;
 
@@ -20,5 +20,12 @@ export class SubscriptionsManager extends ManagerMixin<Subscription> {
     const innerArgs = args || {};
     const path = `${this.buildPath()}/${subscriptionId}/cancel`;
     return this._create({ path_: path, ...innerArgs });
+  }
+
+  detachPaymentMethod(subscriptionId: string, args?: ResourceArguments): Promise<Subscription> {
+    const path = `${this.buildPath()}/${subscriptionId}/payment_method`;
+    return this._action<Subscription>('delete', path, {
+      args, methods: SubscriptionsManager.methods, objectPath: this.buildPath(),
+    });
   }
 }

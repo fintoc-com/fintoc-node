@@ -1407,6 +1407,8 @@ test('fintoc.v2.invoices.addLines()', async (t) => {
 
   t.is(invoice.method, 'post');
   t.is(invoice.url, `v2/invoices/${invoiceId}/add_lines`);
+  t.is(invoice.json.lines[0].amount, lines[0].amount);
+  t.is(invoice.json.path_, undefined);
 });
 
 test('fintoc.v2.invoices.removeLines()', async (t) => {
@@ -1810,4 +1812,552 @@ test('fintoc.whoami.get()', async (t) => {
 
   t.is(whoami.method, 'get');
   t.is(whoami.url, 'v1/whoami');
+});
+
+test('fintoc.charges.update()', async (t) => {
+  const ctx: any = t.context;
+  const chargeId = 'ch_12345';
+  const charge = await ctx.fintoc.charges.update(chargeId, { amount: 2000, currency: 'CLP' });
+
+  t.is(charge.method, 'patch');
+  t.is(charge.url, `v1/charges/${chargeId}`);
+  t.is(charge.json.amount, 2000);
+  t.is(charge.json.currency, 'CLP');
+});
+
+test('fintoc.charges.cancel()', async (t) => {
+  const ctx: any = t.context;
+  const chargeId = 'ch_12345';
+  const charge = await ctx.fintoc.charges.cancel(chargeId);
+
+  t.is(charge.method, 'post');
+  t.is(charge.url, `v1/charges/${chargeId}/cancel`);
+  t.true(charge.headers['Idempotency-Key'] && charge.headers['Idempotency-Key'].length > 0);
+});
+
+test('fintoc.charges.cancel() with idempotency key', async (t) => {
+  const ctx: any = t.context;
+  const chargeId = 'ch_12345';
+  const charge = await ctx.fintoc.charges.cancel(chargeId, { idempotency_key: 'idem_123' });
+
+  t.is(charge.url, `v1/charges/${chargeId}/cancel`);
+  t.is(charge.headers['Idempotency-Key'], 'idem_123');
+});
+
+test('fintoc.charges.cancel() does not send its options in the body', async (t) => {
+  const ctx: any = t.context;
+  const charge = await ctx.fintoc.charges.cancel('ch_12345', { idempotency_key: 'idem_123' });
+
+  t.is(charge.json.path_, undefined);
+  t.is(charge.json.idempotency_key, undefined);
+});
+
+test('fintoc.charges.cancel() returns a charge that updates on its own path', async (t) => {
+  const ctx: any = t.context;
+  const chargeId = 'ch_12345';
+  const charge = await ctx.fintoc.charges.cancel(chargeId);
+  await charge.update({ amount: 2000 });
+
+  t.is(charge.method, 'patch');
+  t.is(charge.url, `v1/charges/${chargeId}`);
+  t.is(charge.json.amount, 2000);
+});
+
+test('fintoc.refunds.voucherUrl()', async (t) => {
+  const ctx: any = t.context;
+  const refundId = 'ref_12345';
+  const voucher = await ctx.fintoc.refunds.voucherUrl(refundId);
+
+  t.is(voucher.constructor.name, 'GenericFintocResource');
+  t.is(voucher.method, 'get');
+  t.is(voucher.url, `v1/refunds/${refundId}/voucher_url`);
+});
+
+test('fintoc.invoices.get()', async (t) => {
+  const ctx: any = t.context;
+  const invoiceId = 'in_12345';
+  const invoice = await ctx.fintoc.invoices.get(invoiceId, { link_token: 'link_token' });
+
+  t.is(invoice.method, 'get');
+  t.is(invoice.url, `v1/invoices/${invoiceId}`);
+  t.is(invoice.params.link_token, 'link_token');
+});
+
+test('fintoc.links.exchange()', async (t) => {
+  const ctx: any = t.context;
+  const link = await ctx.fintoc.links.exchange({ exchange_token: 'exchange_token' });
+
+  t.is(link.constructor.name, 'Link');
+  t.is(link.method, 'get');
+  t.is(link.url, 'v1/links/exchange');
+  t.is(link.params.exchange_token, 'exchange_token');
+});
+
+test('fintoc.institutions.list()', async (t) => {
+  const ctx: any = t.context;
+  const institutions = await ctx.fintoc.institutions.list({ country: 'cl' });
+
+  let count = 0;
+  for await (const institution of institutions) {
+    count += 1;
+    t.is(institution.constructor.name, 'Institution');
+    t.is(institution.method, 'get');
+    t.is(institution.url, 'v1/institutions');
+    t.is(institution.params.country, 'cl');
+  }
+
+  t.true(count > 0);
+});
+
+test('fintoc.linkIntents.create()', async (t) => {
+  const ctx: any = t.context;
+  const linkIntentData = { country: 'cl', holder_type: 'individual', product: 'movements' };
+  const linkIntent = await ctx.fintoc.linkIntents.create(linkIntentData);
+
+  t.is(linkIntent.constructor.name, 'LinkIntent');
+  t.is(linkIntent.method, 'post');
+  t.is(linkIntent.url, 'v1/link_intents');
+  t.is(linkIntent.json.country, linkIntentData.country);
+  t.is(linkIntent.json.holder_type, linkIntentData.holder_type);
+  t.is(linkIntent.json.product, linkIntentData.product);
+  t.true(linkIntent.headers['Idempotency-Key'] && linkIntent.headers['Idempotency-Key'].length > 0);
+});
+
+test('fintoc.linkIntents.create() with idempotency key', async (t) => {
+  const ctx: any = t.context;
+  const linkIntent = await ctx.fintoc.linkIntents.create({
+    country: 'cl', holder_type: 'individual', product: 'movements', idempotency_key: 'idem_123',
+  });
+
+  t.is(linkIntent.headers['Idempotency-Key'], 'idem_123');
+});
+
+test('fintoc.payouts.list()', async (t) => {
+  const ctx: any = t.context;
+  const payouts = await ctx.fintoc.payouts.list({ status: 'succeeded' });
+
+  let count = 0;
+  for await (const payout of payouts) {
+    count += 1;
+    t.is(payout.constructor.name, 'Payout');
+    t.is(payout.method, 'get');
+    t.is(payout.url, 'v1/payouts');
+    t.is(payout.params.status, 'succeeded');
+  }
+
+  t.true(count > 0);
+});
+
+test('fintoc.payouts.get()', async (t) => {
+  const ctx: any = t.context;
+  const payoutId = 'po_12345';
+  const payout = await ctx.fintoc.payouts.get(payoutId);
+
+  t.is(payout.constructor.name, 'Payout');
+  t.is(payout.method, 'get');
+  t.is(payout.url, `v1/payouts/${payoutId}`);
+});
+
+test('fintoc.payouts.listResources()', async (t) => {
+  const ctx: any = t.context;
+  const payoutId = 'po_12345';
+  const resources = await ctx.fintoc.payouts.listResources(payoutId, { resource_type: 'refund' });
+
+  let count = 0;
+  for await (const resource of resources) {
+    count += 1;
+    t.is(resource.constructor.name, 'Refund');
+    t.is(resource.method, 'get');
+    t.is(resource.url, `v1/payouts/${payoutId}/resources`);
+    t.is(resource.params.resource_type, 'refund');
+  }
+
+  t.true(count > 0);
+});
+
+test('fintoc.taxStatements.list()', async (t) => {
+  const ctx: any = t.context;
+  const taxStatements = await ctx.fintoc.taxStatements.list({ link_token: 'link_token' });
+
+  let count = 0;
+  for await (const taxStatement of taxStatements) {
+    count += 1;
+    t.is(taxStatement.constructor.name, 'TaxStatement');
+    t.is(taxStatement.method, 'get');
+    t.is(taxStatement.url, 'v1/tax_statements');
+    t.is(taxStatement.params.link_token, 'link_token');
+  }
+
+  t.true(count > 0);
+});
+
+test('fintoc.taxStatements.get()', async (t) => {
+  const ctx: any = t.context;
+  const taxStatementId = 'ts_12345';
+  const taxStatement = await ctx.fintoc.taxStatements.get(taxStatementId, { link_token: 'link_token' });
+
+  t.is(taxStatement.method, 'get');
+  t.is(taxStatement.url, `v1/tax_statements/${taxStatementId}`);
+  t.is(taxStatement.params.link_token, 'link_token');
+});
+
+test('fintoc.v2.invoices.create()', async (t) => {
+  const { fintoc } = t.context as { fintoc: Fintoc };
+  const invoiceData = {
+    customer: 'cus_12345',
+    collection_method: 'send_invoice',
+    lines: [{ amount: 60000, currency: 'CLP', name: 'Design', quantity: 2 }],
+  };
+  const invoice = await fintoc.v2.invoices.create(invoiceData);
+
+  t.is(invoice.method, 'post');
+  t.is(invoice.url, 'v2/invoices');
+  t.is(invoice.json.customer, invoiceData.customer);
+  t.is(invoice.json.collection_method, invoiceData.collection_method);
+  t.deepEqual(invoice.json.lines[0].serialize(), invoiceData.lines[0]);
+  t.true(invoice.headers['Idempotency-Key'] && invoice.headers['Idempotency-Key'].length > 0);
+});
+
+test('fintoc.v2.invoices.create() with idempotency key', async (t) => {
+  const { fintoc } = t.context as { fintoc: Fintoc };
+  const invoice = await fintoc.v2.invoices.create({
+    customer: 'cus_12345',
+    collection_method: 'send_invoice',
+    lines: [{ amount: 60000, currency: 'CLP', name: 'Design', quantity: 2 }],
+    idempotency_key: 'idem_123',
+  });
+
+  t.is(invoice.headers['Idempotency-Key'], 'idem_123');
+});
+
+test('fintoc.v2.invoices.update()', async (t) => {
+  const ctx: any = t.context;
+  const invoiceId = 'in_12345';
+  const invoice = await ctx.fintoc.v2.invoices.update(invoiceId, { metadata: { order: '42' } });
+
+  t.is(invoice.method, 'patch');
+  t.is(invoice.url, `v2/invoices/${invoiceId}`);
+  t.is(invoice.json.metadata.order, '42');
+});
+
+[
+  ['finalize', 'finalize'],
+  ['markUncollectible', 'mark_uncollectible'],
+  ['pay', 'pay'],
+  ['void', 'void'],
+].forEach(([method, action]) => {
+  test(`fintoc.v2.invoices.${method}()`, async (t) => {
+    const ctx: any = t.context;
+    const invoiceId = 'in_12345';
+    const invoice = await ctx.fintoc.v2.invoices[method](invoiceId);
+
+    t.is(invoice.method, 'post');
+    t.is(invoice.url, `v2/invoices/${invoiceId}/${action}`);
+    t.true(invoice.headers['Idempotency-Key'] && invoice.headers['Idempotency-Key'].length > 0);
+  });
+
+  test(`fintoc.v2.invoices.${method}() with idempotency key`, async (t) => {
+    const ctx: any = t.context;
+    const invoice = await ctx.fintoc.v2.invoices[method]('in_12345', { idempotency_key: 'idem_123' });
+
+    t.is(invoice.headers['Idempotency-Key'], 'idem_123');
+  });
+});
+
+test('fintoc.v2.invoices.pay() forwards its body', async (t) => {
+  const ctx: any = t.context;
+  const invoice = await ctx.fintoc.v2.invoices.pay('in_12345', { payment_method: 'pm_12345' });
+
+  t.is(invoice.json.payment_method, 'pm_12345');
+});
+
+test('fintoc.v2.invoices.finalize() does not send its options in the body', async (t) => {
+  const ctx: any = t.context;
+  const invoice = await ctx.fintoc.v2.invoices.finalize('in_12345', { idempotency_key: 'idem_123' });
+
+  t.is(invoice.json.path_, undefined);
+  t.is(invoice.json.idempotency_key, undefined);
+});
+
+test('fintoc.v2.invoices.finalize() returns an invoice that updates on its own path', async (t) => {
+  const ctx: any = t.context;
+  const invoiceId = 'in_12345';
+  const invoice = await ctx.fintoc.v2.invoices.finalize(invoiceId);
+  await invoice.update({ metadata: { order: '42' } });
+
+  t.is(invoice.method, 'patch');
+  t.is(invoice.url, `v2/invoices/${invoiceId}`);
+  t.is(invoice.json.metadata.order, '42');
+});
+
+test('fintoc.v2.paymentIntents.cancel()', async (t) => {
+  const ctx: any = t.context;
+  const paymentIntentId = 'pi_12345';
+  const paymentIntent = await ctx.fintoc.v2.paymentIntents.cancel(paymentIntentId);
+
+  t.is(paymentIntent.method, 'post');
+  t.is(paymentIntent.url, `v2/payment_intents/${paymentIntentId}/cancel`);
+  t.true(paymentIntent.headers['Idempotency-Key'] && paymentIntent.headers['Idempotency-Key'].length > 0);
+});
+
+test('fintoc.v2.paymentIntents.cancel() with idempotency key', async (t) => {
+  const ctx: any = t.context;
+  const paymentIntent = await ctx.fintoc.v2.paymentIntents.cancel('pi_12345', { idempotency_key: 'idem_123' });
+
+  t.is(paymentIntent.headers['Idempotency-Key'], 'idem_123');
+});
+
+test('fintoc.v2.paymentIntents.checkEligibility()', async (t) => {
+  const ctx: any = t.context;
+  const eligibilityData = {
+    amount: 1000,
+    currency: 'CLP',
+    sender_account: { holder_id: '111111111' },
+  };
+  const result = await ctx.fintoc.v2.paymentIntents.checkEligibility(eligibilityData);
+
+  t.is(result.constructor.name, 'GenericFintocResource');
+  t.is(result.method, 'post');
+  t.is(result.url, 'v2/payment_intents/check_eligibility');
+  t.is(result.json.amount, eligibilityData.amount);
+  t.is(result.json.currency, eligibilityData.currency);
+  t.is(result.json.sender_account.holder_id, eligibilityData.sender_account.holder_id);
+  t.true(result.headers['Idempotency-Key'] && result.headers['Idempotency-Key'].length > 0);
+});
+
+test('fintoc.v2.paymentIntents.checkEligibility() with idempotency key', async (t) => {
+  const ctx: any = t.context;
+  const result = await ctx.fintoc.v2.paymentIntents.checkEligibility({
+    amount: 1000, currency: 'CLP', idempotency_key: 'idem_123',
+  });
+
+  t.is(result.headers['Idempotency-Key'], 'idem_123');
+  t.is(result.json.idempotency_key, undefined);
+});
+
+test('fintoc.v2.paymentIntents.voucherUrl()', async (t) => {
+  const ctx: any = t.context;
+  const paymentIntentId = 'pi_12345';
+  const voucher = await ctx.fintoc.v2.paymentIntents.voucherUrl(paymentIntentId);
+
+  t.is(voucher.method, 'get');
+  t.is(voucher.url, `v2/payment_intents/${paymentIntentId}/voucher_url`);
+});
+
+test('fintoc.v2.paymentMethods.create()', async (t) => {
+  const ctx: any = t.context;
+  const file = (filename: string) => ({
+    data: Buffer.from('fake pdf'), filename, contentType: 'application/pdf',
+  });
+  const paymentMethod = await ctx.fintoc.v2.paymentMethods.create({
+    type: 'mx_direct_debit',
+    customer: 'cus_12345',
+    mx_direct_debit: {
+      account_number: '000000000000000000',
+      account_type: 'clabe',
+      interval: 'month',
+      max_amount: 100000,
+      account_holder: { name: 'Test Customer' },
+      consent_documents: {
+        contract: file('contract.pdf'),
+        selfie: file('selfie.pdf'),
+        id_front: file('id_front.pdf'),
+        id_back: file('id_back.pdf'),
+      },
+    },
+  });
+
+  t.is(paymentMethod.method, 'post');
+  t.is(paymentMethod.url, 'v2/payment_methods');
+  t.true(paymentMethod.multipart);
+  t.deepEqual(paymentMethod.multipartFields, [
+    'type',
+    'customer',
+    'mx_direct_debit[account_number]',
+    'mx_direct_debit[account_type]',
+    'mx_direct_debit[interval]',
+    'mx_direct_debit[max_amount]',
+    'mx_direct_debit[account_holder][name]',
+    'mx_direct_debit[consent_documents][contract]',
+    'mx_direct_debit[consent_documents][selfie]',
+    'mx_direct_debit[consent_documents][id_front]',
+    'mx_direct_debit[consent_documents][id_back]',
+  ]);
+  t.true(paymentMethod.headers['Idempotency-Key'] && paymentMethod.headers['Idempotency-Key'].length > 0);
+});
+
+test('fintoc.v2.paymentMethods.create() with idempotency key', async (t) => {
+  const ctx: any = t.context;
+  const paymentMethod = await ctx.fintoc.v2.paymentMethods.create({
+    type: 'mx_direct_debit', customer: 'cus_12345', idempotency_key: 'idem_123',
+  });
+
+  t.is(paymentMethod.headers['Idempotency-Key'], 'idem_123');
+  t.deepEqual(paymentMethod.multipartFields, ['type', 'customer']);
+});
+
+test('fintoc.v2.paymentMethods.cancel()', async (t) => {
+  const ctx: any = t.context;
+  const paymentMethodId = 'pm_12345';
+  const paymentMethod = await ctx.fintoc.v2.paymentMethods.cancel(paymentMethodId);
+
+  t.is(paymentMethod.method, 'post');
+  t.is(paymentMethod.url, `v2/payment_methods/${paymentMethodId}/cancel`);
+  t.true(paymentMethod.headers['Idempotency-Key'] && paymentMethod.headers['Idempotency-Key'].length > 0);
+});
+
+test('fintoc.v2.paymentMethods.cancel() with idempotency key', async (t) => {
+  const ctx: any = t.context;
+  const paymentMethod = await ctx.fintoc.v2.paymentMethods.cancel('pm_12345', { idempotency_key: 'idem_123' });
+
+  t.is(paymentMethod.headers['Idempotency-Key'], 'idem_123');
+});
+
+test('fintoc.v2.paymentMethods.mandateDocument()', async (t) => {
+  const ctx: any = t.context;
+  const paymentMethodId = 'pm_12345';
+  const document = await ctx.fintoc.v2.paymentMethods.mandateDocument(paymentMethodId);
+
+  t.is(document.method, 'get');
+  t.is(document.url, `v2/payment_methods/${paymentMethodId}/mandate_document`);
+});
+
+test('fintoc.v2.products.update()', async (t) => {
+  const ctx: any = t.context;
+  const productId = 'prod_12345';
+  const product = await ctx.fintoc.v2.products.update(productId, { name: 'New name' });
+
+  t.is(product.method, 'patch');
+  t.is(product.url, `v2/products/${productId}`);
+  t.is(product.json.name, 'New name');
+});
+
+test('fintoc.v2.subscriptions.detachPaymentMethod()', async (t) => {
+  const ctx: any = t.context;
+  const subscriptionId = 'sub_12345';
+  const subscription = await ctx.fintoc.v2.subscriptions.detachPaymentMethod(subscriptionId);
+
+  t.is(subscription.constructor.name, 'Subscription');
+  t.is(subscription.method, 'delete');
+  t.is(subscription.url, `v2/subscriptions/${subscriptionId}/payment_method`);
+});
+
+test('fintoc.v2.transfers.receipt()', async (t) => {
+  const ctx: any = t.context;
+  const transferId = 'tr_12345';
+  const receipt = await ctx.fintoc.v2.transfers.receipt(transferId);
+
+  t.is(receipt.constructor.name, 'TransferReceipt');
+  t.is(receipt.method, 'get');
+  t.is(receipt.url, `v2/transfers/${transferId}/receipt`);
+});
+
+test('fintoc.v2.entities.settlementAccount()', async (t) => {
+  const ctx: any = t.context;
+  const entityId = 'ent_12345';
+  const settlementAccount = await ctx.fintoc.v2.entities.settlementAccount(entityId);
+
+  t.is(settlementAccount.constructor.name, 'SettlementAccount');
+  t.is(settlementAccount.method, 'get');
+  t.is(settlementAccount.url, `v2/entities/${entityId}/settlement_account`);
+});
+
+test('fintoc.v2.entities.create()', async (t) => {
+  const ctx: any = t.context;
+  const entity = await ctx.fintoc.v2.entities.create({ holder_name: 'Test' });
+
+  t.is(entity.method, 'post');
+  t.is(entity.url, 'v2/entities');
+});
+
+test('fintoc.v2.entities.onboardings.addDocument()', async (t) => {
+  const ctx: any = t.context;
+  const entityId = 'ent_12345';
+  const onboardingId = 'onb_12345';
+  const slotKey = 'incorporation_amendments';
+  const file = { data: Buffer.from('fake pdf'), filename: 'cert.pdf', contentType: 'application/pdf' };
+  const onboarding = await ctx.fintoc.v2.entities.onboardings.addDocument(
+    onboardingId,
+    slotKey,
+    file,
+    { entity_id: entityId },
+  );
+
+  t.is(onboarding.method, 'post');
+  t.is(onboarding.url, `v2/entities/${entityId}/onboardings/${onboardingId}/documents/${slotKey}`);
+  t.true(onboarding.multipart);
+  t.deepEqual(onboarding.multipartFields, ['file']);
+  t.true(onboarding.headers['Idempotency-Key'] && onboarding.headers['Idempotency-Key'].length > 0);
+});
+
+test('fintoc.v2.entities.onboardings.addDocument() preserves the idempotency key on retries', async (t) => {
+  const { fintoc } = t.context as { fintoc: Fintoc };
+  const file = { data: Buffer.from('fake pdf'), filename: 'amendment.pdf', contentType: 'application/pdf' };
+
+  for (let attempt = 0; attempt < 2; attempt += 1) {
+    const onboarding = await fintoc.v2.entities.onboardings.addDocument(
+      'onb_12345',
+      'incorporation_amendments',
+      file,
+      { entity_id: 'ent_12345', idempotency_key: 'idem_123' },
+    );
+
+    t.is(onboarding.headers['Idempotency-Key'], 'idem_123');
+    t.deepEqual(onboarding.multipartFields, ['file']);
+  }
+});
+
+test('fintoc.v2.entities.onboardings.deleteDocument()', async (t) => {
+  const ctx: any = t.context;
+  const entityId = 'ent_12345';
+  const onboardingId = 'onb_12345';
+  const slotKey = 'tax_registration_certificate';
+  const documentId = 'onbdoc_12345';
+  const onboarding = await ctx.fintoc.v2.entities.onboardings.deleteDocument(
+    onboardingId,
+    slotKey,
+    documentId,
+    { entity_id: entityId },
+  );
+
+  t.is(onboarding.method, 'delete');
+  t.is(
+    onboarding.url,
+    `v2/entities/${entityId}/onboardings/${onboardingId}/documents/${slotKey}/${documentId}`,
+  );
+  t.is(onboarding.params.entity_id, undefined);
+});
+
+test('fintoc.v2.events.list()', async (t) => {
+  const ctx: any = t.context;
+  const events = await ctx.fintoc.v2.events.list({ type: 'payment_intent.succeeded' });
+
+  let count = 0;
+  for await (const event of events) {
+    count += 1;
+    t.is(event.method, 'get');
+    t.is(event.url, 'v2/events');
+    t.is(event.params.type, 'payment_intent.succeeded');
+  }
+
+  t.true(count > 0);
+});
+
+test('fintoc.v2.events.get()', async (t) => {
+  const ctx: any = t.context;
+  const eventId = 'evt_12345';
+  const event = await ctx.fintoc.v2.events.get(eventId);
+
+  t.is(event.method, 'get');
+  t.is(event.url, `v2/events/${eventId}`);
+});
+
+test('fintoc.v2.setupIntents.get()', async (t) => {
+  const ctx: any = t.context;
+  const setupIntentId = 'seti_12345';
+  const setupIntent = await ctx.fintoc.v2.setupIntents.get(setupIntentId);
+
+  t.is(setupIntent.constructor.name, 'SetupIntent');
+  t.is(setupIntent.method, 'get');
+  t.is(setupIntent.url, `v2/setup_intents/${setupIntentId}`);
 });

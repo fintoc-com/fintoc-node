@@ -1,15 +1,26 @@
 import { IManagerMixinConstructor, IResourceMixin } from '../../interfaces/mixins';
-import { GenericFunction, ResourceArguments, UploadFile } from '../../types';
+import {
+  GenericFunction, MultipartArguments, ResourceArguments, UploadFile,
+} from '../../types';
 import { Client } from '../client';
 import {
   resourceAll,
   resourceCreate,
   resourceDelete,
   resourceGet,
+  resourceMultipart,
   resourceUpdate,
   resourceUpload,
 } from '../resourceHandlers';
-import { canRaiseHTTPError, getResourceClass } from '../utils';
+import { GenericFintocResource } from '../resources/genericFintocResource';
+import { canRaiseHTTPError, getResourceClass, objetize } from '../utils';
+
+type ActionOptions = {
+  resource?: string | null;
+  args?: ResourceArguments;
+  methods?: string[];
+  objectPath?: string;
+};
 
 export abstract class ManagerMixin<ResourceType extends IResourceMixin> {
   static resource: string;
@@ -173,7 +184,11 @@ export abstract class ManagerMixin<ResourceType extends IResourceMixin> {
   }
 
   @canRaiseHTTPError
-  protected async _upload(path: string, file: UploadFile): Promise<ResourceType> {
+  protected async _upload(
+    path: string,
+    file: UploadFile,
+    method: 'post' | 'put' = 'put',
+  ): Promise<ResourceType> {
     const klass = await getResourceClass(this.#originatingClass.resource);
     return resourceUpload<ResourceType>(
       this._client,
@@ -182,7 +197,60 @@ export abstract class ManagerMixin<ResourceType extends IResourceMixin> {
       file,
       this.#handlers,
       this.#originatingClass.methods,
+      method,
     );
+  }
+
+  @canRaiseHTTPError
+  protected async _createMultipart(
+    path: string,
+    fields: MultipartArguments,
+    idempotencyKey?: string,
+  ): Promise<ResourceType> {
+    const klass = await getResourceClass(this.#originatingClass.resource);
+    const object = await resourceMultipart<ResourceType>(
+      this._client,
+      path,
+      klass,
+      fields,
+      this.#handlers,
+      this.#originatingClass.methods,
+      'post',
+      idempotencyKey,
+    );
+    return this.postCreateHandler(object, {});
+  }
+
+  @canRaiseHTTPError
+  protected async _action<T = ResourceType>(
+    method: 'get' | 'post' | 'delete',
+    path: string,
+    options: ActionOptions = {},
+  ): Promise<T> {
+    const {
+      resource = this.#originatingClass.resource, args = {}, methods = [], objectPath = path,
+    } = options;
+    const klass = resource === null ? GenericFintocResource : await getResourceClass(resource);
+    let data;
+    if (method === 'post') {
+      const { idempotency_key: idempotencyKey, ...json } = args;
+      data = await this._client.request({
+        path, method, json: json as Record<string, any>, idempotencyKey: idempotencyKey?.toString(),
+      });
+    } else {
+      data = await this._client.request({ path, method, params: args });
+    }
+    return objetize(klass, this._client, data, this.#handlers, methods, objectPath);
+  }
+
+  @canRaiseHTTPError
+  protected async _listAction<T>(
+    path: string,
+    resource: string | null,
+    args?: ResourceArguments,
+  ): Promise<T[] | AsyncGenerator<T>> {
+    const klass = resource === null ? GenericFintocResource : await getResourceClass(resource);
+    return resourceAll<T>(this._client, path, klass, this.#handlers, [], args || {});
   }
 
   @canRaiseHTTPError

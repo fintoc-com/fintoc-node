@@ -29,6 +29,28 @@ export class OnboardingsManager extends ManagerMixin<Onboarding> {
     return this._upload(path, file);
   }
 
+  addDocument(
+    id: string,
+    slotKey: string,
+    file: UploadFile,
+    args?: ResourceArguments,
+  ): Promise<Onboarding> {
+    const { idempotency_key: idempotencyKey, ...innerArgs } = args || {};
+    const path = `${this.buildPath(innerArgs)}/${id}/documents/${slotKey}`;
+    return this._createMultipart(path, { file }, idempotencyKey?.toString());
+  }
+
+  deleteDocument(
+    id: string,
+    slotKey: string,
+    documentId: string,
+    args?: ResourceArguments,
+  ): Promise<Onboarding> {
+    const { entity_id: entityId, ...innerArgs } = args || {};
+    const path = `${this.buildPath({ entity_id: entityId })}/${id}/documents/${slotKey}/${documentId}`;
+    return this._action<Onboarding>('delete', path, { args: innerArgs });
+  }
+
   uploadShareholderDocument(
     id: string,
     shareholderId: string,

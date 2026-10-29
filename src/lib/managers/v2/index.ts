@@ -18,3 +18,5 @@ export * from './subscriptionItemsManager';
 export * from './accountStatementsManager';
 export * from './onboardingsManager';
 export * from './transferBatchesManager';
+export * from './eventsManager';
+export * from './setupIntentsManager';
