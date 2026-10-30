@@ -34,7 +34,9 @@
   - [Transfer batches](#transfer-batches)
   - [Payment methods](#payment-methods)
   - [Payouts](#payouts)
+  - [Disputes](#disputes)
   - [Links](#links)
+  - [Refresh intents](#refresh-intents)
   - [Webhook Signature Validation](#webhook-signature-validation)
   - [Idempotency Keys](#idempotency-keys)
   - [Serialization](#serialization)
@@ -348,6 +350,22 @@ for await (const refund of refunds) {
 }
 ```
 
+### Disputes
+
+Upload evidence and receive the created dispute document. Files must be PDF, JPEG or PNG, smaller than 10 MB. The dispute must be in `waiting_documentation` and within its upload deadline:
+
+```javascript
+import fs from 'node:fs';
+
+const document = await fintocClient.disputes.createDocument('cb_8anBm9YpVwXzK2qLr4TjNdUe', {
+  file: {
+    data: fs.readFileSync('evidence.pdf'),
+    filename: 'evidence.pdf',
+    contentType: 'application/pdf',
+  },
+});
+```
+
 ### Links
 
 After the widget finishes, exchange the `exchange_token` for the link. The returned link carries its `link_token`:
@@ -355,6 +373,17 @@ After the widget finishes, exchange the `exchange_token` for the link. The retur
 ```javascript
 const link = await fintocClient.links.exchange({ exchange_token: 'exchange_token' });
 console.log(link.link_token);
+```
+
+### Refresh intents
+
+Request an account refresh using the link’s `link_token`. Results arrive through webhooks:
+
+```javascript
+const refreshIntent = await fintocClient.refreshIntents.create({
+  link_token: 'link_token',
+  refresh_type: 'only_last',
+});
 ```
 
 ### Webhook Signature Validation
