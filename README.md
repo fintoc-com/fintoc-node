@@ -32,6 +32,7 @@
     - [delete](#delete)
   - [Entity onboardings](#entity-onboardings)
   - [Transfer batches](#transfer-batches)
+  - [Recipients](#recipients)
   - [Payment methods](#payment-methods)
   - [Payouts](#payouts)
   - [Disputes](#disputes)
@@ -305,6 +306,32 @@ const transferBatches = await fintocClient.v2.transferBatches.list({
 });
 ```
 
+### Recipients
+
+Recipients are saved bank accounts that belong to an entity:
+
+```javascript
+const recipient = await fintocClient.v2.recipients.create({
+  entity_id: 'ent_12345678',
+  account_number: '012969100000000026',
+  holder_name: 'Jon Snow',
+  holder_type: 'person',
+});
+
+const fetchedRecipient = await fintocClient.v2.recipients.get(recipient.id);
+
+const recipients = await fintocClient.v2.recipients.list({
+  entity_id: 'ent_12345678',
+  holder_type: 'company',
+});
+
+const updatedRecipient = await fintocClient.v2.recipients.update(recipient.id, {
+  alias: 'Payroll account',
+});
+
+await fintocClient.v2.recipients.delete(recipient.id);
+```
+
 ### Payment methods
 
 Mexican direct debit mandates are created as `multipart/form-data`. Nested fields are sent as `parent[child]` and the consent documents are passed as file descriptors:
@@ -335,6 +362,12 @@ const paymentMethod = await fintocClient.v2.paymentMethods.create({
 
 const mandate = await fintocClient.v2.paymentMethods.mandateDocument(paymentMethod.id);
 console.log(mandate.download_url);
+```
+
+A payment method can be canceled by its id:
+
+```javascript
+const canceledPaymentMethod = await fintocClient.v2.paymentMethods.cancel(paymentMethod.id);
 ```
 
 ### Payouts
