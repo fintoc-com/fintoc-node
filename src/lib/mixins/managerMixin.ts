@@ -20,6 +20,8 @@ type ActionOptions = {
   args?: ResourceArguments;
   methods?: string[];
   objectPath?: string;
+  // Send the arguments of a POST as query parameters instead of a JSON body
+  query?: boolean;
 };
 
 const REQUEST_OPTIONS = ['path_', 'idempotency_key'];
@@ -230,14 +232,21 @@ export abstract class ManagerMixin<ResourceType extends IResourceMixin> {
     options: ActionOptions = {},
   ): Promise<T> {
     const {
-      resource = this.#originatingClass.resource, args = {}, methods = [], objectPath = path,
+      resource = this.#originatingClass.resource,
+      args = {},
+      methods = [],
+      objectPath = path,
+      query = false,
     } = options;
     const klass = resource === null ? GenericFintocResource : await getResourceClass(resource);
     let data;
     if (method === 'post') {
-      const { idempotency_key: idempotencyKey, ...json } = args;
+      const { idempotency_key: idempotencyKey, ...rest } = args;
       data = await this._client.request({
-        path, method, json: json as Record<string, any>, idempotencyKey: idempotencyKey?.toString(),
+        path,
+        method,
+        ...(query ? { params: rest } : { json: rest as Record<string, any> }),
+        idempotencyKey: idempotencyKey?.toString(),
       });
     } else {
       data = await this._client.request({ path, method, params: args });

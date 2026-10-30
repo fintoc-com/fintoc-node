@@ -67,3 +67,16 @@ test.serial('payment link cancel is a PATCH with an empty body', async (t) => {
   t.true(config.url.endsWith('/v1/payment_links/pl_123/cancel'));
   t.deepEqual(JSON.parse(config.data), {});
 });
+
+test.serial('refresh intent create sends its arguments as query parameters', async (t) => {
+  await new Fintoc('sk_test_refresh').refreshIntents.create({
+    link_token: 'link_token',
+    refresh_type: 'historical',
+  });
+
+  const config = request.firstCall.args[0];
+  t.is(config.method, 'post');
+  t.true(config.url.endsWith('/v1/refresh_intents'));
+  t.deepEqual(config.params, { link_token: 'link_token', refresh_type: 'historical' });
+  t.is(config.data, undefined);
+});

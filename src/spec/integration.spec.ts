@@ -470,8 +470,23 @@ test('fintoc.refreshIntents.create()', async (t) => {
 
   t.is(refreshIntent.method, 'post');
   t.is(refreshIntent.url, 'v1/refresh_intents');
-  t.is(refreshIntent.json.link_token, refreshData.link_token);
-  t.is(refreshIntent.json.refresh_type, refreshData.refresh_type);
+  t.is(refreshIntent.params.link_token, refreshData.link_token);
+  t.is(refreshIntent.params.refresh_type, refreshData.refresh_type);
+  t.is(refreshIntent.json.link_token, undefined);
+  t.true(refreshIntent.headers['Idempotency-Key'] && refreshIntent.headers['Idempotency-Key'].length > 0);
+});
+
+test('fintoc.refreshIntents.create() with idempotency key', async (t) => {
+  const ctx: any = t.context;
+  const refreshIntent = await ctx.fintoc.refreshIntents.create({
+    link_token: 'link_token_example',
+    result_status: 'succeeded',
+    idempotency_key: 'idem_123',
+  });
+
+  t.is(refreshIntent.params.result_status, 'succeeded');
+  t.is(refreshIntent.params.idempotency_key, undefined);
+  t.is(refreshIntent.headers['Idempotency-Key'], 'idem_123');
 });
 
 test('fintoc.subscriptions.list()', async (t) => {
