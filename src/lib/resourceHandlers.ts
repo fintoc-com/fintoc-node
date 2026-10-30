@@ -130,33 +130,40 @@ function isUploadFile(value: unknown): value is MultipartFile {
   );
 }
 
-function appendFormValue(form: FormData, key: string, value: unknown) {
+async function appendFormValue(form: FormData, key: string, value: unknown): Promise<void> {
   if (value === undefined || value === null) {
     return;
   }
   if (isUploadFile(value)) {
-    form.append(key, value.data, {
+    const data = 'arrayBuffer' in value.data
+      ? Buffer.from(await value.data.arrayBuffer())
+      : value.data;
+    form.append(key, data, {
       filename: value.filename,
       contentType: value.contentType,
     });
   } else if (Array.isArray(value)) {
-    value.forEach((element) => appendFormValue(form, `${key}[]`, element));
+    for (const element of value) {
+      await appendFormValue(form, `${key}[]`, element);
+    }
   } else if (typeof value === 'object') {
     const prototype = Object.getPrototypeOf(value);
     if (prototype !== Object.prototype && prototype !== null) {
       throw new TypeError(`Unsupported multipart value for "${key}"`);
     }
-    Object.entries(value as Record<string, unknown>).forEach(([innerKey, innerValue]) => {
-      appendFormValue(form, `${key}[${innerKey}]`, innerValue);
-    });
+    for (const [innerKey, innerValue] of Object.entries(value as Record<string, unknown>)) {
+      await appendFormValue(form, `${key}[${innerKey}]`, innerValue);
+    }
   } else {
     form.append(key, String(value));
   }
 }
 
-export function buildForm(fields: MultipartArguments) {
+export async function buildForm(fields: MultipartArguments) {
   const form = new FormData();
-  Object.entries(fields).forEach(([key, value]) => appendFormValue(form, key, value));
+  for (const [key, value] of Object.entries(fields)) {
+    await appendFormValue(form, key, value);
+  }
   return form;
 }
 
@@ -170,7 +177,7 @@ export async function resourceMultipart<ResourceType>(
   method: 'post' | 'put' = 'post',
   idempotencyKey?: string,
 ): Promise<ResourceType> {
-  const form = buildForm(fields);
+  const form = await buildForm(fields);
   const data = await client.request({
     path, method, form, idempotencyKey,
   });

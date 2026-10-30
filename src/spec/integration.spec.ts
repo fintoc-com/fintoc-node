@@ -1,6 +1,7 @@
 import test from 'ava';
 
 import { Fintoc } from '../lib/core';
+import { DisputeDocument } from '../lib/resources/disputeDocument';
 import { AccountVerification, TransferBatch } from '../lib/resources/v2';
 
 import { mockAxios, restore } from './mocks/initializers';
@@ -141,6 +142,7 @@ test('fintoc.paymentLinks.cancel()', async (t) => {
 
   t.is(cancelledPaymentLink.method, 'patch');
   t.is(cancelledPaymentLink.url, `v1/payment_links/${paymentLinkId}/cancel`);
+  t.is(cancelledPaymentLink.json.path_, undefined);
 });
 
 test('fintoc.links.list()', async (t) => {
@@ -378,6 +380,7 @@ test('fintoc.webhookEndpoints.test()', async (t) => {
   t.is(event.method, 'post');
   t.is(event.url, `v1/webhook_endpoints/${webhookEndpointId}/test`);
   t.is(event.json.type, eventType);
+  t.is(event.json.path_, undefined);
 });
 
 test('fintoc.events.trigger()', async (t) => {
@@ -468,8 +471,23 @@ test('fintoc.refreshIntents.create()', async (t) => {
 
   t.is(refreshIntent.method, 'post');
   t.is(refreshIntent.url, 'v1/refresh_intents');
-  t.is(refreshIntent.json.link_token, refreshData.link_token);
-  t.is(refreshIntent.json.refresh_type, refreshData.refresh_type);
+  t.is(refreshIntent.params.link_token, refreshData.link_token);
+  t.is(refreshIntent.params.refresh_type, refreshData.refresh_type);
+  t.is(refreshIntent.json.link_token, undefined);
+  t.true(refreshIntent.headers['Idempotency-Key'] && refreshIntent.headers['Idempotency-Key'].length > 0);
+});
+
+test('fintoc.refreshIntents.create() with idempotency key', async (t) => {
+  const ctx: any = t.context;
+  const refreshIntent = await ctx.fintoc.refreshIntents.create({
+    link_token: 'link_token_example',
+    result_status: 'succeeded',
+    idempotency_key: 'idem_123',
+  });
+
+  t.is(refreshIntent.params.result_status, 'succeeded');
+  t.is(refreshIntent.params.idempotency_key, undefined);
+  t.is(refreshIntent.headers['Idempotency-Key'], 'idem_123');
 });
 
 test('fintoc.subscriptions.list()', async (t) => {
@@ -627,10 +645,13 @@ test('fintoc.refunds.create()', async (t) => {
 test('fintoc.refunds.cancel()', async (t) => {
   const ctx: any = t.context;
   const refundId = 'ref_QmbpWzP1HOngN3X7';
-  const refund = await ctx.fintoc.refunds.cancel(refundId);
+  const refund = await ctx.fintoc.refunds.cancel(refundId, { idempotency_key: 'idem_123' });
 
   t.is(refund.method, 'post');
   t.is(refund.url, `v1/refunds/${refundId}/cancel`);
+  t.is(refund.json.path_, undefined);
+  t.is(refund.json.idempotency_key, undefined);
+  t.is(refund.headers['Idempotency-Key'], 'idem_123');
 });
 
 test('fintoc.disputes.list()', async (t) => {
@@ -688,10 +709,28 @@ test('fintoc.disputes.submitForReview()', async (t) => {
 test('fintoc.disputes.createDocument()', async (t) => {
   const ctx: any = t.context;
   const disputeId = 'dp_example_id';
-  const document = await ctx.fintoc.disputes.createDocument(disputeId);
+  const document = await ctx.fintoc.disputes.createDocument(disputeId, {
+    file: { data: Buffer.from('pdf bytes'), filename: 'evidence.pdf', contentType: 'application/pdf' },
+  });
 
+  t.true(document instanceof DisputeDocument);
   t.is(document.method, 'post');
   t.is(document.url, `v1/disputes/${disputeId}/documents`);
+  t.true(document.multipart);
+  t.deepEqual(document.multipartFields, ['file']);
+  t.true(document.headers['Idempotency-Key'] && document.headers['Idempotency-Key'].length > 0);
+});
+
+test('fintoc.disputes.createDocument() with a Blob and idempotency key', async (t) => {
+  const ctx: any = t.context;
+  const document = await ctx.fintoc.disputes.createDocument('dp_example_id', {
+    file: { data: new Blob(['pdf bytes']), filename: 'evidence.pdf' },
+    idempotency_key: 'idem_123',
+  });
+
+  t.true(document instanceof DisputeDocument);
+  t.deepEqual(document.multipartFields, ['file']);
+  t.is(document.headers['Idempotency-Key'], 'idem_123');
 });
 
 test('fintoc.subscriptionIntents.list()', async (t) => {
@@ -1432,6 +1471,8 @@ test('fintoc.v2.invoices.lines.update()', async (t) => {
 
   t.is(line.method, 'patch');
   t.is(line.url, `v2/invoices/${invoiceId}/lines/${lineId}`);
+  t.is(line.json.quantity, 2);
+  t.is(line.json.invoice_id, undefined);
 });
 
 test('fintoc.v2.paymentIntents.list()', async (t) => {
@@ -1564,6 +1605,9 @@ test('fintoc.v2.subscriptions.items.create()', async (t) => {
 
   t.is(item.method, 'post');
   t.is(item.url, `v2/subscriptions/${subscriptionId}/items`);
+  t.is(item.json.subscription_id, undefined);
+  t.is(item.json.path_, undefined);
+  t.is(item.json.quantity, 1);
 });
 
 test('fintoc.v2.subscriptions.items.update()', async (t) => {
@@ -1577,6 +1621,8 @@ test('fintoc.v2.subscriptions.items.update()', async (t) => {
 
   t.is(item.method, 'patch');
   t.is(item.url, `v2/subscriptions/${subscriptionId}/items/${itemId}`);
+  t.is(item.json.quantity, 3);
+  t.is(item.json.subscription_id, undefined);
 });
 
 test('fintoc.v2.subscriptions.items.delete()', async (t) => {
@@ -1709,6 +1755,8 @@ test('fintoc.v2.entities.onboardings.create()', async (t) => {
 
   t.is(onboarding.method, 'post');
   t.is(onboarding.url, `v2/entities/${entityId}/onboardings`);
+  t.is(onboarding.json.entity_id, undefined);
+  t.is(onboarding.json.path_, undefined);
   t.is(onboarding.json.type, 'account_holder');
   t.is(onboarding.json.data.company_information.business_activity, 'Servicios financieros');
   t.is(onboarding.json.data.legal_representatives[0].first_name, 'Jane');
@@ -1728,6 +1776,8 @@ test('fintoc.v2.entities.onboardings.submit()', async (t) => {
 
   t.is(onboarding.method, 'post');
   t.is(onboarding.url, `v2/entities/${entityId}/onboardings/${onboardingId}/submit`);
+  t.is(onboarding.json.entity_id, undefined);
+  t.is(onboarding.json.path_, undefined);
 });
 
 test('fintoc.v2.entities.onboardings.uploadDocument()', async (t) => {
