@@ -22,6 +22,8 @@ type ActionOptions = {
   objectPath?: string;
 };
 
+const REQUEST_OPTIONS = ['path_', 'idempotency_key'];
+
 export abstract class ManagerMixin<ResourceType extends IResourceMixin> {
   static resource: string;
   static methods: string[];
@@ -177,7 +179,7 @@ export abstract class ManagerMixin<ResourceType extends IResourceMixin> {
       klass,
       this.#handlers,
       this.#originatingClass.methods,
-      innerArgs,
+      this.#requestParams(innerArgs),
       idempotencyKey?.toString(),
     );
     return this.postCreateHandler(object, innerArgs);
@@ -265,7 +267,7 @@ export abstract class ManagerMixin<ResourceType extends IResourceMixin> {
       klass,
       this.#handlers,
       this.#originatingClass.methods,
-      innerArgs,
+      this.#requestParams(innerArgs),
       path_?.toString(),
     );
     return this.postUpdateHandler(object, identifier, innerArgs);
@@ -278,7 +280,7 @@ export abstract class ManagerMixin<ResourceType extends IResourceMixin> {
       this._client,
       this.buildPath(innerArgs),
       identifier,
-      this.#handlers,
+      this.#requestParams(innerArgs),
     );
     return this.postDeleteHandler(identifier, innerArgs);
   }
@@ -304,6 +306,15 @@ export abstract class ManagerMixin<ResourceType extends IResourceMixin> {
 
   protected postDeleteHandler(identifier: string, args: ResourceArguments) {
     return identifier;
+  }
+
+  // Path placeholders and SDK options are not API parameters, so they stay out of the request
+  #requestParams(args: ResourceArguments): ResourceArguments {
+    return Object.fromEntries(
+      Object.entries(args).filter(
+        ([key]) => !REQUEST_OPTIONS.includes(key) && !this.#path.includes(`{${key}}`),
+      ),
+    );
   }
 
   protected buildPath(args?: ResourceArguments) {

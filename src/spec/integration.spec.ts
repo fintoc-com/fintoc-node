@@ -141,6 +141,7 @@ test('fintoc.paymentLinks.cancel()', async (t) => {
 
   t.is(cancelledPaymentLink.method, 'patch');
   t.is(cancelledPaymentLink.url, `v1/payment_links/${paymentLinkId}/cancel`);
+  t.is(cancelledPaymentLink.json.path_, undefined);
 });
 
 test('fintoc.links.list()', async (t) => {
@@ -378,6 +379,7 @@ test('fintoc.webhookEndpoints.test()', async (t) => {
   t.is(event.method, 'post');
   t.is(event.url, `v1/webhook_endpoints/${webhookEndpointId}/test`);
   t.is(event.json.type, eventType);
+  t.is(event.json.path_, undefined);
 });
 
 test('fintoc.events.trigger()', async (t) => {
@@ -627,10 +629,13 @@ test('fintoc.refunds.create()', async (t) => {
 test('fintoc.refunds.cancel()', async (t) => {
   const ctx: any = t.context;
   const refundId = 'ref_QmbpWzP1HOngN3X7';
-  const refund = await ctx.fintoc.refunds.cancel(refundId);
+  const refund = await ctx.fintoc.refunds.cancel(refundId, { idempotency_key: 'idem_123' });
 
   t.is(refund.method, 'post');
   t.is(refund.url, `v1/refunds/${refundId}/cancel`);
+  t.is(refund.json.path_, undefined);
+  t.is(refund.json.idempotency_key, undefined);
+  t.is(refund.headers['Idempotency-Key'], 'idem_123');
 });
 
 test('fintoc.disputes.list()', async (t) => {
@@ -1432,6 +1437,8 @@ test('fintoc.v2.invoices.lines.update()', async (t) => {
 
   t.is(line.method, 'patch');
   t.is(line.url, `v2/invoices/${invoiceId}/lines/${lineId}`);
+  t.is(line.json.quantity, 2);
+  t.is(line.json.invoice_id, undefined);
 });
 
 test('fintoc.v2.paymentIntents.list()', async (t) => {
@@ -1564,6 +1571,9 @@ test('fintoc.v2.subscriptions.items.create()', async (t) => {
 
   t.is(item.method, 'post');
   t.is(item.url, `v2/subscriptions/${subscriptionId}/items`);
+  t.is(item.json.subscription_id, undefined);
+  t.is(item.json.path_, undefined);
+  t.is(item.json.quantity, 1);
 });
 
 test('fintoc.v2.subscriptions.items.update()', async (t) => {
@@ -1577,6 +1587,8 @@ test('fintoc.v2.subscriptions.items.update()', async (t) => {
 
   t.is(item.method, 'patch');
   t.is(item.url, `v2/subscriptions/${subscriptionId}/items/${itemId}`);
+  t.is(item.json.quantity, 3);
+  t.is(item.json.subscription_id, undefined);
 });
 
 test('fintoc.v2.subscriptions.items.delete()', async (t) => {
@@ -1709,6 +1721,8 @@ test('fintoc.v2.entities.onboardings.create()', async (t) => {
 
   t.is(onboarding.method, 'post');
   t.is(onboarding.url, `v2/entities/${entityId}/onboardings`);
+  t.is(onboarding.json.entity_id, undefined);
+  t.is(onboarding.json.path_, undefined);
   t.is(onboarding.json.type, 'account_holder');
   t.is(onboarding.json.data.company_information.business_activity, 'Servicios financieros');
   t.is(onboarding.json.data.legal_representatives[0].first_name, 'Jane');
@@ -1728,6 +1742,8 @@ test('fintoc.v2.entities.onboardings.submit()', async (t) => {
 
   t.is(onboarding.method, 'post');
   t.is(onboarding.url, `v2/entities/${entityId}/onboardings/${onboardingId}/submit`);
+  t.is(onboarding.json.entity_id, undefined);
+  t.is(onboarding.json.path_, undefined);
 });
 
 test('fintoc.v2.entities.onboardings.uploadDocument()', async (t) => {
