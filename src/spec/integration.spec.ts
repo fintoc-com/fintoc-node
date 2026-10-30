@@ -1,6 +1,7 @@
 import test from 'ava';
 
 import { Fintoc } from '../lib/core';
+import { DisputeDocument } from '../lib/resources/disputeDocument';
 import { AccountVerification, TransferBatch } from '../lib/resources/v2';
 
 import { mockAxios, restore } from './mocks/initializers';
@@ -708,10 +709,28 @@ test('fintoc.disputes.submitForReview()', async (t) => {
 test('fintoc.disputes.createDocument()', async (t) => {
   const ctx: any = t.context;
   const disputeId = 'dp_example_id';
-  const document = await ctx.fintoc.disputes.createDocument(disputeId);
+  const document = await ctx.fintoc.disputes.createDocument(disputeId, {
+    file: { data: Buffer.from('pdf bytes'), filename: 'evidence.pdf', contentType: 'application/pdf' },
+  });
 
+  t.true(document instanceof DisputeDocument);
   t.is(document.method, 'post');
   t.is(document.url, `v1/disputes/${disputeId}/documents`);
+  t.true(document.multipart);
+  t.deepEqual(document.multipartFields, ['file']);
+  t.true(document.headers['Idempotency-Key'] && document.headers['Idempotency-Key'].length > 0);
+});
+
+test('fintoc.disputes.createDocument() with a Blob and idempotency key', async (t) => {
+  const ctx: any = t.context;
+  const document = await ctx.fintoc.disputes.createDocument('dp_example_id', {
+    file: { data: new Blob(['pdf bytes']), filename: 'evidence.pdf' },
+    idempotency_key: 'idem_123',
+  });
+
+  t.true(document instanceof DisputeDocument);
+  t.deepEqual(document.multipartFields, ['file']);
+  t.is(document.headers['Idempotency-Key'], 'idem_123');
 });
 
 test('fintoc.subscriptionIntents.list()', async (t) => {

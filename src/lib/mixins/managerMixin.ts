@@ -210,8 +210,9 @@ export abstract class ManagerMixin<ResourceType extends IResourceMixin> {
     path: string,
     fields: MultipartArguments,
     idempotencyKey?: string,
+    resource: string = this.#originatingClass.resource,
   ): Promise<ResourceType> {
-    const klass = await getResourceClass(this.#originatingClass.resource);
+    const klass = await getResourceClass(resource);
     const object = await resourceMultipart<ResourceType>(
       this._client,
       path,
