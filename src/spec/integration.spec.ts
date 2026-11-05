@@ -654,6 +654,43 @@ test('fintoc.refunds.cancel()', async (t) => {
   t.is(refund.headers['Idempotency-Key'], 'idem_123');
 });
 
+test('fintoc.organizations.create()', async (t) => {
+  const ctx: any = t.context;
+  const organizationData = {
+    name: 'Empresa SpA',
+    tax_id: '11.111.111-1',
+    founder_email: 'founder@example.com',
+    products: { business_accounts: {} },
+    external_reference: 'ref_123',
+  };
+  const organization = await ctx.fintoc.organizations.create(organizationData);
+
+  t.is(organization.method, 'post');
+  t.is(organization.url, 'v1/organizations');
+  t.is(organization.json.name, organizationData.name);
+  t.is(organization.json.tax_id, organizationData.tax_id);
+  t.is(organization.json.founder_email, organizationData.founder_email);
+  t.truthy(organization.json.products.business_accounts);
+  t.is(organization.json.external_reference, organizationData.external_reference);
+  t.true(organization.headers['Idempotency-Key'] && organization.headers['Idempotency-Key'].length > 0);
+});
+
+test('fintoc.organizations.create() with idempotency key', async (t) => {
+  const ctx: any = t.context;
+  const organization = await ctx.fintoc.organizations.create({
+    name: 'Empresa SpA',
+    tax_id: '11.111.111-1',
+    founder_email: 'founder@example.com',
+    products: { business_accounts: {} },
+    idempotency_key: 'idem_123',
+  });
+
+  t.is(organization.method, 'post');
+  t.is(organization.url, 'v1/organizations');
+  t.is(organization.headers['Idempotency-Key'], 'idem_123');
+  t.is(organization.json.idempotency_key, undefined);
+});
+
 test('fintoc.disputes.list()', async (t) => {
   const ctx: any = t.context;
   const disputes = await ctx.fintoc.disputes.list();

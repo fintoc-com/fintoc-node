@@ -38,6 +38,7 @@
   - [Disputes](#disputes)
   - [Links](#links)
   - [Refresh intents](#refresh-intents)
+  - [Organizations](#organizations)
   - [Webhook Signature Validation](#webhook-signature-validation)
   - [Idempotency Keys](#idempotency-keys)
   - [Serialization](#serialization)
@@ -416,6 +417,22 @@ Request an account refresh using the link’s `link_token`. Results arrive throu
 const refreshIntent = await fintocClient.refreshIntents.create({
   link_token: 'link_token',
   refresh_type: 'only_last',
+});
+```
+
+### Organizations
+
+Creating an organization requires a JWS private key and a live API key. It returns the created organization, or the existing one if it was already created:
+
+```javascript
+const fintocClient = new Fintoc('your_api_key', 'path/to/private_key.pem');
+
+const organization = await fintocClient.organizations.create({
+  name: 'Empresa SpA',
+  tax_id: '11.111.111-1',
+  founder_email: 'jared@piedpiper.com',
+  products: { business_accounts: {} },
+  external_reference: 'SOL-123',
 });
 ```
 

@@ -5,6 +5,7 @@ export * from './disputesManager';
 export * from './eventsManager';
 export * from './invoicesManager';
 export * from './linksManager';
+export * from './organizationsManager';
 export * from './movementsManager';
 export * from './paymentIntentsManager';
 export * from './paymentLinksManager';
