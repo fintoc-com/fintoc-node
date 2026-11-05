@@ -11,6 +11,7 @@ import {
   InvoicesManager,
   LinkIntentsManager,
   LinksManager,
+  OrganizationsManager,
   PaymentIntentsManager,
   PaymentLinksManager,
   PayoutsManager,
@@ -96,6 +97,7 @@ export class Fintoc {
   invoices: InvoicesManager;
   linkIntents: LinkIntentsManager;
   links: LinksManager;
+  organizations: OrganizationsManager;
   paymentIntents: PaymentIntentsManager;
   paymentLinks: PaymentLinksManager;
   payouts: PayoutsManager;
@@ -126,6 +128,7 @@ export class Fintoc {
     this.invoices = new InvoicesManager('/v1/invoices', this.#client);
     this.linkIntents = new LinkIntentsManager('/v1/link_intents', this.#client);
     this.links = new LinksManager('/v1/links', this.#client);
+    this.organizations = new OrganizationsManager('/v1/organizations', this.#client);
     this.paymentIntents = new PaymentIntentsManager('/v1/payment_intents', this.#client);
     this.paymentLinks = new PaymentLinksManager('/v1/payment_links', this.#client);
     this.payouts = new PayoutsManager('/v1/payouts', this.#client);
