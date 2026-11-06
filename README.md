@@ -422,17 +422,24 @@ const refreshIntent = await fintocClient.refreshIntents.create({
 
 ### Organizations
 
-Creating an organization requires a JWS private key and a live API key. It returns the created organization, or the existing one if it was already created:
+Creating an organization returns the created organization, or the existing one if it was already created. With a test API key it returns a mock organization:
 
 ```javascript
-const fintocClient = new Fintoc('your_api_key', 'path/to/private_key.pem');
-
 const organization = await fintocClient.organizations.create({
   name: 'Empresa SpA',
   tax_id: '11.111.111-1',
   founder_email: 'jared@piedpiper.com',
   products: { business_accounts: {} },
   external_reference: 'SOL-123',
+});
+```
+
+You can also update an organization's founder email:
+
+```javascript
+const updatedOrganization = await fintocClient.organizations.update(organization.id, {
+  founder_email: 'richard@piedpiper.com',
+  previous_founder_email: 'jared@piedpiper.com',
 });
 ```
 
