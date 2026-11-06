@@ -691,6 +691,21 @@ test('fintoc.organizations.create() with idempotency key', async (t) => {
   t.is(organization.json.idempotency_key, undefined);
 });
 
+test('fintoc.organizations.update()', async (t) => {
+  const ctx: any = t.context;
+  const organizationId = 'org_8anqVLlBC8ROodem';
+  const organizationData = {
+    founder_email: 'new.founder@example.com',
+    previous_founder_email: 'founder@example.com',
+  };
+  const organization = await ctx.fintoc.organizations.update(organizationId, organizationData);
+
+  t.is(organization.method, 'patch');
+  t.is(organization.url, `v1/organizations/${organizationId}`);
+  t.is(organization.json.founder_email, organizationData.founder_email);
+  t.is(organization.json.previous_founder_email, organizationData.previous_founder_email);
+});
+
 test('fintoc.disputes.list()', async (t) => {
   const ctx: any = t.context;
   const disputes = await ctx.fintoc.disputes.list();
