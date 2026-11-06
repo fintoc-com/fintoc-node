@@ -128,13 +128,12 @@ export function canRaiseHTTPError(
     try {
       return await descriptor.value.apply(this, args);
     } catch (exc: any) {
-      if (axios.isAxiosError(exc) && exc.response) {
-        const errorData = exc.response.data as Record<string, any>;
-        const ErrorKlass = getErrorClass(errorData.error.type);
-        throw new ErrorKlass(errorData.error);
-      } else {
-        throw exc;
+      const apiError = axios.isAxiosError(exc) ? exc.response?.data?.error : undefined;
+      if (apiError && typeof apiError === 'object' && typeof apiError.type === 'string') {
+        const ErrorKlass = getErrorClass(apiError.type);
+        throw new ErrorKlass(apiError);
       }
+      throw exc;
     }
   };
 
