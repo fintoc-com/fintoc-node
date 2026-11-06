@@ -1,0 +1,17 @@
+name: release-scripts
+
+on:
+  pull_request:
+    paths:
+      - ".github/workflows/release-scripts.yml"
+      - ".github/scripts/**"
+
+jobs:
+  resolve-release:
+    runs-on: ubuntu-24.04
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Test resolve-release
+        run: .github/scripts/resolve-release.test.sh
