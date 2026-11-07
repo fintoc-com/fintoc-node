@@ -18,4 +18,4 @@ Skills live in `.agents/skills/`. `.claude/skills` is a symlink to that folder, 
 
 ## Releases
 
-Releases are manual from GitHub Actions (see `RELEASING.md`). Do not bump the version in feature PRs.
+Merging a PR to `master` with a `release:patch|minor|major` label publishes a release, with notes from the PR's `## Release notes` section (see `RELEASING.md`). Do not bump the version in feature PRs.
