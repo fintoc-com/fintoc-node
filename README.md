@@ -33,6 +33,8 @@
   - [Entity onboardings](#entity-onboardings)
   - [Transfer batches](#transfer-batches)
   - [Recipients](#recipients)
+  - [Account certificates](#account-certificates)
+  - [Crossborder](#crossborder)
   - [Payment methods](#payment-methods)
   - [Payouts](#payouts)
   - [Disputes](#disputes)
@@ -331,6 +333,50 @@ const updatedRecipient = await fintocClient.v2.recipients.update(recipient.id, {
 });
 
 await fintocClient.v2.recipients.delete(recipient.id);
+```
+
+### Account certificates
+
+You can get the certificate of an account, or of one of its account numbers:
+
+```javascript
+const accountCertificate = await fintocClient.v2.accounts.certificate('acc_12345678');
+
+const accountNumberCertificate = await fintocClient.v2.accountNumbers.certificate('acno_12345678');
+
+console.log(accountCertificate.download_url);
+```
+
+### Crossborder
+
+Crossborder transfers convert funds between `MXN` and `USD`. First create a quote, then accept it with a transfer. Transfers from `MXN` to `USD` need a beneficiary:
+
+```javascript
+const beneficiary = await fintocClient.v2.crossborder.beneficiaries.create({
+  holder_type: 'business',
+  business_name: 'Acme LLC',
+  account_identifier: '123456789',
+  routing_number: '021000021',
+  bank_name: 'JPMorgan Chase Bank, N.A.',
+});
+
+const quote = await fintocClient.v2.crossborder.quotes.create({
+  direction: 'mx_to_usd',
+  source_amount: 200001,
+});
+
+const transfer = await fintocClient.v2.crossborder.transfers.create({
+  quote_id: quote.id,
+  beneficiary_id: beneficiary.id,
+  reference: 'Invoice 123',
+});
+
+const transfers = await fintocClient.v2.crossborder.transfers.list({
+  status: ['in_progress', 'failed'],
+  direction: 'mx_to_usd',
+});
+
+await fintocClient.v2.crossborder.beneficiaries.delete(beneficiary.id);
 ```
 
 ### Payment methods

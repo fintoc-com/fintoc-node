@@ -27,6 +27,7 @@ import {
 import {
   AccountNumbersManager,
   AccountVerificationsManager,
+  CrossborderManager,
   CustomersManager,
   EntitiesManager,
   PaymentMethodsManager,
@@ -63,6 +64,7 @@ class FintocV2 {
   transferBatches: TransferBatchesManager;
   events: V2EventsManager;
   setupIntents: SetupIntentsManager;
+  crossborder: CrossborderManager;
 
   constructor(client: Client) {
     this.accounts = new V2AccountsManager('/v2/accounts', client);
@@ -82,6 +84,7 @@ class FintocV2 {
     this.transferBatches = new TransferBatchesManager('/v2/transfer_batches', client);
     this.events = new V2EventsManager('/v2/events', client);
     this.setupIntents = new SetupIntentsManager('/v2/setup_intents', client);
+    this.crossborder = new CrossborderManager('/v2/crossborder', client);
   }
 }
 

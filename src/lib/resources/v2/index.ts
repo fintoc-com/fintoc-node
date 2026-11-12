@@ -23,3 +23,7 @@ export * from './transferBatch';
 export * from './setupIntent';
 export * from './settlementAccount';
 export * from './transferReceipt';
+export * from './crossborderQuote';
+export * from './crossborderBeneficiary';
+export * from './crossborderTransfer';
+export * from './accountCertificate';

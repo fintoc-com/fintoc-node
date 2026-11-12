@@ -20,3 +20,7 @@ export * from './onboardingsManager';
 export * from './transferBatchesManager';
 export * from './eventsManager';
 export * from './setupIntentsManager';
+export * from './crossborderManager';
+export * from './crossborderQuotesManager';
+export * from './crossborderBeneficiariesManager';
+export * from './crossborderTransfersManager';

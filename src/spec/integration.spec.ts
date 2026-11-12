@@ -2354,6 +2354,176 @@ test('fintoc.v2.transfers.receipt()', async (t) => {
   t.is(receipt.url, `v2/transfers/${transferId}/receipt`);
 });
 
+test('fintoc.v2.accounts.certificate()', async (t) => {
+  const ctx: any = t.context;
+  const accountId = 'acc_12345';
+  const certificate = await ctx.fintoc.v2.accounts.certificate(accountId);
+
+  t.is(certificate.constructor.name, 'AccountCertificate');
+  t.is(certificate.method, 'get');
+  t.is(certificate.url, `v2/accounts/${accountId}/certificate`);
+});
+
+test('fintoc.v2.accountNumbers.certificate()', async (t) => {
+  const ctx: any = t.context;
+  const accountNumberId = 'acno_12345';
+  const certificate = await ctx.fintoc.v2.accountNumbers.certificate(accountNumberId);
+
+  t.is(certificate.constructor.name, 'AccountCertificate');
+  t.is(certificate.method, 'get');
+  t.is(certificate.url, `v2/account_numbers/${accountNumberId}/certificate`);
+});
+
+test('fintoc.v2.crossborder.quotes.create()', async (t) => {
+  const ctx: any = t.context;
+  const quoteData = { direction: 'mx_to_usd', source_amount: 200001 };
+  const quote = await ctx.fintoc.v2.crossborder.quotes.create(quoteData);
+
+  t.is(quote.constructor.name, 'CrossborderQuote');
+  t.is(quote.method, 'post');
+  t.is(quote.url, 'v2/crossborder/quotes');
+  t.like(quote.json, quoteData);
+  t.true(quote.headers['Idempotency-Key'] && quote.headers['Idempotency-Key'].length > 0);
+});
+
+test('fintoc.v2.crossborder.quotes.create() with idempotency key', async (t) => {
+  const ctx: any = t.context;
+  const quote = await ctx.fintoc.v2.crossborder.quotes.create({
+    direction: 'usd_to_mx',
+    source_amount: 2000,
+    idempotency_key: 'idem_123',
+  });
+
+  t.is(quote.url, 'v2/crossborder/quotes');
+  t.is(quote.headers['Idempotency-Key'], 'idem_123');
+  t.is(quote.json.idempotency_key, undefined);
+});
+
+test('fintoc.v2.crossborder.quotes.get()', async (t) => {
+  const ctx: any = t.context;
+  const quoteId = 'xbq_12345';
+  const quote = await ctx.fintoc.v2.crossborder.quotes.get(quoteId);
+
+  t.is(quote.constructor.name, 'CrossborderQuote');
+  t.is(quote.method, 'get');
+  t.is(quote.url, `v2/crossborder/quotes/${quoteId}`);
+});
+
+test('fintoc.v2.crossborder.quotes.list() is not supported', (t) => {
+  const ctx: any = t.context;
+  t.throws(() => ctx.fintoc.v2.crossborder.quotes.list(), { instanceOf: TypeError });
+});
+
+test('fintoc.v2.crossborder.beneficiaries.create()', async (t) => {
+  const ctx: any = t.context;
+  const beneficiaryData = {
+    holder_type: 'business',
+    business_name: 'Acme LLC',
+    account_identifier: '123456789',
+    routing_number: '021000021',
+  };
+  const beneficiary = await ctx.fintoc.v2.crossborder.beneficiaries.create(beneficiaryData);
+
+  t.is(beneficiary.constructor.name, 'CrossborderBeneficiary');
+  t.is(beneficiary.method, 'post');
+  t.is(beneficiary.url, 'v2/crossborder/beneficiaries');
+  t.like(beneficiary.json, beneficiaryData);
+  t.true(beneficiary.headers['Idempotency-Key'] && beneficiary.headers['Idempotency-Key'].length > 0);
+});
+
+test('fintoc.v2.crossborder.beneficiaries.create() with idempotency key', async (t) => {
+  const ctx: any = t.context;
+  const beneficiary = await ctx.fintoc.v2.crossborder.beneficiaries.create({
+    holder_type: 'individual',
+    idempotency_key: 'idem_123',
+  });
+
+  t.is(beneficiary.headers['Idempotency-Key'], 'idem_123');
+  t.is(beneficiary.json.idempotency_key, undefined);
+});
+
+test('fintoc.v2.crossborder.beneficiaries.list()', async (t) => {
+  const ctx: any = t.context;
+  const beneficiaries = await ctx.fintoc.v2.crossborder.beneficiaries.list({ lazy: false });
+
+  t.true(beneficiaries.length > 0);
+  beneficiaries.forEach((beneficiary: any) => {
+    t.is(beneficiary.constructor.name, 'CrossborderBeneficiary');
+    t.is(beneficiary.method, 'get');
+    t.is(beneficiary.url, 'v2/crossborder/beneficiaries');
+  });
+});
+
+test('fintoc.v2.crossborder.beneficiaries.get()', async (t) => {
+  const ctx: any = t.context;
+  const beneficiaryId = 'xbb_12345';
+  const beneficiary = await ctx.fintoc.v2.crossborder.beneficiaries.get(beneficiaryId);
+
+  t.is(beneficiary.constructor.name, 'CrossborderBeneficiary');
+  t.is(beneficiary.method, 'get');
+  t.is(beneficiary.url, `v2/crossborder/beneficiaries/${beneficiaryId}`);
+});
+
+test('fintoc.v2.crossborder.beneficiaries.delete()', async (t) => {
+  const ctx: any = t.context;
+  const beneficiaryId = 'xbb_12345';
+  const deletedIdentifier = await ctx.fintoc.v2.crossborder.beneficiaries.delete(beneficiaryId);
+
+  t.is(deletedIdentifier, beneficiaryId);
+});
+
+test('fintoc.v2.crossborder.transfers.create()', async (t) => {
+  const ctx: any = t.context;
+  const transferData = {
+    quote_id: 'xbq_12345',
+    beneficiary_id: 'xbb_12345',
+    reference: 'Factura 123',
+  };
+  const transfer = await ctx.fintoc.v2.crossborder.transfers.create(transferData);
+
+  t.is(transfer.constructor.name, 'CrossborderTransfer');
+  t.is(transfer.method, 'post');
+  t.is(transfer.url, 'v2/crossborder/transfers');
+  t.like(transfer.json, transferData);
+  t.true(transfer.headers['Idempotency-Key'] && transfer.headers['Idempotency-Key'].length > 0);
+});
+
+test('fintoc.v2.crossborder.transfers.create() with idempotency key', async (t) => {
+  const ctx: any = t.context;
+  const transfer = await ctx.fintoc.v2.crossborder.transfers.create({
+    quote_id: 'xbq_12345',
+    idempotency_key: 'idem_123',
+  });
+
+  t.is(transfer.headers['Idempotency-Key'], 'idem_123');
+  t.is(transfer.json.idempotency_key, undefined);
+});
+
+test('fintoc.v2.crossborder.transfers.list()', async (t) => {
+  const ctx: any = t.context;
+  const filters = { status: ['in_progress', 'failed'], direction: 'mx_to_usd' };
+  const transfers = await ctx.fintoc.v2.crossborder.transfers.list({ ...filters, lazy: false });
+
+  t.true(transfers.length > 0);
+  transfers.forEach((transfer: any) => {
+    t.is(transfer.constructor.name, 'CrossborderTransfer');
+    t.is(transfer.method, 'get');
+    t.is(transfer.url, 'v2/crossborder/transfers');
+    t.deepEqual(transfer.params.status, filters.status);
+    t.is(transfer.params.direction, filters.direction);
+  });
+});
+
+test('fintoc.v2.crossborder.transfers.get()', async (t) => {
+  const ctx: any = t.context;
+  const transferId = 'xbt_12345';
+  const transfer = await ctx.fintoc.v2.crossborder.transfers.get(transferId);
+
+  t.is(transfer.constructor.name, 'CrossborderTransfer');
+  t.is(transfer.method, 'get');
+  t.is(transfer.url, `v2/crossborder/transfers/${transferId}`);
+});
+
 test('fintoc.v2.entities.settlementAccount()', async (t) => {
   const ctx: any = t.context;
   const entityId = 'ent_12345';
