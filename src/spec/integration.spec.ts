@@ -1461,6 +1461,27 @@ test('fintoc.v2.checkoutSessions.expire()', async (t) => {
   t.is(checkoutSession.url, `v2/checkout_sessions/${checkoutSessionId}/expire`);
 });
 
+test('fintoc.v2.checkoutSessions.confirm()', async (t) => {
+  const ctx: any = t.context;
+  const checkoutSessionId = 'checkout_session_id';
+  const checkoutSession = await ctx.fintoc.v2.checkoutSessions.confirm(checkoutSessionId);
+
+  t.is(checkoutSession.method, 'post');
+  t.is(checkoutSession.url, `v2/checkout_sessions/${checkoutSessionId}/confirm`);
+  t.true(checkoutSession.headers['Idempotency-Key'] && checkoutSession.headers['Idempotency-Key'].length > 0);
+});
+
+test('fintoc.v2.checkoutSessions.confirm() with idempotency key', async (t) => {
+  const ctx: any = t.context;
+  const checkoutSessionId = 'checkout_session_id';
+  const checkoutSession = await ctx.fintoc.v2.checkoutSessions.confirm(checkoutSessionId, {
+    idempotency_key: 'idem_123',
+  });
+
+  t.is(checkoutSession.json.idempotency_key, undefined);
+  t.is(checkoutSession.headers['Idempotency-Key'], 'idem_123');
+});
+
 test('fintoc.v2.invoices.list()', async (t) => {
   const ctx: any = t.context;
   const invoices = await ctx.fintoc.v2.invoices.list();
