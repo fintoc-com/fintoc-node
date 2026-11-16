@@ -376,6 +376,11 @@ const transfers = await fintocClient.v2.crossborder.transfers.list({
   direction: 'mx_to_usd',
 });
 
+const canceledTransfer = await fintocClient.v2.crossborder.transfers.cancel('xbt_12345678');
+
+// Test mode only: simulates the credit of a transfer
+const creditedTransfer = await fintocClient.v2.crossborder.transfers.simulateCredit('xbt_87654321');
+
 await fintocClient.v2.crossborder.beneficiaries.delete(beneficiary.id);
 ```
 
