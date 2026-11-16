@@ -80,3 +80,18 @@ test.serial('refresh intent create sends its arguments as query parameters', asy
   t.deepEqual(config.params, { link_token: 'link_token', refresh_type: 'historical' });
   t.is(config.data, undefined);
 });
+
+test.serial('payment method installments sends amount and currency as query parameters', async (t) => {
+  request.resolves({ data: { available_installments: [3, 6, 12] } });
+
+  const installments = await new Fintoc('sk_test_installments').v2.paymentMethods.installments(
+    'pm_123',
+    { amount: 100000, currency: 'CLP' },
+  );
+
+  const config = request.firstCall.args[0];
+  t.is(config.method, 'get');
+  t.true(config.url.endsWith('/v2/payment_methods/pm_123/installments'));
+  t.deepEqual(config.params, { amount: 100000, currency: 'CLP' });
+  t.deepEqual(installments.available_installments, [3, 6, 12]);
+});

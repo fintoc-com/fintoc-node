@@ -422,6 +422,15 @@ A payment method can be canceled by its id:
 const canceledPaymentMethod = await fintocClient.v2.paymentMethods.cancel(paymentMethod.id);
 ```
 
+The installments available for a card payment method are fetched for an amount and currency. Debit, prepaid and foreign cards return an empty list:
+
+```javascript
+const { available_installments } = await fintocClient.v2.paymentMethods.installments(
+  'pm_0ujsswThIGTUYm2K8FjOOfXtY1K',
+  { amount: 100000, currency: 'CLP' },
+);
+```
+
 ### Payouts
 
 The resources of a payout are listed by `resource_type` (`payment_intent`, `charge`, `refund` or `refund_adjustment`):
