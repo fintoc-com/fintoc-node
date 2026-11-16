@@ -2545,6 +2545,50 @@ test('fintoc.v2.crossborder.transfers.get()', async (t) => {
   t.is(transfer.url, `v2/crossborder/transfers/${transferId}`);
 });
 
+test('fintoc.v2.crossborder.transfers.cancel()', async (t) => {
+  const ctx: any = t.context;
+  const transferId = 'xbt_12345';
+  const transfer = await ctx.fintoc.v2.crossborder.transfers.cancel(transferId);
+
+  t.is(transfer.constructor.name, 'CrossborderTransfer');
+  t.is(transfer.method, 'post');
+  t.is(transfer.url, `v2/crossborder/transfers/${transferId}/cancel`);
+  t.true(transfer.headers['Idempotency-Key'] && transfer.headers['Idempotency-Key'].length > 0);
+});
+
+test('fintoc.v2.crossborder.transfers.cancel() with idempotency key', async (t) => {
+  const ctx: any = t.context;
+  const transferId = 'xbt_12345';
+  const transfer = await ctx.fintoc.v2.crossborder.transfers.cancel(transferId, {
+    idempotency_key: 'idem_123',
+  });
+
+  t.is(transfer.headers['Idempotency-Key'], 'idem_123');
+  t.is(transfer.json.idempotency_key, undefined);
+});
+
+test('fintoc.v2.crossborder.transfers.simulateCredit()', async (t) => {
+  const ctx: any = t.context;
+  const transferId = 'xbt_12345';
+  const transfer = await ctx.fintoc.v2.crossborder.transfers.simulateCredit(transferId);
+
+  t.is(transfer.constructor.name, 'CrossborderTransfer');
+  t.is(transfer.method, 'post');
+  t.is(transfer.url, `v2/crossborder/transfers/${transferId}/simulate_credit`);
+  t.true(transfer.headers['Idempotency-Key'] && transfer.headers['Idempotency-Key'].length > 0);
+});
+
+test('fintoc.v2.crossborder.transfers.simulateCredit() with idempotency key', async (t) => {
+  const ctx: any = t.context;
+  const transferId = 'xbt_12345';
+  const transfer = await ctx.fintoc.v2.crossborder.transfers.simulateCredit(transferId, {
+    idempotency_key: 'idem_123',
+  });
+
+  t.is(transfer.headers['Idempotency-Key'], 'idem_123');
+  t.is(transfer.json.idempotency_key, undefined);
+});
+
 test('fintoc.v2.entities.settlementAccount()', async (t) => {
   const ctx: any = t.context;
   const entityId = 'ent_12345';
