@@ -5,7 +5,7 @@ import { PaymentMethod } from '../../resources/v2/paymentMethod';
 
 export class PaymentMethodsManager extends ManagerMixin<PaymentMethod> {
   static resource = 'payment_method';
-  static methods = ['list', 'get', 'create', 'cancel', 'mandateDocument'];
+  static methods = ['list', 'get', 'create', 'cancel', 'mandateDocument', 'installments'];
 
   create(args?: MultipartArguments): Promise<PaymentMethod> {
     const { idempotency_key: idempotencyKey, ...fields } = args || {};
@@ -23,6 +23,14 @@ export class PaymentMethodsManager extends ManagerMixin<PaymentMethod> {
     args?: ResourceArguments,
   ): Promise<GenericFintocResource> {
     const path = `${this.buildPath()}/${paymentMethodId}/mandate_document`;
+    return this._action<GenericFintocResource>('get', path, { resource: null, args });
+  }
+
+  installments(
+    paymentMethodId: string,
+    args: { amount: number; currency: string },
+  ): Promise<GenericFintocResource> {
+    const path = `${this.buildPath()}/${paymentMethodId}/installments`;
     return this._action<GenericFintocResource>('get', path, { resource: null, args });
   }
 }
