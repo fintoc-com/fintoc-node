@@ -335,6 +335,16 @@ const updatedRecipient = await fintocClient.v2.recipients.update(recipient.id, {
 await fintocClient.v2.recipients.delete(recipient.id);
 ```
 
+### Customers
+
+Updating a customer replaces its whole `metadata`. Other fields are ignored:
+
+```javascript
+const customer = await fintocClient.v2.customers.update('cus_0ujsswThIGTUYm2K8FjOOfXtY1K', {
+  metadata: { channel: 'digital' },
+});
+```
+
 ### Account certificates
 
 You can get the certificate of an account, or of one of its account numbers:

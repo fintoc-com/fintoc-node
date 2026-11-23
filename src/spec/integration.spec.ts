@@ -1411,6 +1411,18 @@ test('fintoc.v2.customers.create()', async (t) => {
   t.is(customer.json.email, customerData.email);
 });
 
+test('fintoc.v2.customers.update()', async (t) => {
+  const ctx: any = t.context;
+  const customerId = 'customer_id';
+  const customer = await ctx.fintoc.v2.customers.update(customerId, {
+    metadata: { channel: 'digital' },
+  });
+
+  t.is(customer.method, 'patch');
+  t.is(customer.url, `v2/customers/${customerId}`);
+  t.is(customer.json.metadata.channel, 'digital');
+});
+
 test('fintoc.v2.checkoutSessions.list()', async (t) => {
   const ctx: any = t.context;
   const checkoutSessions = await ctx.fintoc.v2.checkoutSessions.list();
