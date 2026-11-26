@@ -37,7 +37,6 @@ export class Client {
       this.#client = axios.create({
         baseURL: this.baseUrl,
         headers: this.staticHeaders,
-        params: this.params,
       });
     }
     return this.#client;
