@@ -1,3 +1,5 @@
+import * as crypto from 'crypto';
+
 import test from 'ava';
 
 import { Client } from '../../lib/client';
@@ -78,4 +80,24 @@ test('"Client" params extension', (t) => {
   const newClient = client.extend({ params: newParams });
   t.assert(Object.keys(newClient.params).length === Object.keys(client.params).length + 1);
   t.assert(newClient.params.first_param !== client.params.first_param);
+});
+
+test('"Client" extension preserves JWS signer when jwsPrivateKey is not overridden', (t) => {
+  const ctx: any = t.context;
+  const { privateKey } = crypto.generateKeyPairSync('rsa', {
+    modulusLength: 2048,
+    publicKeyEncoding: { type: 'spki', format: 'pem' },
+    privateKeyEncoding: { type: 'pkcs8', format: 'pem' },
+  });
+
+  const client = new Client({
+    baseUrl: ctx.baseURL,
+    apiKey: ctx.apiKey,
+    userAgent: ctx.userAgent,
+    jwsPrivateKey: privateKey,
+  });
+
+  const extended = client.extend({ params: { link_token: 'link_token_123' } });
+  t.truthy(extended.jws);
+  t.is(extended.jws, client.jws);
 });

@@ -11,7 +11,7 @@ import { JWSSignature } from './jws';
 import { paginate } from './paginator';
 
 export class Client {
-  static #client?: AxiosInstance;
+  #client?: AxiosInstance;
 
   baseUrl: string;
   apiKey: string;
@@ -33,14 +33,13 @@ export class Client {
   }
 
   private get client() {
-    if (Client.#client === undefined) {
-      Client.#client = axios.create({
+    if (this.#client === undefined) {
+      this.#client = axios.create({
         baseURL: this.baseUrl,
         headers: this.staticHeaders,
-        params: this.params,
       });
     }
-    return Client.#client;
+    return this.#client;
   }
 
   get staticHeaders() {
@@ -86,14 +85,19 @@ export class Client {
 
   extend(extension?: IExtendOptions) {
     const {
-      baseUrl, apiKey, userAgent, params,
+      baseUrl, apiKey, userAgent, params, jwsPrivateKey,
     } = (extension || {});
-    return new Client({
+    const extendedClient = new Client({
       baseUrl: baseUrl || this.baseUrl,
       apiKey: apiKey || this.apiKey,
       userAgent: userAgent || this.userAgent,
       params: params ? { ...this.params, ...params } : { ...this.params },
+      jwsPrivateKey,
     });
+    if (!jwsPrivateKey && this.jws) {
+      extendedClient.jws = this.jws;
+    }
+    return extendedClient;
   }
 
   private buildHeaders(
